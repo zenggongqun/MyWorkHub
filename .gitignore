@@ -1,0 +1,10 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# WorkHub local exports
+workhub-*.json
+
+# Optional local env files
+.env
+.env.*
