@@ -266,6 +266,43 @@
         color: color-mix(in oklab, var(--accent-3) 70%, var(--ink));
       }
 
+      .todo-head {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .seg {
+        display: inline-flex;
+        border: 1px solid color-mix(in oklab, var(--rule) 82%, transparent);
+        background: color-mix(in oklab, white 76%, var(--cream));
+        border-radius: 999px;
+        padding: 2px;
+        box-shadow: 0 8px 16px rgba(12, 27, 29, 0.06);
+      }
+
+      .segbtn {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: color-mix(in oklab, var(--muted) 84%, var(--ink));
+        padding: 6px 9px;
+        font-size: 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .segbtn[aria-selected="true"] {
+        background: linear-gradient(180deg, white, color-mix(in oklab, white 72%, var(--cream)));
+        color: var(--ink);
+        box-shadow: 0 10px 18px rgba(12, 27, 29, 0.08);
+      }
+
+      .segbtn:active {
+        transform: translateY(1px);
+      }
+
       .countdown-row {
         display: grid;
         grid-template-columns: auto 1fr;
@@ -371,17 +408,25 @@
       .todoquick {
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 8px;
-        margin-bottom: 10px;
+        gap: 9px;
+        margin-bottom: 12px;
       }
 
       .todoquick input,
       .todoquick select {
-        border: 1px solid color-mix(in oklab, var(--rule) 84%, transparent);
-        background: color-mix(in oklab, white 76%, var(--cream));
-        border-radius: 11px;
-        padding: 9px 10px;
+        border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
+        background: linear-gradient(180deg, color-mix(in oklab, white 82%, var(--cream)), color-mix(in oklab, white 74%, var(--cream)));
+        border-radius: 12px;
+        padding: 9px 11px;
         font-size: 12px;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .todoquick input:focus-visible,
+      .todoquick select:focus-visible {
+        outline: none;
+        border-color: color-mix(in oklab, var(--accent) 42%, var(--rule));
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
       }
 
       .todoquick input[type="date"] {
@@ -389,59 +434,106 @@
       }
 
       .todo-g {
-        margin-top: 8px;
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 14px;
+        border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(241, 252, 248, 0.66));
       }
 
       .todo-gh {
         font-size: 11px;
-        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin: 0 0 6px;
+        color: color-mix(in oklab, var(--muted) 76%, var(--ink));
+        letter-spacing: 0.06em;
+        margin: 0 0 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .todo-gh::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 99px;
+        background: linear-gradient(140deg, var(--accent), color-mix(in oklab, var(--accent-3) 35%, var(--accent)));
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
       }
 
       .todo-list {
         display: grid;
-        gap: 6px;
+        gap: 7px;
       }
 
       .todo-item {
-        border: 1px solid color-mix(in oklab, var(--rule) 84%, transparent);
-        border-radius: 12px;
-        background: color-mix(in oklab, white 78%, var(--cream));
-        box-shadow: 0 8px 16px rgba(12, 27, 29, 0.07);
-        padding: 7px 8px;
+        border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
+        border-radius: 14px;
+        background: linear-gradient(180deg, color-mix(in oklab, white 83%, var(--cream)), color-mix(in oklab, white 75%, var(--cream)));
+        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.08);
+        padding: 8px 9px;
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: 8px;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+        animation: todoRise 240ms cubic-bezier(0.22, 0.9, 0.24, 1) both;
+      }
+
+      .todo-item:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent) 34%, var(--rule));
+        box-shadow: 0 14px 28px rgba(12, 27, 29, 0.1);
       }
 
       .todo-item.done {
-        opacity: 0.56;
+        border-color: color-mix(in oklab, var(--accent) 24%, var(--rule));
+        background: linear-gradient(180deg, color-mix(in oklab, #dff8ed 70%, white), color-mix(in oklab, #dff8ed 58%, var(--cream)));
+        box-shadow: 0 10px 20px rgba(18, 121, 94, 0.12);
       }
 
       .todo-item.done .todo-t {
         text-decoration: line-through;
+        text-decoration-thickness: 1.4px;
+        color: color-mix(in oklab, var(--muted) 70%, var(--ink));
       }
 
       .todo-cb {
-        width: 16px;
-        height: 16px;
+        width: 17px;
+        height: 17px;
+        accent-color: color-mix(in oklab, var(--accent) 78%, #0f766e);
+        cursor: pointer;
+        transition: transform 140ms ease;
+      }
+
+      .todo-cb:checked {
+        transform: scale(1.08);
       }
 
       .todo-t {
-        font-size: 12px;
+        font-size: 12.5px;
+        font-weight: 600;
         line-height: 1.35;
       }
 
       .todo-empty {
-        margin-top: 3px;
-        border: 1px dashed color-mix(in oklab, var(--rule) 88%, transparent);
-        border-radius: 11px;
-        padding: 8px;
-        font-size: 11px;
-        color: color-mix(in oklab, var(--muted) 92%, var(--ink));
+        margin-top: 4px;
+        border: 1px dashed color-mix(in oklab, var(--accent) 26%, var(--rule));
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 11.5px;
+        color: color-mix(in oklab, var(--muted) 86%, var(--ink));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(230, 250, 244, 0.5));
+      }
+
+      @keyframes todoRise {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .panel .hd .row {
@@ -1563,8 +1655,13 @@
         .btn,
         .card,
         .cat,
-        .iconbtn {
+        .iconbtn,
+        .todo-item,
+        .todo-cb {
           transition: none;
+        }
+        .todo-item {
+          animation: none;
         }
       }
 
@@ -1941,20 +2038,11 @@
           </section>
 
           <aside class="panel reveal d3 planpanel" aria-label="周计划">
-            <div class="hd">
-              <div class="row">
-                <div>
-                  <div class="title">工作节奏</div>
-                  <div class="sub">周一开局，轻一点，也稳一点</div>
-                </div>
-              </div>
-            </div>
-
             <div class="planbody">
               <section class="plancard" aria-label="放假倒计时">
                 <div class="plan-h">
                   <strong>放假倒计时</strong>
-                  <a href="#modal-holidays" class="plan-link" id="open-holidays-modal">配置法定假日</a>
+                  <a href="#modal-holidays" class="plan-link" id="open-holidays-modal">管理假日</a>
                 </div>
                 <div class="countdown-row">
                   <span class="countdown-k">周末</span>
@@ -1988,10 +2076,16 @@
                 <div class="calgrid" id="calendar-grid" role="grid" aria-label="月历"></div>
               </section>
 
-              <section class="plancard" aria-label="本周待办">
+              <section class="plancard" aria-label="待办">
                 <div class="plan-h">
-                  <strong>本周待办</strong>
-                  <span class="plan-link" id="todo-week-label"></span>
+                  <strong id="todo-panel-title">待办</strong>
+                  <span class="todo-head">
+                    <span class="seg" role="tablist" aria-label="待办维度">
+                      <button id="todo-view-week-btn" class="segbtn" type="button" data-action="todo-view-week" aria-selected="true">周</button>
+                      <button id="todo-view-month-btn" class="segbtn" type="button" data-action="todo-view-month" aria-selected="false">月</button>
+                    </span>
+                    <span class="plan-link" id="todo-week-label"></span>
+                  </span>
                 </div>
 
                 <form class="todoquick" id="todo-quick-form">
@@ -2297,6 +2391,10 @@
               <option value="7">周日</option>
             </select>
           </div>
+          <div class="field">
+            <label for="tm">所属月份</label>
+            <input id="tm" type="month" />
+          </div>
         </div>
         <div class="ft">
           <a class="btn ghost" href="#">取消</a>
@@ -2385,6 +2483,11 @@
 
         const STORAGE_KEY = "workhub.db";
         const DB_VERSION = 2;
+        const HOLIDAY_COUNTRY = "CN";
+        const HOLIDAY_API_BASE = "https://date.nager.at/Api/v3/PublicHolidays";
+        const HOLIDAY_CACHE_PREFIX = "workhub.holidays.cache.v1.";
+        const HOLIDAY_CACHE_TTL_MS = 86400000 * 90;
+        const HOLIDAY_MANUAL_KEY = "workhub.holidays.manual.v1";
         const ALL_CATEGORY_ID = "all";
         const COLOR_TOKENS = new Set(["mint", "sky", "aqua", "coral", "lemon", "lilac", "slate"]);
         const COMMON_ENGINES = [
@@ -2451,7 +2554,9 @@
             deletingLinkId: null,
             deletingCategoryId: null,
             editingTodoId: null,
+            editingTodoScope: "week", // week | month
             deletingTodoId: null,
+            deletingTodoScope: "week", // week | month
             deletingHolidayId: null,
             draggingPresetEngineId: null,
             draggingLinkId: null,
@@ -2462,6 +2567,7 @@
             readOnly: false,
             pageLoaded: false,
             toastTimer: null,
+            holidayAutoStatus: "idle", // idle | loading | ok | error | manual
           },
         };
 
@@ -2517,6 +2623,8 @@
           calendarMonthTitle: document.getElementById("calendar-month-title"),
           calendarGrid: document.getElementById("calendar-grid"),
           todoWeekLabel: document.getElementById("todo-week-label"),
+          todoViewWeekBtn: document.getElementById("todo-view-week-btn"),
+          todoViewMonthBtn: document.getElementById("todo-view-month-btn"),
           todoGroups: document.getElementById("todo-groups"),
           todoQuickForm: document.getElementById("todo-quick-form"),
           todoQuickTitle: document.getElementById("todo-quick-title"),
@@ -2524,6 +2632,7 @@
           todoModalTitle: document.getElementById("todo-modal-title"),
           todoTitleInput: document.getElementById("tt"),
           todoDaySelect: document.getElementById("td"),
+          todoMonthInput: document.getElementById("tm"),
           todoSaveBtn: document.getElementById("todo-save-btn"),
           dangerTodoName: document.getElementById("danger-todo-name"),
           todoDeleteConfirmBtn: document.getElementById("todo-delete-confirm-btn"),
@@ -2543,6 +2652,7 @@
           saveDb();
           bindEvents();
           renderAll();
+          ensureAutoHolidays();
           syncColorPalette((els.categoryColorSelect && els.categoryColorSelect.value) || "sky");
           syncModalWithHash();
           window.addEventListener("hashchange", syncModalWithHash);
@@ -2600,6 +2710,7 @@
               weekStart: "mon",
               selectedDate: formatYmd(new Date(now)),
               calendarMonth: formatYm(new Date(now)),
+              todoView: "week",
               todos: [],
               holidays: [
                 { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now },
@@ -2739,9 +2850,29 @@
           const selectedDate = parseYmd(safeString(source.selectedDate)) ? safeString(source.selectedDate) : formatYmd(new Date(now));
           const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(source.calendarMonth)) ? safeString(source.calendarMonth) : selectedDate.slice(0, 7);
           const weekStart = "mon";
+          const todoView = safeString(source.todoView) === "month" ? "month" : "week";
           const todos = (Array.isArray(source.todos) ? source.todos : [])
             .map((todo, index) => normalizeTodo(todo, index, now))
+            .filter(Boolean);
+
+          const legacyMonthTodos = (Array.isArray(source.monthTodos) ? source.monthTodos : [])
+            .map((todo, index) => normalizeMonthTodo(todo, index, now))
             .filter(Boolean)
+            .map((todo, index) => ({
+              id: todo.id,
+              title: todo.title,
+              date: lastDayOfMonthYmd(todo.monthKey),
+              weekKey: "",
+              day: "",
+              monthKey: todo.monthKey,
+              scope: "month",
+              done: todo.done,
+              order: Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10,
+              createdAt: todo.createdAt,
+              updatedAt: todo.updatedAt,
+            }));
+
+          const mergedTodos = [...todos, ...legacyMonthTodos]
             .sort((a, b) => a.order - b.order);
           const holidays = (Array.isArray(source.holidays) ? source.holidays : [])
             .map((holiday, index) => normalizeHoliday(holiday, index, now))
@@ -2751,7 +2882,8 @@
             weekStart,
             selectedDate,
             calendarMonth,
-            todos,
+            todoView,
+            todos: mergedTodos,
             holidays,
           };
         }
@@ -2766,6 +2898,8 @@
           const day = Number.isInteger(dayNum) && dayNum >= 1 && dayNum <= 7 ? String(dayNum) : "";
           const fallbackDate = date ? parseYmd(date) : new Date(now);
           const weekKey = /^\d{4}-W\d{2}$/.test(safeString(todo.weekKey)) ? safeString(todo.weekKey) : weekKeyForDate(fallbackDate);
+          const scope = safeString(todo.scope) === "month" ? "month" : "week";
+          const monthKey = /^\d{4}-\d{2}$/.test(safeString(todo.monthKey)) ? safeString(todo.monthKey) : "";
           const order = Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10;
           return {
             id: safeString(todo.id) || uid("todo"),
@@ -2773,11 +2907,43 @@
             date,
             weekKey,
             day,
+            monthKey,
+            scope,
             done: Boolean(todo.done),
             order,
             createdAt: Number.isFinite(Number(todo.createdAt)) ? Number(todo.createdAt) : now,
             updatedAt: Number.isFinite(Number(todo.updatedAt)) ? Number(todo.updatedAt) : now,
           };
+        }
+
+        function normalizeMonthTodo(todo, index, now) {
+          if (!todo || typeof todo !== "object") return null;
+          const title = safeString(todo.title);
+          if (!title) return null;
+          const monthKey = safeString(todo.monthKey);
+          if (!/^\d{4}-\d{2}$/.test(monthKey)) return null;
+          const order = Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10;
+          return {
+            id: safeString(todo.id) || uid("mtodo"),
+            title,
+            monthKey,
+            done: Boolean(todo.done),
+            order,
+            createdAt: Number.isFinite(Number(todo.createdAt)) ? Number(todo.createdAt) : now,
+            updatedAt: Number.isFinite(Number(todo.updatedAt)) ? Number(todo.updatedAt) : now,
+          };
+        }
+
+        function endOfWeekMon(date) {
+          const ws = startOfWeekMon(date);
+          return new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
+        }
+
+        function lastDayOfMonthYmd(monthKey) {
+          const base = parseYm(monthKey);
+          if (!base) return "";
+          const last = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+          return formatYmd(last);
         }
 
         function normalizeHoliday(holiday, index, now) {
@@ -3493,6 +3659,15 @@
             return;
           }
 
+          const viewBtn = event.target.closest("button[data-action='todo-view-week'], button[data-action='todo-view-month']");
+          if (viewBtn) {
+            const action = viewBtn.getAttribute("data-action");
+            state.db.plan.todoView = action === "todo-view-month" ? "month" : "week";
+            saveDb();
+            renderPlanPanel();
+            return;
+          }
+
           const dayBtn = event.target.closest(".calday[data-date]");
           if (!dayBtn) return;
           const date = safeString(dayBtn.getAttribute("data-date"));
@@ -3511,6 +3686,32 @@
             return;
           }
           const now = Date.now();
+
+          const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
+          if (view === "month") {
+            const monthKey = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
+              ? safeString(state.db.plan.calendarMonth)
+              : formatYm(new Date(now));
+            state.db.plan.todos.push({
+              id: uid("todo"),
+              title,
+              date: lastDayOfMonthYmd(monthKey),
+              weekKey: "",
+              day: "",
+              monthKey,
+              scope: "month",
+              done: false,
+              order: nextOrder(state.db.plan.todos.filter((item) => item.scope === "month" && item.monthKey === monthKey)),
+              createdAt: now,
+              updatedAt: now,
+            });
+            if (els.todoQuickTitle) els.todoQuickTitle.value = "";
+            saveDb();
+            renderPlanPanel();
+            toast("已新增", "本月待办已加入清单。", false);
+            return;
+          }
+
           const selectedDate = parseYmd(safeString(els.todoQuickDate && els.todoQuickDate.value))
             || parseYmd(state.db.plan.selectedDate)
             || new Date();
@@ -3523,6 +3724,8 @@
             date,
             weekKey,
             day,
+            monthKey: "",
+            scope: "week",
             done: false,
             order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
             createdAt: now,
@@ -3534,7 +3737,7 @@
           state.db.plan.calendarMonth = date.slice(0, 7);
           saveDb();
           renderPlanPanel();
-          toast("已新增", "待办已加入本周清单。");
+          toast("已新增", "小目标已加入清单，今天继续稳稳推进。", false);
         }
 
         function onTodoGroupsClick(event) {
@@ -3543,11 +3746,14 @@
           const todoId = actionNode.getAttribute("data-todo-id");
           if (!todoId) return;
           const action = actionNode.getAttribute("data-action");
+          const scope = safeString(actionNode.getAttribute("data-todo-scope")) === "month" ? "month" : "week";
           if (action === "edit-todo") {
             state.ui.editingTodoId = todoId;
+            state.ui.editingTodoScope = scope;
           }
           if (action === "delete-todo") {
             state.ui.deletingTodoId = todoId;
+            state.ui.deletingTodoScope = scope;
           }
         }
 
@@ -3561,29 +3767,73 @@
           todo.updatedAt = Date.now();
           saveDb();
           renderPlanPanel();
+          if (todo.done) {
+            toast("已完成", "太棒了，又完成一件事。", false);
+          }
         }
 
         function onTodoSave(event) {
           event.preventDefault();
           const title = safeString(els.todoTitleInput && els.todoTitleInput.value);
+          const scope = state.ui.editingTodoScope === "month" || (state.db.plan && state.db.plan.todoView === "month") ? "month" : "week";
           const day = normalizeDayValue(els.todoDaySelect && els.todoDaySelect.value);
           if (!title) {
             toast("校验失败", "请输入待办标题。", true);
             return;
           }
+          const now = Date.now();
+
+          if (scope === "month") {
+            const monthKey = /^\d{4}-\d{2}$/.test(safeString(els.todoMonthInput && els.todoMonthInput.value))
+              ? safeString(els.todoMonthInput && els.todoMonthInput.value)
+              : (/^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth)) ? safeString(state.db.plan.calendarMonth) : formatYm(new Date(now)));
+            const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
+            if (editing) {
+              editing.title = title;
+              editing.scope = "month";
+              editing.monthKey = monthKey;
+              editing.date = lastDayOfMonthYmd(monthKey);
+              editing.weekKey = "";
+              editing.day = "";
+              editing.updatedAt = now;
+            } else {
+              state.db.plan.todos.push({
+                id: uid("todo"),
+                title,
+                date: lastDayOfMonthYmd(monthKey),
+                weekKey: "",
+                day: "",
+                monthKey,
+                scope: "month",
+                done: false,
+                order: nextOrder(state.db.plan.todos.filter((item) => item.scope === "month" && item.monthKey === monthKey)),
+                createdAt: now,
+                updatedAt: now,
+              });
+            }
+            state.ui.editingTodoId = null;
+            state.ui.editingTodoScope = "week";
+            saveDb();
+            renderPlanPanel();
+            closeHashModal();
+            toast("已保存", "本月待办已更新。", false);
+            return;
+          }
+
           const selected = parseYmd(state.db.plan.selectedDate) || new Date();
           const weekKey = weekKeyForDate(selected);
           const baseWeekStart = startOfWeekMon(selected);
           const date = day
             ? formatYmd(new Date(baseWeekStart.getFullYear(), baseWeekStart.getMonth(), baseWeekStart.getDate() + Number(day) - 1))
-            : formatYmd(selected);
-          const now = Date.now();
+            : formatYmd(endOfWeekMon(selected));
           const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
           if (editing) {
             editing.title = title;
             editing.date = date;
             editing.day = day;
             editing.weekKey = weekKey;
+            editing.scope = "week";
+            editing.monthKey = "";
             editing.updatedAt = now;
           } else {
             state.db.plan.todos.push({
@@ -3592,6 +3842,8 @@
               date,
               weekKey,
               day,
+              monthKey: "",
+              scope: "week",
               done: false,
               order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
               createdAt: now,
@@ -3599,10 +3851,11 @@
             });
           }
           state.ui.editingTodoId = null;
+          state.ui.editingTodoScope = "week";
           saveDb();
           renderPlanPanel();
           closeHashModal();
-          toast("已保存", "待办已更新。", false);
+          toast("已保存", "安排已更新，节奏很稳。", false);
         }
 
         function onTodoDeleteConfirm(event) {
@@ -3617,10 +3870,11 @@
           const removed = state.db.plan.todos[idx];
           state.db.plan.todos.splice(idx, 1);
           state.ui.deletingTodoId = null;
+          state.ui.deletingTodoScope = "week";
           saveDb();
           renderPlanPanel();
           closeHashModal();
-          toast("已删除", `已删除待办：${removed.title}`);
+          toast("已删除", `已移除：${removed.title}`);
         }
 
         function onHolidayAdd(event) {
@@ -3646,6 +3900,7 @@
             createdAt: now,
             updatedAt: now,
           });
+          markHolidayManual();
           saveDb();
           renderPlanPanel();
           fillHolidayModal();
@@ -3661,6 +3916,7 @@
           if (idx < 0) return;
           const removed = state.db.plan.holidays[idx];
           state.db.plan.holidays.splice(idx, 1);
+          markHolidayManual();
           saveDb();
           renderPlanPanel();
           renderHolidayList();
@@ -3766,15 +4022,37 @@
 
         function fillTodoModal() {
           const selectedDate = parseYmd(state.db.plan.selectedDate) || new Date();
-          const defaultDay = String(weekdayMon(selectedDate));
+          const defaultDay = "7";
+          const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
+          const scope = state.ui.editingTodoScope === "month" ? "month" : view;
+          if (!state.ui.editingTodoId) {
+            state.ui.editingTodoScope = scope;
+          }
           const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
+
+          const monthKey = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
+            ? safeString(state.db.plan.calendarMonth)
+            : formatYm(selectedDate);
+          if (els.todoMonthInput) {
+            els.todoMonthInput.value = monthKey;
+            els.todoMonthInput.closest(".field").hidden = scope !== "month";
+          }
+          if (els.todoDaySelect) {
+            els.todoDaySelect.closest(".field").hidden = scope === "month";
+          }
+
           if (editing) {
-            if (els.todoModalTitle) els.todoModalTitle.textContent = "编辑待办";
+            if (els.todoModalTitle) els.todoModalTitle.textContent = scope === "month" ? "编辑本月待办" : "编辑待办";
             if (els.todoTitleInput) els.todoTitleInput.value = editing.title;
-            if (els.todoDaySelect) els.todoDaySelect.value = editing.day || "";
+            if (scope === "month") {
+              if (els.todoMonthInput) els.todoMonthInput.value = editing.monthKey;
+            } else {
+              if (els.todoDaySelect) els.todoDaySelect.value = editing.day || "";
+            }
             return;
           }
-          if (els.todoModalTitle) els.todoModalTitle.textContent = "新增待办";
+
+          if (els.todoModalTitle) els.todoModalTitle.textContent = scope === "month" ? "新增本月待办" : "新增待办";
           if (els.todoTitleInput) els.todoTitleInput.value = "";
           if (els.todoDaySelect) els.todoDaySelect.value = defaultDay;
         }
@@ -4066,7 +4344,19 @@
 
           const holiday = getNearestHoliday(now);
           if (!holiday) {
-            els.holidayCountdown.textContent = "尚未配置，点击右上角添加";
+            if (state.ui.holidayAutoStatus === "loading") {
+              els.holidayCountdown.textContent = "正在自动获取...";
+              return;
+            }
+            if (state.ui.holidayAutoStatus === "error") {
+              els.holidayCountdown.textContent = "自动获取失败，可点击右上角手动添加";
+              return;
+            }
+            if (state.ui.holidayAutoStatus === "manual") {
+              els.holidayCountdown.textContent = "尚未设置假日，可点击右上角手动添加";
+              return;
+            }
+            els.holidayCountdown.textContent = "正在准备假日数据...";
             return;
           }
 
@@ -4076,6 +4366,136 @@
           }
 
           els.holidayCountdown.textContent = `${holiday.name} 还有 ${holiday.days} 天`;
+        }
+
+        function markHolidayManual() {
+          try {
+            localStorage.setItem(HOLIDAY_MANUAL_KEY, "1");
+          } catch (_error) {
+          }
+          state.ui.holidayAutoStatus = "manual";
+        }
+
+        function isHolidayManual() {
+          return safeReadStorage(HOLIDAY_MANUAL_KEY) === "1";
+        }
+
+        async function ensureAutoHolidays() {
+          if (!state.db || !state.db.plan) return;
+          if (isHolidayManual()) {
+            state.ui.holidayAutoStatus = "manual";
+            return;
+          }
+          if (Array.isArray(state.db.plan.holidays) && state.db.plan.holidays.length) {
+            state.ui.holidayAutoStatus = "ok";
+            return;
+          }
+
+          state.ui.holidayAutoStatus = "loading";
+          renderPlanPanel();
+          const now = Date.now();
+          const year = new Date().getFullYear();
+          const years = [year, year + 1];
+          try {
+            const all = [];
+            for (let i = 0; i < years.length; i += 1) {
+              const y = years[i];
+              const raw = await loadOrFetchHolidaysForYear(y);
+              all.push(...raw);
+            }
+            const normalized = nagerToRanges(all, now)
+              .sort((a, b) => a.startDate.localeCompare(b.startDate));
+            state.db.plan.holidays = normalized;
+            saveDb();
+            state.ui.holidayAutoStatus = normalized.length ? "ok" : "error";
+            renderPlanPanel();
+          } catch (_error) {
+            state.ui.holidayAutoStatus = "error";
+            renderPlanPanel();
+          }
+        }
+
+        async function loadOrFetchHolidaysForYear(year) {
+          const cacheKey = `${HOLIDAY_CACHE_PREFIX}${HOLIDAY_COUNTRY}.${year}`;
+          const cached = safeReadStorage(cacheKey);
+          if (cached) {
+            try {
+              const payload = JSON.parse(cached);
+              if (payload
+                && Array.isArray(payload.data)
+                && Number.isFinite(Number(payload.fetchedAt))
+                && (Date.now() - Number(payload.fetchedAt)) < HOLIDAY_CACHE_TTL_MS) {
+                return payload.data;
+              }
+            } catch (_error) {
+            }
+          }
+
+          const controller = new AbortController();
+          const timer = window.setTimeout(() => controller.abort(), 8000);
+          try {
+            const url = `${HOLIDAY_API_BASE}/${year}/${HOLIDAY_COUNTRY}`;
+            const res = await fetch(url, { signal: controller.signal });
+            if (!res.ok) throw new Error(`http_${res.status}`);
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : [];
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify({ fetchedAt: Date.now(), data: list }));
+            } catch (_error) {
+            }
+            return list;
+          } finally {
+            window.clearTimeout(timer);
+          }
+        }
+
+        function nagerToRanges(items, now) {
+          const list = Array.isArray(items) ? items : [];
+          const normalized = list
+            .map((item) => {
+              const date = safeString(item && item.date);
+              const localName = safeString(item && item.localName);
+              const name = safeString(item && item.name);
+              const label = localName || name;
+              if (!label || !parseYmd(date)) return null;
+              return { date, label };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.date.localeCompare(b.date));
+          if (!normalized.length) return [];
+
+          const ranges = [];
+          let current = null;
+          normalized.forEach((item) => {
+            if (!current) {
+              current = { label: item.label, startDate: item.date, endDate: item.date };
+              return;
+            }
+            if (item.label === current.label && isNextYmd(current.endDate, item.date)) {
+              current.endDate = item.date;
+              return;
+            }
+            ranges.push(current);
+            current = { label: item.label, startDate: item.date, endDate: item.date };
+          });
+          if (current) ranges.push(current);
+
+          return ranges.map((r, index) => ({
+            id: uid("holiday"),
+            name: r.label,
+            startDate: r.startDate,
+            endDate: r.endDate,
+            order: (index + 1) * 10,
+            createdAt: now,
+            updatedAt: now,
+          }));
+        }
+
+        function isNextYmd(prevYmd, nextYmd) {
+          const prev = parseYmd(prevYmd);
+          const next = parseYmd(nextYmd);
+          if (!prev || !next) return false;
+          return (next.getTime() - prev.getTime()) === 86400000;
         }
 
         function renderCalendar() {
@@ -4118,21 +4538,60 @@
 
         function renderTodos() {
           if (!els.todoGroups || !els.todoWeekLabel) return;
+          const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
+
+          if (els.todoViewWeekBtn) els.todoViewWeekBtn.setAttribute("aria-selected", view === "week" ? "true" : "false");
+          if (els.todoViewMonthBtn) els.todoViewMonthBtn.setAttribute("aria-selected", view === "month" ? "true" : "false");
+
+          if (els.todoQuickDate) {
+            els.todoQuickDate.hidden = view === "month";
+          }
+          if (els.todoQuickTitle) {
+            els.todoQuickTitle.placeholder = view === "month" ? "记录一件本月要推进的事..." : "记录一件要推进的事...";
+          }
+
           const selected = parseYmd(state.db.plan.selectedDate) || new Date();
+          const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
+            ? safeString(state.db.plan.calendarMonth)
+            : formatYm(selected);
+
+          if (view === "month") {
+            els.todoWeekLabel.textContent = `${calendarMonth} 月`;
+            const todos = (state.db.plan.todos || [])
+              .filter((todo) => todo.scope === "month" && todo.monthKey === calendarMonth)
+              .sort((a, b) => a.order - b.order);
+            if (!todos.length) {
+              els.todoGroups.innerHTML = '<div class="todo-empty">本月还没有待办，写下一件最重要的月度目标吧。</div>';
+              return;
+            }
+            els.todoGroups.innerHTML = `
+              <section class="todo-g">
+                <h4 class="todo-gh">${calendarMonth} 月目标</h4>
+                <div class="todo-list">${todos.map((todo, index) => renderMonthTodoItem(todo, index)).join("")}</div>
+              </section>
+            `;
+            return;
+          }
+
           const weekStart = startOfWeekMon(selected);
           const weekKey = weekKeyForDate(selected);
           els.todoWeekLabel.textContent = `${formatYmd(weekStart)} 周`;
 
           const todos = state.db.plan.todos
-            .filter((todo) => todo.weekKey === weekKey)
+            .filter((todo) => todo.scope !== "month" && todo.weekKey === weekKey)
             .sort((a, b) => a.order - b.order);
 
           if (els.todoQuickDate) {
-            els.todoQuickDate.value = formatYmd(selected);
+            els.todoQuickDate.value = formatYmd(endOfWeekMon(selected));
           }
 
           if (!todos.length) {
-            els.todoGroups.innerHTML = '<div class="todo-empty">还没有待办，先新增一条今天要推进的事。</div>';
+            const selectedKey = formatYmd(selected);
+            const todayKey = formatYmd(new Date());
+            const text = selectedKey === todayKey
+              ? "今天还没安排，先写下一件最想推进的小事。"
+              : "这一天暂时空白，给它放一件轻松可完成的小目标吧。";
+            els.todoGroups.innerHTML = `<div class="todo-empty">${text}</div>`;
             return;
           }
 
@@ -4149,7 +4608,7 @@
             return `
               <section class="todo-g">
                 <h4 class="todo-gh">${formatDateTitle(date)}</h4>
-                <div class="todo-list">${list.map((todo) => renderTodoItem(todo)).join("")}</div>
+                <div class="todo-list">${list.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>
               </section>
             `;
           }).join("");
@@ -4157,20 +4616,49 @@
           els.todoGroups.innerHTML = html;
         }
 
-        function renderTodoItem(todo) {
+        function renderTodoItem(todo, index) {
+          const delay = Math.min(index * 28, 180);
           return `
-            <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}">
-              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
+            <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
+              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
               <div class="todo-t">${escHtml(todo.title)}</div>
               <div class="acts">
-                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
+                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">编辑</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
                     <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
                   </svg>
                 </a>
-                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
+                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}">
+                  <span class="sr">删除</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </a>
+              </div>
+            </article>
+          `;
+        }
+
+        function renderMonthTodoItem(todo, index) {
+          const delay = Math.min(index * 28, 180);
+          return `
+            <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
+              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
+              <div class="todo-t">${escHtml(todo.title)}</div>
+              <div class="acts">
+                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}">
+                  <span class="sr">编辑</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </a>
+                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">删除</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -4505,7 +4993,10 @@
           if (!els.holidayList) return;
           const holidays = [...state.db.plan.holidays].sort((a, b) => a.startDate.localeCompare(b.startDate));
           if (!holidays.length) {
-            els.holidayList.innerHTML = '<div class="todo-empty">还没配置法定假日。</div>';
+            const msg = state.ui.holidayAutoStatus === "loading"
+              ? "正在自动获取假日数据..."
+              : "暂时没有假日数据，可手动添加一条。";
+            els.holidayList.innerHTML = `<div class="todo-empty">${msg}</div>`;
             return;
           }
           els.holidayList.innerHTML = holidays.map((holiday) => `
