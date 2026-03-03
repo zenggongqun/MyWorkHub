@@ -1,0 +1,4776 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>WorkHub · 快速搜索与常用链接</title>
+
+    <style>
+      /*
+        WorkHub UI (HTML + CSS only)
+        - Side-by-side layout: top search, left categories, right links
+        - Tabs with icons; one search box + one button
+        - CSS-only modals via :target
+      */
+
+      @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,350;9..144,650;9..144,800&family=Noto+Sans+SC:wght@400;500;600&display=swap");
+
+      :root {
+        --bg0: #f2fbff;
+        --bg1: #ecfbf6;
+        --bg2: #f7fbff;
+        --cream: #f7fbff;
+        --ink: #0c1b1d;
+        --ink-2: #1a2b2e;
+        --muted: #5b6a6d;
+        --rule: rgba(12, 27, 29, 0.12);
+        --shadow: rgba(12, 27, 29, 0.16);
+
+        --accent: #0ea5a5; /* sea-salt teal */
+        --accent-2: #ff996b; /* sunrise orange */
+        --accent-3: #3a7bd5; /* soda blue */
+
+        /* category palette (tokens) */
+        --cat-mint: #20c997;
+        --cat-sky: #4dabf7;
+        --cat-aqua: #15aabf;
+        --cat-coral: #ff7a59;
+        --cat-lemon: #f59f00;
+        --cat-lilac: #9775fa;
+        --cat-slate: #64748b;
+
+        --radius-1: 10px;
+        --radius-2: 16px;
+        --radius-3: 22px;
+
+        --focus: color-mix(in oklab, var(--accent) 70%, white);
+        --ring: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent);
+
+        --s-1: 6px;
+        --s0: 10px;
+        --s1: 14px;
+        --s2: 18px;
+        --s3: 24px;
+        --s4: 30px;
+        --s5: 42px;
+
+        --max: 1720px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: radial-gradient(1200px 700px at 10% 0%, rgba(58, 123, 213, 0.18), transparent 60%),
+          radial-gradient(900px 680px at 80% 10%, rgba(14, 165, 165, 0.18), transparent 55%),
+          radial-gradient(800px 620px at 55% 110%, rgba(255, 153, 107, 0.14), transparent 60%),
+          linear-gradient(180deg, var(--bg0), var(--bg1));
+        font-family: "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        letter-spacing: 0.1px;
+        overflow-x: hidden;
+      }
+
+      /* sea-salt soda bubbles */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.75;
+        background-image:
+          radial-gradient(40px 40px at 12% 18%, rgba(255, 255, 255, 0.75), transparent 62%),
+          radial-gradient(56px 56px at 18% 62%, rgba(255, 255, 255, 0.55), transparent 64%),
+          radial-gradient(38px 38px at 78% 22%, rgba(255, 255, 255, 0.6), transparent 60%),
+          radial-gradient(72px 72px at 86% 64%, rgba(255, 255, 255, 0.45), transparent 66%),
+          radial-gradient(22px 22px at 52% 38%, rgba(255, 255, 255, 0.55), transparent 62%),
+          radial-gradient(14px 14px at 40% 74%, rgba(255, 255, 255, 0.55), transparent 60%),
+          radial-gradient(18px 18px at 62% 86%, rgba(255, 255, 255, 0.55), transparent 62%),
+          radial-gradient(900px 650px at 50% 10%, rgba(58, 123, 213, 0.06), transparent 60%),
+          radial-gradient(900px 650px at 60% 90%, rgba(14, 165, 165, 0.06), transparent 60%);
+        filter: saturate(1.05);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        position: relative;
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 10px 12px 14px;
+        width: 100%;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 176px minmax(0, 2fr) minmax(320px, 1fr);
+        grid-template-rows: auto 1fr;
+        column-gap: 14px;
+        row-gap: var(--s3);
+        padding-top: 12px;
+        height: calc(100vh - 20px);
+        min-height: calc(100vh - 20px);
+      }
+
+      .below {
+        display: contents;
+      }
+
+      .shell > .panel.hero {
+        grid-column: 1 / 3;
+        grid-row: 1;
+      }
+
+      .catpanel {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .linkpanel {
+        grid-column: 2;
+        grid-row: 2;
+      }
+
+      .planpanel {
+        grid-column: 3;
+        grid-row: 1 / 3;
+      }
+
+      .catpanel,
+      .linkpanel,
+      .planpanel {
+        min-height: 0;
+      }
+
+      .catpanel,
+      .linkpanel,
+      .planpanel {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .catpanel .cats {
+        flex: 1;
+        overflow: auto;
+        padding-bottom: 12px;
+      }
+
+      .linkpanel .links {
+        flex: 1;
+        overflow: auto;
+      }
+
+      .planpanel .planbody {
+        flex: 1;
+        overflow: auto;
+        padding: 10px;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .panel {
+        border: 1px solid var(--rule);
+        background: color-mix(in oklab, var(--cream) 78%, white);
+        border-radius: var(--radius-3);
+        box-shadow: 0 18px 44px rgba(12, 27, 29, 0.12);
+        overflow: hidden;
+      }
+
+      .panel.hero {
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.75),
+            rgba(247, 251, 255, 0.72)
+          ),
+          radial-gradient(900px 300px at 12% 0%, rgba(58, 123, 213, 0.18), transparent 65%),
+          radial-gradient(820px 320px at 78% 0%, rgba(14, 165, 165, 0.20), transparent 62%);
+        backdrop-filter: blur(10px);
+      }
+
+      .panel.hero .hd {
+        border-bottom: 0;
+        padding: 10px 14px 6px;
+        gap: 0;
+      }
+
+      .panel .hd {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--rule);
+        display: grid;
+        gap: 8px;
+      }
+
+      .catpanel .hd,
+      .linkpanel .hd,
+      .planpanel .hd {
+        min-height: 64px;
+        align-content: center;
+      }
+
+      .planpanel .hd .row {
+        align-items: flex-end;
+      }
+
+      .planpanel .title {
+        line-height: 1.1;
+      }
+
+      .planpanel .sub {
+        margin-top: 4px;
+        font-size: 11px;
+        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
+        letter-spacing: 0.02em;
+      }
+
+      .plancard {
+        border: 1px solid color-mix(in oklab, var(--rule) 86%, transparent);
+        border-radius: 16px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 251, 255, 0.8));
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.09);
+        padding: 10px;
+      }
+
+      .plan-h {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .plan-h strong {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: color-mix(in oklab, var(--muted) 80%, var(--ink));
+      }
+
+      .plan-link {
+        font-size: 11px;
+        font-weight: 700;
+        color: color-mix(in oklab, var(--accent-3) 70%, var(--ink));
+      }
+
+      .countdown-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: baseline;
+        gap: 8px;
+        padding: 6px 0;
+      }
+
+      .countdown-k {
+        font-size: 11px;
+        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
+      }
+
+      .countdown-v {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .calbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+
+      .calmonth {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+      }
+
+      .calops {
+        display: inline-flex;
+        gap: 6px;
+      }
+
+      .calgrid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .caldow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: color-mix(in oklab, var(--muted) 90%, var(--ink));
+        text-align: center;
+        padding-bottom: 2px;
+      }
+
+      .calday {
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        border-radius: 8px;
+        min-height: 28px;
+        background: color-mix(in oklab, white 72%, var(--cream));
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        line-height: 1;
+        position: relative;
+        transition: transform 140ms ease, border-color 140ms ease;
+      }
+
+      .calday:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--rule));
+      }
+
+      .calday.muted {
+        opacity: 0.42;
+      }
+
+      .calday.today {
+        border-color: color-mix(in oklab, var(--accent-2) 45%, var(--rule));
+      }
+
+      .calday.selected {
+        border-color: color-mix(in oklab, var(--accent-3) 52%, var(--rule));
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-3) 16%, transparent);
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, white 72%, var(--cream)),
+          color-mix(in oklab, var(--accent-3) 8%, white)
+        );
+      }
+
+      .calday .dot {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 99px;
+        left: 50%;
+        bottom: 4px;
+        transform: translateX(-50%);
+        background: var(--accent);
+        box-shadow: none;
+      }
+
+      .todoquick {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .todoquick input,
+      .todoquick select {
+        border: 1px solid color-mix(in oklab, var(--rule) 84%, transparent);
+        background: color-mix(in oklab, white 76%, var(--cream));
+        border-radius: 11px;
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .todoquick input[type="date"] {
+        grid-column: 1 / -1;
+      }
+
+      .todo-g {
+        margin-top: 8px;
+      }
+
+      .todo-gh {
+        font-size: 11px;
+        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 6px;
+      }
+
+      .todo-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .todo-item {
+        border: 1px solid color-mix(in oklab, var(--rule) 84%, transparent);
+        border-radius: 12px;
+        background: color-mix(in oklab, white 78%, var(--cream));
+        box-shadow: 0 8px 16px rgba(12, 27, 29, 0.07);
+        padding: 7px 8px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .todo-item.done {
+        opacity: 0.56;
+      }
+
+      .todo-item.done .todo-t {
+        text-decoration: line-through;
+      }
+
+      .todo-cb {
+        width: 16px;
+        height: 16px;
+      }
+
+      .todo-t {
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .todo-empty {
+        margin-top: 3px;
+        border: 1px dashed color-mix(in oklab, var(--rule) 88%, transparent);
+        border-radius: 11px;
+        padding: 8px;
+        font-size: 11px;
+        color: color-mix(in oklab, var(--muted) 92%, var(--ink));
+      }
+
+      .panel .hd .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s1);
+      }
+
+      .catpanel .hd .row {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .kicker {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .title {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .ops {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+      }
+
+      /* header ops: keep same height as sidebar header */
+      .ops .toolbtn {
+        width: 32px;
+        height: 32px;
+      }
+
+      .ops .toolbtn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .ops .pill {
+        padding: 6px 9px;
+      }
+
+      .toolbtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42));
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
+        cursor: pointer;
+      }
+
+      .toolbtn.sm {
+        width: 26px;
+        height: 26px;
+      }
+
+      .toolbtn.sm svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .toolbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .toolbtn:hover {
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--rule));
+      }
+
+      .toolbtn.ghost {
+        border-style: dashed;
+        box-shadow: none;
+      }
+
+      .toolbtn.danger:hover {
+        border-color: color-mix(in oklab, var(--accent-2) 45%, var(--rule));
+      }
+
+      .motto {
+        max-width: 460px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 70%, transparent);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.66),
+            rgba(255, 255, 255, 0.38)
+          );
+        backdrop-filter: blur(8px);
+        box-shadow: 0 16px 40px rgba(12, 27, 29, 0.10);
+        color: color-mix(in oklab, var(--ink) 82%, var(--muted));
+      }
+
+      .brand-name {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .hero-note {
+        margin-left: auto;
+        max-width: 420px;
+        text-align: right;
+        color: color-mix(in oklab, var(--ink) 72%, var(--muted));
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.72), rgba(213, 241, 235, 0.55));
+        border: 1px solid color-mix(in oklab, var(--accent-3) 22%, var(--rule));
+        animation: noteGlow 2.8s ease-in-out infinite, noteFloat 4.8s ease-in-out infinite;
+      }
+
+      .motto-emoji {
+        font-size: 15px;
+        line-height: 1;
+        animation: emojiHop 1.8s ease-in-out infinite;
+        filter: drop-shadow(0 4px 8px rgba(58, 123, 213, 0.24));
+      }
+
+      .hero-note .motto-t {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: transparent;
+        background: linear-gradient(90deg, #2a5f91, #1f8f7d, #3a7bd5);
+        background-size: 180% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        animation: textShimmer 4.5s linear infinite;
+      }
+
+      @keyframes emojiHop {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-1.5px) rotate(-6deg); }
+      }
+
+      @keyframes noteGlow {
+        0%, 100% { box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+        50% { box-shadow: 0 10px 20px rgba(12, 27, 29, 0.08); }
+      }
+
+      @keyframes noteFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-1px); }
+      }
+
+      @keyframes textShimmer {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 180% 50%; }
+      }
+
+      .spark {
+        width: 10px;
+        height: 10px;
+        border-radius: 99px;
+        background: radial-gradient(circle at 30% 30%, #fff 0 35%, transparent 36%),
+          linear-gradient(135deg, var(--accent-3), var(--accent));
+        box-shadow:
+          0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent),
+          0 14px 30px rgba(58, 123, 213, 0.18);
+      }
+
+      .motto-t {
+        font-size: 12px;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Search */
+      .search {
+        padding: 10px 14px 12px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .shell > .panel .search {
+        padding-bottom: 12px;
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .shell > .panel .tabs {
+        gap: 10px;
+      }
+
+      .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        border-radius: 999px;
+        background: color-mix(in oklab, white 70%, var(--cream));
+        box-shadow: 0 10px 22px rgba(20, 18, 13, 0.07);
+        cursor: pointer;
+        user-select: none;
+        transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      }
+
+      .tab:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent-3) 22%, var(--rule));
+      }
+
+      .tab .ico {
+        width: 18px;
+        height: 18px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
+      }
+
+      .fav {
+        width: 16px;
+        height: 16px;
+        display: block;
+        border-radius: 4px;
+      }
+
+      .tab .nm {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .tab[aria-current="true"] {
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--accent) 10%, white),
+          color-mix(in oklab, var(--cream) 75%, white)
+        );
+        border-color: color-mix(in oklab, var(--accent) 40%, var(--rule));
+        box-shadow: 0 18px 40px rgba(27, 95, 90, 0.16);
+      }
+
+      .engine-manage-empty {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .engine-option {
+        display: grid;
+        grid-template-columns: 20px 18px 1fr;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .engine-option-name {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .engine-preset-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .engine-preset-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid color-mix(in oklab, var(--rule) 84%, transparent);
+        border-radius: 12px;
+        background: color-mix(in oklab, white 74%, var(--cream));
+        padding: 8px 10px;
+        min-width: 0;
+        width: 100%;
+        cursor: move;
+      }
+
+      .engine-preset-item.dragging {
+        opacity: 0.55;
+      }
+
+      .engine-preset-item .todo-cb {
+        margin: 0;
+      }
+
+      .engine-preset-item .engine-option {
+        width: 100%;
+        grid-template-columns: 16px 16px auto;
+        gap: 8px;
+      }
+
+      .engine-preset-item .engine-option-name {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .searchbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .shell > .panel .searchbar {
+        grid-template-columns: 1fr 180px;
+      }
+
+      .searchbar input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: var(--radius-2);
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 74%, var(--cream));
+        color: var(--ink);
+        outline: none;
+        box-shadow: 0 12px 30px rgba(20, 18, 13, 0.08);
+        font-size: 14px;
+      }
+
+      .searchbar input:focus-visible {
+        border-color: color-mix(in oklab, var(--accent) 55%, var(--rule));
+        box-shadow: 0 12px 34px rgba(20, 18, 13, 0.09), var(--ring);
+      }
+
+      .btn {
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: linear-gradient(180deg, rgba(20, 18, 13, 0.06), rgba(20, 18, 13, 0.02));
+        color: var(--ink);
+        padding: 10px 12px;
+        border-radius: var(--radius-2);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(20, 18, 13, 0.08);
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        min-width: 140px;
+        white-space: nowrap;
+      }
+
+      .btn.tight {
+        min-width: unset;
+        padding: 9px 10px;
+        border-radius: 999px;
+        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.07);
+      }
+
+      .btn.tight .btn-ico {
+        width: 16px;
+        height: 16px;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent-3) 26%, var(--rule));
+        box-shadow: 0 18px 40px rgba(20, 18, 13, 0.12);
+      }
+
+      .btn:active {
+        transform: translateY(0px);
+      }
+
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: 0 18px 44px rgba(20, 18, 13, 0.14), var(--ring);
+      }
+
+      .btn .btn-ico {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        object-fit: cover;
+        border-radius: 6px;
+        box-shadow: 0 6px 14px rgba(12, 27, 29, 0.14);
+      }
+
+      /* Sidebar */
+      .cats {
+        padding: 10px 10px 12px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        align-content: start;
+      }
+
+      .cat {
+        --cat: var(--cat-slate);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px 8px 28px;
+        min-height: 44px;
+        border-radius: 14px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 72%, var(--cream));
+        box-shadow: 0 12px 28px rgba(20, 18, 13, 0.07);
+        transition: transform 160ms ease, border-color 160ms ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cat::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        background: radial-gradient(circle at 35% 35%, color-mix(in oklab, white 70%, var(--cat)), var(--cat));
+        box-shadow:
+          0 0 0 4px color-mix(in oklab, var(--cat) 14%, transparent),
+          0 8px 18px color-mix(in oklab, var(--cat) 20%, transparent);
+      }
+
+      .cat[data-color="mint"] { --cat: var(--cat-mint); }
+      .cat[data-color="sky"] { --cat: var(--cat-sky); }
+      .cat[data-color="aqua"] { --cat: var(--cat-aqua); }
+      .cat[data-color="coral"] { --cat: var(--cat-coral); }
+      .cat[data-color="lemon"] { --cat: var(--cat-lemon); }
+      .cat[data-color="lilac"] { --cat: var(--cat-lilac); }
+      .cat[data-color="slate"] { --cat: var(--cat-slate); }
+
+      .cat:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--cat) 30%, var(--rule));
+      }
+
+      .cat[aria-current="true"] {
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--accent-3) 7%, white),
+          color-mix(in oklab, white 68%, var(--cream))
+        );
+        border-color: color-mix(in oklab, var(--cat) 38%, var(--rule));
+        box-shadow:
+          0 12px 28px rgba(12, 27, 29, 0.08),
+          0 0 0 5px color-mix(in oklab, var(--cat) 14%, transparent);
+      }
+
+      .cat .name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .cat .name strong {
+        font-size: 13px;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+      }
+
+      .cat .count {
+        font-size: 12px;
+        font-weight: 800;
+        margin-left: auto;
+        min-width: 2ch;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        color: color-mix(in oklab, var(--ink) 78%, var(--muted));
+      }
+
+      .pill {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, var(--cream) 70%, white);
+        color: color-mix(in oklab, var(--ink) 82%, var(--muted));
+      }
+
+      .sidebar-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .catpanel .sidebar-actions {
+        gap: 6px;
+      }
+
+      .iconbtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 70%, var(--cream));
+        cursor: pointer;
+        box-shadow: 0 10px 22px rgba(20, 18, 13, 0.07);
+        transition: transform 160ms ease, border-color 160ms ease;
+      }
+
+      .iconbtn.sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 11px;
+      }
+
+      .iconbtn:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent-2) 24%, var(--rule));
+      }
+
+      .iconbtn:focus-visible {
+        outline: none;
+        box-shadow: 0 10px 24px rgba(20, 18, 13, 0.09), var(--ring);
+      }
+
+      .iconbtn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Main */
+      /* legacy toolbar styles removed (replaced by .managebar) */
+
+      .ghost {
+        background: color-mix(in oklab, white 76%, var(--cream));
+        border-style: dashed;
+        box-shadow: none;
+        min-width: unset;
+      }
+
+      .danger {
+        border-color: color-mix(in oklab, var(--accent-2) 35%, var(--rule));
+      }
+
+      .links {
+        padding: 6px 14px 14px;
+        position: relative;
+        overflow: auto;
+      }
+
+      .managebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .managebar .left,
+      .managebar .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .modeToggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.44));
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
+      }
+
+      .modeToggle input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      .modeToggle label {
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        color: color-mix(in oklab, var(--muted) 85%, var(--ink));
+        border: 1px solid transparent;
+        transition: background 160ms ease, border-color 160ms ease;
+        user-select: none;
+      }
+
+      #mode-browse:checked ~ label[for="mode-browse"],
+      #mode-manage:checked ~ label[for="mode-manage"] {
+        background: color-mix(in oklab, white 70%, var(--cream));
+        color: var(--ink);
+        border-color: color-mix(in oklab, var(--accent) 26%, var(--rule));
+        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.06);
+      }
+
+      .managebar .filter {
+        width: 200px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 78%, var(--cream));
+        outline: none;
+        font-size: 13px;
+      }
+
+      .managebar .filter:focus-visible {
+        border-color: color-mix(in oklab, var(--accent) 55%, var(--rule));
+        box-shadow: var(--ring);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 6px;
+        align-content: start;
+      }
+
+      /* per-link details are shown via native title tooltip */
+
+      /* PC-only: allow grid to wrap naturally */
+
+      .card {
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 76%, var(--cream));
+        border-radius: var(--radius-2);
+        padding: 9px 10px 8px;
+        box-shadow: 0 14px 34px rgba(20, 18, 13, 0.08);
+        transition: transform 160ms ease, border-color 160ms ease;
+        position: relative;
+        overflow: hidden;
+        min-height: 62px;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background: radial-gradient(500px 260px at 20% 0%, rgba(27, 95, 90, 0.10), transparent 50%);
+        transition: opacity 180ms ease;
+        pointer-events: none;
+      }
+
+      .card:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in oklab, var(--accent) 26%, var(--rule));
+      }
+
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card .t {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        position: relative;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .grid.all-mode {
+        display: block;
+      }
+
+      .grid.site-grouped {
+        display: block;
+      }
+
+      .all-group {
+        margin-top: 10px;
+        scroll-margin-top: 8px;
+      }
+
+      .all-group:first-child {
+        margin-top: 0;
+      }
+
+      .all-group-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+        margin: 0;
+      }
+
+      .all-group-title::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--group-cat, var(--cat-slate));
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--group-cat, var(--cat-slate)) 16%, transparent);
+      }
+
+      .all-group-links {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 8px;
+        align-content: start;
+      }
+
+      .site-group {
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px dashed color-mix(in oklab, var(--rule) 86%, transparent);
+        border-radius: 12px;
+        background: color-mix(in oklab, white 80%, var(--cream));
+      }
+
+      .site-group:first-child {
+        margin-top: 0;
+      }
+
+      .site-group-title {
+        margin: 0 0 7px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: color-mix(in oklab, var(--muted) 78%, var(--ink));
+      }
+
+      .site-group-title strong {
+        color: color-mix(in oklab, var(--ink) 88%, var(--accent-3));
+      }
+
+      .site-group-links {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .brandline {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .site-ico {
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
+        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.10);
+        object-fit: cover;
+      }
+
+      .card .u {
+        margin-top: 4px;
+        font-size: 10.5px;
+        color: color-mix(in oklab, var(--muted) 92%, var(--ink));
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .card .acts {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        position: relative;
+        z-index: 3;
+      }
+
+      .linkcard {
+        cursor: pointer;
+      }
+
+      .linkcard .acts {
+        display: none;
+      }
+
+
+      .linkcard .stretched {
+        color: inherit;
+        text-decoration: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .linkcard .stretched::before {
+        content: "";
+        position: absolute;
+        inset: -12px -14px;
+        z-index: -1;
+      }
+
+      /* Management mode reveals actions; browse mode stays clean */
+      .linkpanel:has(#mode-manage:checked) .linkcard .acts {
+        display: flex;
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        flex-direction: row;
+        gap: 4px;
+      }
+
+      /* anchor actions to the card corner (not the flex row) */
+      .linkpanel:has(#mode-manage:checked) .linkcard .t {
+        position: static;
+        padding-right: 52px;
+      }
+
+      .linkcard[draggable="true"] {
+        cursor: grab;
+      }
+
+      .linkpanel:has(#mode-manage:checked) .linkcard.dragging {
+        opacity: 0.62;
+        border-style: dashed;
+      }
+
+      .cats .cat[draggable="true"] {
+        cursor: grab;
+      }
+
+      .cats .cat.dragging {
+        opacity: 0.6;
+        border-style: dashed;
+      }
+
+      /* smaller corner icons in manage mode */
+      .linkpanel:has(#mode-manage:checked) .linkcard .acts .toolbtn.sm {
+        width: 22px;
+        height: 22px;
+      }
+
+      .linkpanel:has(#mode-manage:checked) .linkcard .acts .toolbtn.sm svg {
+        width: 13px;
+        height: 13px;
+      }
+
+
+      .mini {
+        padding: 8px 10px;
+        min-width: unset;
+        border-radius: 999px;
+        font-size: 12px;
+        box-shadow: 0 10px 22px rgba(20, 18, 13, 0.07);
+      }
+
+      .open {
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--rule));
+      }
+
+      .card .meta {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: color-mix(in oklab, var(--muted) 85%, var(--ink));
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, var(--cream) 78%, white);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 99px;
+        background: var(--accent-2);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-2) 20%, transparent);
+      }
+
+      /* Modals via :target */
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 26px;
+        z-index: 50;
+      }
+
+      .modal:target {
+        display: flex;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 10, 10, 0.36);
+        backdrop-filter: blur(6px);
+      }
+
+      .sheet {
+        position: relative;
+        width: min(620px, 100%);
+        border-radius: var(--radius-3);
+        border: 1px solid color-mix(in oklab, var(--rule) 80%, transparent);
+        background: linear-gradient(180deg, color-mix(in oklab, white 82%, var(--cream)), color-mix(in oklab, white 72%, var(--cream)));
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+      }
+
+      .sheet .hd {
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .sheet .hd strong {
+        font-size: 14px;
+        letter-spacing: 0.01em;
+      }
+
+      .sheet .bd {
+        padding: 16px 18px 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field label {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        border-radius: var(--radius-2);
+        background: color-mix(in oklab, white 78%, var(--cream));
+        padding: 11px 12px;
+        font-size: 14px;
+        outline: none;
+      }
+
+      .field input:focus-visible,
+      .field select:focus-visible,
+      .field textarea:focus-visible {
+        border-color: color-mix(in oklab, var(--accent) 55%, var(--rule));
+        box-shadow: var(--ring);
+      }
+
+      .color-palette {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        min-height: 42px;
+        padding: 5px 2px;
+      }
+
+      .color-swatch {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in oklab, var(--rule) 78%, transparent);
+        box-shadow: 0 8px 18px rgba(12, 27, 29, 0.12);
+        cursor: pointer;
+      }
+
+      .color-swatch[data-color="mint"] { background: var(--cat-mint); color: var(--cat-mint); }
+      .color-swatch[data-color="sky"] { background: var(--cat-sky); color: var(--cat-sky); }
+      .color-swatch[data-color="aqua"] { background: var(--cat-aqua); color: var(--cat-aqua); }
+      .color-swatch[data-color="coral"] { background: var(--cat-coral); color: var(--cat-coral); }
+      .color-swatch[data-color="lemon"] { background: var(--cat-lemon); color: var(--cat-lemon); }
+      .color-swatch[data-color="lilac"] { background: var(--cat-lilac); color: var(--cat-lilac); }
+      .color-swatch[data-color="slate"] { background: var(--cat-slate); color: var(--cat-slate); }
+
+      .color-swatch[aria-checked="true"] {
+        transform: scale(1.08);
+        box-shadow:
+          0 0 0 4px color-mix(in oklab, currentColor 24%, transparent),
+          0 10px 22px rgba(12, 27, 29, 0.16);
+      }
+
+      .color-swatch:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 30%, transparent);
+      }
+
+      .sheet .ft {
+        padding: 14px 18px 18px;
+        border-top: 1px solid var(--rule);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* Toast (static placeholder) */
+      .toast {
+        position: fixed;
+        bottom: 18px;
+        right: 18px;
+        z-index: 40;
+        width: 200px;
+        pointer-events: none;
+        opacity: 0.92;
+        display: none;
+      }
+
+      .toast .msg {
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
+        background: color-mix(in oklab, white 78%, var(--cream));
+        border-radius: var(--radius-2);
+        padding: 12px 12px;
+        box-shadow: 0 20px 60px rgba(20, 18, 13, 0.18);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .toast .badge {
+        width: 10px;
+        height: 10px;
+        border-radius: 99px;
+        margin-top: 4px;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent);
+      }
+
+      .toast .msg strong {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 2px;
+      }
+
+      .toast .msg span {
+        display: none !important;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* page load */
+      .reveal {
+        animation: rise 560ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+      }
+
+      .d1 { animation-delay: 80ms; }
+      .d2 { animation-delay: 160ms; }
+      .d3 { animation-delay: 240ms; }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .reveal {
+          animation: none;
+        }
+        .tab,
+        .btn,
+        .card,
+        .cat,
+        .iconbtn {
+          transition: none;
+        }
+      }
+
+      /* PC-only layout (mobile is out of scope) */
+
+      /* Utility */
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <main class="shell">
+        <!-- Top: Search -->
+        <section class="panel hero reveal d2" aria-label="快速搜索">
+          <div class="hd">
+            <div class="row">
+              <div class="motto" role="note" title="MyWorkHub">
+                <span class="spark" aria-hidden="true"></span>
+                <span class="brand-name">MyWorkHub</span>
+              </div>
+              <div class="hero-note" role="note" title="每日一句（示意）">
+                <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
+                <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
+              </div>
+            </div>
+          </div>
+
+          <form class="search" action="#" method="get">
+            <div class="tabs" id="engine-tabs" role="tablist" aria-label="搜索引擎">
+              <a id="open-engine-modal" class="iconbtn sm" href="#modal-engine" title="管理引擎">
+                <span class="sr">管理引擎</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+
+            <div class="searchbar" id="search">
+              <label class="sr" for="q">关键词</label>
+              <input id="q" name="q" type="search" placeholder="输入关键词…（回车或点搜索）" autocomplete="off" />
+              <button class="btn" type="submit">
+                <img id="search-btn-ico" class="btn-ico" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" decoding="async" referrerpolicy="no-referrer" />
+                搜索
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Below: Categories + Links -->
+        <div class="below">
+          <aside class="panel reveal d3 catpanel" aria-label="分类">
+            <div class="hd">
+              <div class="row">
+                <div class="title">分类</div>
+                <div class="sidebar-actions">
+                  <a id="open-category-manage" class="iconbtn sm" href="#modal-category" title="新增/重命名分类">
+                    <span class="sr">管理分类</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                  <a id="open-category-delete" class="iconbtn sm" href="#modal-category-danger" title="删除分类（示意）">
+                    <span class="sr">删除分类</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M6.5 8.2h11" stroke="#b1402a" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M9.2 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M14.8 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8.4 6.3h7.2" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <nav class="cats" aria-label="分类列表">
+              <a class="cat" href="#" aria-current="true" data-color="sky">
+                <div class="name">
+                  <strong>开发</strong>
+                  <span class="count">8</span>
+                </div>
+              </a>
+
+              <a class="cat" href="#" data-color="mint">
+                <div class="name">
+                  <strong>AI 工具</strong>
+                  <span class="count">6</span>
+                </div>
+              </a>
+
+              <a class="cat" href="#" data-color="lilac">
+                <div class="name">
+                  <strong>协作</strong>
+                  <span class="count">4</span>
+                </div>
+              </a>
+
+              <a class="cat" href="#" data-color="coral">
+                <div class="name">
+                  <strong>运营</strong>
+                  <span class="count">3</span>
+                </div>
+              </a>
+            </nav>
+          </aside>
+
+          <section class="panel reveal d3 linkpanel" aria-label="链接面板">
+            <div class="hd">
+              <div class="row">
+                <div>
+                  <div class="title">常用链接</div>
+                </div>
+                <div class="ops" aria-label="链接操作">
+                  <a id="open-link-modal" class="toolbtn" href="#modal-link" title="新增链接">
+                    <span class="sr">新增链接</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 5v14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                  <a class="toolbtn ghost" href="#modal-data-import" title="导入">
+                    <span class="sr">导入</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 4v10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M8.5 10.5 12 14l3.5-3.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M6.5 19h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                  <a id="data-export-direct-btn" class="toolbtn ghost" href="#" title="导出">
+                    <span class="sr">导出</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 20V10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M15.5 13.5 12 10 8.5 13.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M6.5 5h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                    </svg>
+                  </a>
+
+                  <div class="modeToggle" aria-label="模式切换">
+                    <input type="radio" name="mode" id="mode-browse" checked />
+                    <input type="radio" name="mode" id="mode-manage" />
+                    <label for="mode-browse" title="纯展示">浏览</label>
+                    <label for="mode-manage" title="显示编辑/删除">管理</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="links">
+              <div class="grid" role="list">
+                <article class="card linkcard" role="listitem" title="GitHub — https://github.com/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/github.ico" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a></h3>
+                      </div>
+                      <div class="u">https://github.com/</div>
+                    </div>
+                    <div class="acts" aria-label="管理操作">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="Google — https://www.google.com/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/chrome.png" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://www.google.com/" target="_blank" rel="noreferrer">Google</a></h3>
+                      </div>
+                      <div class="u">https://www.google.com/</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="百度 — https://www.baidu.com/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/baidu.ico" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://www.baidu.com/" target="_blank" rel="noreferrer">百度</a></h3>
+                      </div>
+                      <div class="u">https://www.baidu.com/</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="DeepSeek — https://www.deepseek.com/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/deepseek.ico" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://www.deepseek.com/" target="_blank" rel="noreferrer">DeepSeek</a></h3>
+                      </div>
+                      <div class="u">https://www.deepseek.com/</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="GLM — https://chatglm.cn/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/glm.ico" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://chatglm.cn/" target="_blank" rel="noreferrer">GLM</a></h3>
+                      </div>
+                      <div class="u">https://chatglm.cn/</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="豆包 — https://www.doubao.com/">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/doubao.png" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://www.doubao.com/" target="_blank" rel="noreferrer">豆包</a></h3>
+                      </div>
+                      <div class="u">https://www.doubao.com/</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="card linkcard" role="listitem" title="Trending — https://github.com/trending">
+                  <div class="t">
+                    <div>
+                      <div class="brandline">
+                        <img class="site-ico" src="assets/icons/github.ico" alt="" decoding="async" />
+                        <h3><a class="stretched" href="https://github.com/trending" target="_blank" rel="noreferrer">Trending</a></h3>
+                      </div>
+                      <div class="u">https://github.com/trending</div>
+                    </div>
+                    <div class="acts">
+                      <a class="toolbtn sm" href="#modal-link" title="编辑">
+                        <span class="sr">编辑</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                          <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                        <span class="sr">删除</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+
+              </div>
+            </div>
+          </section>
+
+          <aside class="panel reveal d3 planpanel" aria-label="周计划">
+            <div class="hd">
+              <div class="row">
+                <div>
+                  <div class="title">工作节奏</div>
+                  <div class="sub">周一开局，轻一点，也稳一点</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="planbody">
+              <section class="plancard" aria-label="放假倒计时">
+                <div class="plan-h">
+                  <strong>放假倒计时</strong>
+                  <a href="#modal-holidays" class="plan-link" id="open-holidays-modal">配置法定假日</a>
+                </div>
+                <div class="countdown-row">
+                  <span class="countdown-k">周末</span>
+                  <span class="countdown-v" id="weekend-countdown">计算中...</span>
+                </div>
+                <div class="countdown-row">
+                  <span class="countdown-k">法定假日</span>
+                  <span class="countdown-v" id="holiday-countdown">尚未配置</span>
+                </div>
+              </section>
+
+              <section class="plancard" aria-label="日历">
+                <div class="calbar">
+                  <div class="calmonth" id="calendar-month-title">2026年03月</div>
+                  <div class="calops">
+                    <button class="toolbtn sm" type="button" data-action="cal-prev" title="上个月">
+                      <span class="sr">上个月</span>
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M14.5 6 8.5 12l6 6" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button class="toolbtn sm ghost" type="button" data-action="cal-today" title="今天">今</button>
+                    <button class="toolbtn sm" type="button" data-action="cal-next" title="下个月">
+                      <span class="sr">下个月</span>
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="m9.5 6 6 6-6 6" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="calgrid" id="calendar-grid" role="grid" aria-label="月历"></div>
+              </section>
+
+              <section class="plancard" aria-label="本周待办">
+                <div class="plan-h">
+                  <strong>本周待办</strong>
+                  <span class="plan-link" id="todo-week-label"></span>
+                </div>
+
+                <form class="todoquick" id="todo-quick-form">
+                  <label class="sr" for="todo-quick-title">新增待办</label>
+                  <input id="todo-quick-title" type="text" placeholder="记录一件要推进的事..." />
+                  <button class="btn tight" type="submit">新增</button>
+                  <label class="sr" for="todo-quick-date">指定日期</label>
+                  <input id="todo-quick-date" type="date" />
+                </form>
+
+                <div id="todo-groups"></div>
+              </section>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modals -->
+    <section id="modal-link" class="modal" aria-label="链接编辑弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong id="link-modal-title">新增 / 编辑链接</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label for="lt">名称</label>
+            <input id="lt" type="text" placeholder="例如：GitHub / CI / 文档" />
+          </div>
+          <div class="field">
+            <label for="lu">URL</label>
+            <input id="lu" type="url" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="lc">所属分类</label>
+            <select id="lc">
+              <option>开发</option>
+              <option>AI 工具</option>
+              <option>协作</option>
+              <option>运营</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="ln">备注（可选）</label>
+            <textarea id="ln" rows="3" placeholder="用于你自己：比如用途、登录方式、常用路径"></textarea>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="link-save-btn" class="btn" href="#" title="保存链接">保存</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-category" class="modal" aria-label="分类管理弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>分类管理</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label for="cn">分类名</label>
+            <input id="cn" type="text" placeholder="例如：开发 / AI 工具 / 协作" />
+          </div>
+          <div class="field">
+            <label for="cc">分类颜色</label>
+            <div id="cc-palette" class="color-palette" role="radiogroup" aria-label="分类颜色调色盘">
+              <button type="button" class="color-swatch" data-color="sky" aria-checked="true" title="sky"></button>
+              <button type="button" class="color-swatch" data-color="mint" aria-checked="false" title="mint"></button>
+              <button type="button" class="color-swatch" data-color="aqua" aria-checked="false" title="aqua"></button>
+              <button type="button" class="color-swatch" data-color="coral" aria-checked="false" title="coral"></button>
+              <button type="button" class="color-swatch" data-color="lemon" aria-checked="false" title="lemon"></button>
+              <button type="button" class="color-swatch" data-color="lilac" aria-checked="false" title="lilac"></button>
+              <button type="button" class="color-swatch" data-color="slate" aria-checked="false" title="slate"></button>
+            </div>
+            <input id="cc" type="hidden" value="sky" />
+          </div>
+          <div class="field">
+            <label for="cm">操作</label>
+            <select id="cm">
+              <option value="add">新增</option>
+              <option value="rename">重命名当前分类</option>
+            </select>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="category-confirm-btn" class="btn" href="#" title="保存分类">确认</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-category-danger" class="modal" aria-label="删除分类确认">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>删除分类？</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+            这将删除分类 <strong id="danger-category-name">开发</strong>，并影响 <strong id="danger-category-count">8</strong> 条链接。
+            首版建议：一并删除这些链接（后续可扩展“迁移到其他分类”）。
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="category-delete-confirm-btn" class="btn danger" href="#" title="确认删除分类">确认删除</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-data-export" class="modal" aria-label="导出弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>导出（JSON）</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label>导出文件</label>
+            <a id="data-export-btn" class="btn ghost" href="#" title="下载数据">下载 workhub.json</a>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">关闭</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-data-import" class="modal" aria-label="导入弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>导入（JSON）</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label for="imp">导入文件</label>
+            <input id="imp" type="file" accept="application/json" />
+          </div>
+          <div class="field">
+            <label for="import-strategy">导入策略</label>
+            <select id="import-strategy">
+              <option value="overwrite">覆盖本地数据（推荐）</option>
+              <option value="merge">合并（后续可做）</option>
+            </select>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="data-import-apply-btn" class="btn" href="#" title="导入并应用">导入并应用</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-engine" class="modal" aria-label="搜索引擎管理弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>搜索引擎管理</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <div class="tabs" style="justify-content:space-between;align-items:center;">
+              <label style="margin:0;">常用搜索引擎（可多选）· 选择后点击“应用选择”</label>
+              <div class="tabs" style="gap:6px;">
+                <button id="engine-select-all-btn" type="button" class="btn tight ghost" title="全部勾选">全选</button>
+                <button id="engine-select-none-btn" type="button" class="btn tight ghost" title="取消勾选">清空</button>
+                <button id="engine-open-custom-form" type="button" class="iconbtn sm" title="添加自定义引擎">
+                  <span class="sr">添加自定义引擎</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="engine-preset-list" style="display:grid;gap:8px;"></div>
+          </div>
+
+          <div id="engine-custom-panel" hidden>
+            <div class="field">
+              <label for="en-name">名称</label>
+              <input id="en-name" type="text" placeholder="例如：Google / 百度 / 内网搜索" />
+            </div>
+            <div class="field">
+              <label for="en-search">搜索 URL 模板</label>
+              <input id="en-search" type="text" placeholder="例如：https://www.google.com/search?q={q}" />
+            </div>
+            <div class="field">
+              <label for="en-home">主页 URL（可选）</label>
+              <input id="en-home" type="url" placeholder="例如：https://www.google.com/" />
+            </div>
+            <div class="ft" style="padding:0;border-top:none;justify-content:flex-end;">
+              <a id="engine-custom-add-btn" class="btn" href="#" title="添加自定义引擎">添加自定义引擎</a>
+            </div>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="engine-add-btn" class="btn" href="#" title="应用默认引擎选择">应用选择</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-delete" class="modal" aria-label="删除链接确认">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>删除链接？</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+            将删除 <strong id="danger-link-name">GitHub</strong>。该操作不可撤销（可通过 JSON 备份恢复）。
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="link-delete-confirm-btn" class="btn danger" href="#" title="确认删除链接">确认删除</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-todo" class="modal" aria-label="待办编辑弹窗">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong id="todo-modal-title">新增待办</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label for="tt">标题</label>
+            <input id="tt" type="text" placeholder="例如：整理需求说明并发给团队" />
+          </div>
+          <div class="field">
+            <label for="td">安排到周几</label>
+            <select id="td">
+              <option value="">本周未安排</option>
+              <option value="1">周一</option>
+              <option value="2">周二</option>
+              <option value="3">周三</option>
+              <option value="4">周四</option>
+              <option value="5">周五</option>
+              <option value="6">周六</option>
+              <option value="7">周日</option>
+            </select>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="todo-save-btn" class="btn" href="#" title="保存待办">保存</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-todo-delete" class="modal" aria-label="删除待办确认">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>删除待办？</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+            将删除待办 <strong id="danger-todo-name">示例待办</strong>。
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="todo-delete-confirm-btn" class="btn danger" href="#" title="确认删除待办">确认删除</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal-holidays" class="modal" aria-label="法定假日设置">
+      <a class="overlay" href="#" aria-label="关闭"></a>
+      <div class="sheet" role="dialog" aria-modal="true">
+        <div class="hd">
+          <strong>法定假日设置</strong>
+          <a class="iconbtn" href="#" title="关闭">
+            <span class="sr">关闭</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <label for="hn">假日名称</label>
+            <input id="hn" type="text" placeholder="例如：清明节" />
+          </div>
+          <div class="field">
+            <label for="hs">开始日期</label>
+            <input id="hs" type="date" />
+          </div>
+          <div class="field">
+            <label for="he">结束日期</label>
+            <input id="he" type="date" />
+          </div>
+          <div class="field">
+            <label>已配置假日</label>
+            <div id="holiday-list" style="display: grid; gap: 8px;"></div>
+          </div>
+        </div>
+        <div class="ft">
+          <a class="btn ghost" href="#">取消</a>
+          <a id="holiday-add-btn" class="btn" href="#" title="添加假日">添加假日</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast placeholder -->
+    <div class="toast" aria-hidden="true">
+      <div class="msg">
+        <span class="badge"></span>
+        <div>
+          <strong>提示（示意）</strong>
+          <span>保存成功 / 导入失败 / URL 不合法 等反馈会出现在这里。</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const STORAGE_KEY = "workhub.db";
+        const DB_VERSION = 2;
+        const ALL_CATEGORY_ID = "all";
+        const COLOR_TOKENS = new Set(["mint", "sky", "aqua", "coral", "lemon", "lilac", "slate"]);
+        const COMMON_ENGINES = [
+          { id: "eng-google", name: "Google", searchUrl: "https://www.google.com/search?q={q}", homeUrl: "https://www.google.com/" },
+          { id: "eng-baidu", name: "百度", searchUrl: "https://www.baidu.com/s?wd={q}", homeUrl: "https://www.baidu.com/" },
+          { id: "eng-bing", name: "Bing", searchUrl: "https://www.bing.com/search?q={q}", homeUrl: "https://www.bing.com/" },
+          { id: "eng-duckduckgo", name: "DuckDuckGo", searchUrl: "https://duckduckgo.com/?q={q}", homeUrl: "https://duckduckgo.com/" },
+          { id: "eng-brave", name: "Brave", searchUrl: "https://search.brave.com/search?q={q}", homeUrl: "https://search.brave.com/" },
+          { id: "eng-yahoo", name: "Yahoo", searchUrl: "https://search.yahoo.com/search?p={q}", homeUrl: "https://search.yahoo.com/" },
+          { id: "eng-yandex", name: "Yandex", searchUrl: "https://yandex.com/search/?text={q}", homeUrl: "https://yandex.com/" },
+          { id: "eng-sogou", name: "搜狗", searchUrl: "https://www.sogou.com/web?query={q}", homeUrl: "https://www.sogou.com/" },
+          { id: "eng-360", name: "360 搜索", searchUrl: "https://www.so.com/s?q={q}", homeUrl: "https://www.so.com/" },
+          { id: "eng-sm", name: "神马", searchUrl: "https://m.sm.cn/s?q={q}", homeUrl: "https://m.sm.cn/" },
+
+          { id: "eng-deepseek", name: "DeepSeek", searchUrl: "https://www.deepseek.com/search?q={q}", homeUrl: "https://www.deepseek.com/" },
+          { id: "eng-glm", name: "GLM", searchUrl: "https://chatglm.cn/?q={q}", homeUrl: "https://chatglm.cn/" },
+          { id: "eng-doubao", name: "豆包", searchUrl: "https://www.doubao.com/?q={q}", homeUrl: "https://www.doubao.com/" },
+          { id: "eng-openai", name: "OpenAI", searchUrl: "https://chat.openai.com/?q={q}", homeUrl: "https://chat.openai.com/" },
+          { id: "eng-chatgpt", name: "ChatGPT", searchUrl: "https://chatgpt.com/?q={q}", homeUrl: "https://chatgpt.com/" },
+          { id: "eng-claude", name: "Claude", searchUrl: "https://claude.ai/new?q={q}", homeUrl: "https://claude.ai/" },
+          { id: "eng-gemini", name: "Gemini", searchUrl: "https://gemini.google.com/?q={q}", homeUrl: "https://gemini.google.com/" },
+          { id: "eng-perplexity", name: "Perplexity", searchUrl: "https://www.perplexity.ai/search?q={q}", homeUrl: "https://www.perplexity.ai/" },
+          { id: "eng-kimi", name: "Kimi", searchUrl: "https://kimi.moonshot.cn/?q={q}", homeUrl: "https://kimi.moonshot.cn/" },
+          { id: "eng-poe", name: "Poe", searchUrl: "https://poe.com/search?q={q}", homeUrl: "https://poe.com/" },
+          { id: "eng-tongyi", name: "通义千问", searchUrl: "https://tongyi.aliyun.com/qianwen/?q={q}", homeUrl: "https://tongyi.aliyun.com/" },
+          { id: "eng-yuanbao", name: "腾讯元宝", searchUrl: "https://yuanbao.tencent.com/chat?q={q}", homeUrl: "https://yuanbao.tencent.com/" },
+          { id: "eng-wenxin", name: "文心一言", searchUrl: "https://yiyan.baidu.com/", homeUrl: "https://yiyan.baidu.com/" },
+          { id: "eng-grok", name: "Grok", searchUrl: "https://grok.com/?q={q}", homeUrl: "https://grok.com/" },
+          { id: "eng-copilot", name: "Copilot", searchUrl: "https://copilot.microsoft.com/?q={q}", homeUrl: "https://copilot.microsoft.com/" },
+          { id: "eng-lechat", name: "Le Chat", searchUrl: "https://chat.mistral.ai/chat?q={q}", homeUrl: "https://chat.mistral.ai/" },
+          { id: "eng-github", name: "GitHub", searchUrl: "https://github.com/search?q={q}", homeUrl: "https://github.com/" },
+          { id: "eng-stackoverflow", name: "Stack Overflow", searchUrl: "https://stackoverflow.com/search?q={q}", homeUrl: "https://stackoverflow.com/" },
+        ];
+        const DEFAULT_ENGINE_IDS = new Set(["eng-google", "eng-bing", "eng-baidu"]);
+        const COPY_QUERY_ENGINE_IDS = new Set([
+          "eng-doubao",
+          "eng-openai",
+          "eng-chatgpt",
+          "eng-claude",
+          "eng-gemini",
+          "eng-kimi",
+          "eng-poe",
+          "eng-tongyi",
+          "eng-yuanbao",
+          "eng-wenxin",
+          "eng-grok",
+          "eng-copilot",
+          "eng-lechat",
+        ]);
+        const WEEKDAY_MOTTOS = {
+          1: { emoji: "☕", text: "周一开机中，先把第一颗小齿轮转起来。" },
+          2: { emoji: "🚀", text: "周二冲刺位，今天适合把一个小目标打穿。" },
+          3: { emoji: "🎯", text: "周三稳住节奏，先拿下一件最关键的事。" },
+          4: { emoji: "💡", text: "周四灵感日，想到就记下，做到就加分。" },
+          5: { emoji: "🎉", text: "周五收官局，清掉一件事，周末更轻松。" },
+          6: { emoji: "🌿", text: "周六慢一点，把待办和心情都整理干净。" },
+          7: { emoji: "🌞", text: "周日预热中，给下周的自己留一点从容。" },
+        };
+
+        const state = {
+          db: null,
+          ui: {
+            editingLinkId: null,
+            deletingLinkId: null,
+            deletingCategoryId: null,
+            editingTodoId: null,
+            deletingTodoId: null,
+            deletingHolidayId: null,
+            draggingPresetEngineId: null,
+            draggingLinkId: null,
+            draggingContainer: null,
+            draggingCategoryId: null,
+            dragDirty: false,
+            categoryDragDirty: false,
+            readOnly: false,
+            pageLoaded: false,
+            toastTimer: null,
+          },
+        };
+
+        const els = {
+          searchForm: document.querySelector("form.search"),
+          queryInput: document.getElementById("q"),
+          mottoText: document.getElementById("motto-text"),
+          mottoEmoji: document.getElementById("motto-emoji"),
+          cats: document.querySelector(".catpanel .cats"),
+          linkTitle: document.querySelector(".linkpanel .title"),
+          grid: document.querySelector(".linkpanel .grid"),
+          planPanel: document.querySelector(".planpanel"),
+          modeBrowse: document.getElementById("mode-browse"),
+          modeManage: document.getElementById("mode-manage"),
+          engineTabs: document.getElementById("engine-tabs"),
+          searchBtnIco: document.getElementById("search-btn-ico"),
+          openEngineModal: document.getElementById("open-engine-modal"),
+          engineNameInput: document.getElementById("en-name"),
+          engineSearchInput: document.getElementById("en-search"),
+          engineHomeInput: document.getElementById("en-home"),
+          engineOpenCustomFormBtn: document.getElementById("engine-open-custom-form"),
+          engineSelectAllBtn: document.getElementById("engine-select-all-btn"),
+          engineSelectNoneBtn: document.getElementById("engine-select-none-btn"),
+          engineCustomPanel: document.getElementById("engine-custom-panel"),
+          enginePresetList: document.getElementById("engine-preset-list"),
+          engineAddBtn: document.getElementById("engine-add-btn"),
+          engineCustomAddBtn: document.getElementById("engine-custom-add-btn"),
+          openLinkModal: document.getElementById("open-link-modal"),
+          openCategoryDelete: document.getElementById("open-category-delete"),
+          linkModalTitle: document.getElementById("link-modal-title"),
+          linkTitleInput: document.getElementById("lt"),
+          linkUrlInput: document.getElementById("lu"),
+          linkCategorySelect: document.getElementById("lc"),
+          linkNoteInput: document.getElementById("ln"),
+          linkSaveBtn: document.getElementById("link-save-btn"),
+          categoryNameInput: document.getElementById("cn"),
+          categoryColorSelect: document.getElementById("cc"),
+          categoryColorPalette: document.getElementById("cc-palette"),
+          categoryModeSelect: document.getElementById("cm"),
+          categoryConfirmBtn: document.getElementById("category-confirm-btn"),
+          dangerCategoryName: document.getElementById("danger-category-name"),
+          dangerCategoryCount: document.getElementById("danger-category-count"),
+          categoryDeleteConfirmBtn: document.getElementById("category-delete-confirm-btn"),
+          dangerLinkName: document.getElementById("danger-link-name"),
+          linkDeleteConfirmBtn: document.getElementById("link-delete-confirm-btn"),
+          dataExportBtn: document.getElementById("data-export-btn"),
+          dataExportDirectBtn: document.getElementById("data-export-direct-btn"),
+          importInput: document.getElementById("imp"),
+          importStrategy: document.getElementById("import-strategy"),
+          dataImportApplyBtn: document.getElementById("data-import-apply-btn"),
+          weekendCountdown: document.getElementById("weekend-countdown"),
+          holidayCountdown: document.getElementById("holiday-countdown"),
+          calendarMonthTitle: document.getElementById("calendar-month-title"),
+          calendarGrid: document.getElementById("calendar-grid"),
+          todoWeekLabel: document.getElementById("todo-week-label"),
+          todoGroups: document.getElementById("todo-groups"),
+          todoQuickForm: document.getElementById("todo-quick-form"),
+          todoQuickTitle: document.getElementById("todo-quick-title"),
+          todoQuickDate: document.getElementById("todo-quick-date"),
+          todoModalTitle: document.getElementById("todo-modal-title"),
+          todoTitleInput: document.getElementById("tt"),
+          todoDaySelect: document.getElementById("td"),
+          todoSaveBtn: document.getElementById("todo-save-btn"),
+          dangerTodoName: document.getElementById("danger-todo-name"),
+          todoDeleteConfirmBtn: document.getElementById("todo-delete-confirm-btn"),
+          holidayNameInput: document.getElementById("hn"),
+          holidayStartInput: document.getElementById("hs"),
+          holidayEndInput: document.getElementById("he"),
+          holidayList: document.getElementById("holiday-list"),
+          holidayAddBtn: document.getElementById("holiday-add-btn"),
+          toast: document.querySelector(".toast"),
+          toastTitle: document.querySelector(".toast .msg strong"),
+        };
+
+        init();
+
+        function init() {
+          state.db = loadDb();
+          saveDb();
+          bindEvents();
+          renderAll();
+          syncColorPalette((els.categoryColorSelect && els.categoryColorSelect.value) || "sky");
+          syncModalWithHash();
+          window.addEventListener("hashchange", syncModalWithHash);
+          window.addEventListener("load", () => {
+            state.ui.pageLoaded = true;
+            renderEngineIcons();
+            hydrateLinkIcons();
+          });
+        }
+
+        function defaultDb() {
+          const now = Date.now();
+          const categories = [
+            { id: "cat-dev", name: "开发", order: 10, colorToken: "sky", createdAt: now, updatedAt: now },
+            { id: "cat-ai", name: "AI 工具", order: 20, colorToken: "mint", createdAt: now, updatedAt: now },
+            { id: "cat-collab", name: "协作", order: 30, colorToken: "lilac", createdAt: now, updatedAt: now },
+            { id: "cat-ops", name: "运营", order: 40, colorToken: "coral", createdAt: now, updatedAt: now },
+          ];
+          const links = [
+            { id: uid("link"), categoryId: "cat-dev", title: "GitHub", url: "https://github.com/", note: "", order: 10, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "Google", url: "https://www.google.com/", note: "", order: 20, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "百度", url: "https://www.baidu.com/", note: "", order: 30, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "DeepSeek", url: "https://www.deepseek.com/", note: "", order: 40, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "GLM", url: "https://chatglm.cn/", note: "", order: 50, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "豆包", url: "https://www.doubao.com/", note: "", order: 60, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "Trending", url: "https://github.com/trending", note: "", order: 70, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-dev", title: "DeepSeek Docs", url: "https://api-docs.deepseek.com/", note: "", order: 80, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "OpenAI", url: "https://platform.openai.com/", note: "", order: 10, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "Claude", url: "https://claude.ai/", note: "", order: 20, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "Kimi", url: "https://kimi.moonshot.cn/", note: "", order: 30, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "通义千问", url: "https://tongyi.aliyun.com/", note: "", order: 40, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "Poe", url: "https://poe.com/", note: "", order: 50, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ai", title: "Perplexity", url: "https://www.perplexity.ai/", note: "", order: 60, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-collab", title: "飞书", url: "https://www.feishu.cn/", note: "", order: 10, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-collab", title: "钉钉", url: "https://www.dingtalk.com/", note: "", order: 20, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-collab", title: "腾讯文档", url: "https://docs.qq.com/", note: "", order: 30, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-collab", title: "Notion", url: "https://www.notion.so/", note: "", order: 40, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ops", title: "Google Analytics", url: "https://analytics.google.com/", note: "", order: 10, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ops", title: "Search Console", url: "https://search.google.com/search-console/", note: "", order: 20, createdAt: now, updatedAt: now },
+            { id: uid("link"), categoryId: "cat-ops", title: "百度统计", url: "https://tongji.baidu.com/", note: "", order: 30, createdAt: now, updatedAt: now },
+          ];
+          return {
+            version: DB_VERSION,
+            settings: {
+              activeEngineId: "eng-google",
+              engines: presetEngines(now),
+              enginePresetOrder: COMMON_ENGINES.map((item) => item.id),
+              ui: { mode: "browse" },
+              motto: { mode: "daily", lastDate: "", quoteId: "" },
+            },
+            categories,
+            links,
+            activeCategoryId: "cat-dev",
+            plan: {
+              weekStart: "mon",
+              selectedDate: formatYmd(new Date(now)),
+              calendarMonth: formatYm(new Date(now)),
+              todos: [],
+              holidays: [
+                { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now },
+                { id: uid("holiday"), name: "劳动节", startDate: "2026-05-01", endDate: "2026-05-05", createdAt: now, updatedAt: now },
+              ],
+            },
+          };
+        }
+
+        function loadDb() {
+          const raw = safeReadStorage(STORAGE_KEY);
+          if (!raw) return validateAndNormalize(defaultDb());
+          try {
+            const parsed = JSON.parse(raw);
+            return validateAndNormalize(parsed);
+          } catch (_error) {
+            return validateAndNormalize(defaultDb());
+          }
+        }
+
+        function validateAndNormalize(input) {
+          const fallback = defaultDb();
+          if (!input || typeof input !== "object") return fallback;
+
+          const source = {
+            version: Number(input.version) || DB_VERSION,
+            settings: input.settings || {},
+            categories: Array.isArray(input.categories) ? input.categories : [],
+            links: Array.isArray(input.links) ? input.links : [],
+            activeCategoryId: input.activeCategoryId,
+            plan: input.plan || {},
+          };
+
+          const now = Date.now();
+          const categories = source.categories
+            .map((cat, index) => normalizeCategory(cat, index, now))
+            .filter(Boolean);
+
+          if (!categories.length) {
+            return fallback;
+          }
+
+          const categoryIds = new Set(categories.map((cat) => cat.id));
+          const links = source.links
+            .map((link, index) => normalizeLink(link, index, now))
+            .filter(Boolean)
+            .map((link) => {
+              if (!categoryIds.has(link.categoryId)) {
+                return { ...link, categoryId: categories[0].id };
+              }
+              return link;
+            });
+
+          const engines = (Array.isArray(source.settings.engines) ? source.settings.engines : [])
+            .map((item, index) => normalizeEngine(item, index, now))
+            .filter(Boolean);
+          const normalizedEngines = engines.length ? engines : presetEngines(now);
+          const normalizedPresetOrder = normalizeEnginePresetOrder(source.settings.enginePresetOrder);
+          const activeEngineId = safeString(source.settings.activeEngineId);
+          const normalizedActiveEngineId = normalizedEngines.some((item) => item.id === activeEngineId)
+            ? activeEngineId
+            : ((normalizedEngines[0] && normalizedEngines[0].id) || "");
+          const mode = source.settings.ui && source.settings.ui.mode === "manage" ? "manage" : "browse";
+          const motto = source.settings.motto && typeof source.settings.motto === "object" ? source.settings.motto : {};
+          const activeCategoryId = source.activeCategoryId === ALL_CATEGORY_ID || categoryIds.has(source.activeCategoryId)
+            ? source.activeCategoryId
+            : categories[0].id;
+
+          const plan = normalizePlan(source.plan, now);
+
+          return {
+            version: DB_VERSION,
+            settings: {
+              activeEngineId: normalizedActiveEngineId,
+              engines: normalizedEngines,
+              enginePresetOrder: normalizedPresetOrder,
+              ui: { mode },
+              motto: {
+                mode: "daily",
+                lastDate: typeof motto.lastDate === "string" ? motto.lastDate : "",
+                quoteId: typeof motto.quoteId === "string" ? motto.quoteId : "",
+              },
+            },
+            categories: categories.sort((a, b) => a.order - b.order),
+            links: links.sort((a, b) => a.order - b.order),
+            activeCategoryId,
+            plan,
+          };
+        }
+
+        function normalizeEngine(engine, index, now) {
+          if (!engine || typeof engine !== "object") return null;
+          const name = safeString(engine.name);
+          const searchUrl = safeString(engine.searchUrl);
+          const homeUrl = safeString(engine.homeUrl);
+          if (!name || !searchUrl) return null;
+          const id = safeString(engine.id) || uid("eng");
+          const createdAt = Number.isFinite(Number(engine.createdAt)) ? Number(engine.createdAt) : now;
+          const updatedAt = Number.isFinite(Number(engine.updatedAt)) ? Number(engine.updatedAt) : now;
+          const order = Number.isFinite(Number(engine.order)) ? Number(engine.order) : (index + 1) * 10;
+          return { id, name, searchUrl, homeUrl, order, createdAt, updatedAt };
+        }
+
+        function normalizeEnginePresetOrder(input) {
+          const ids = Array.isArray(input) ? input.map((item) => safeString(item)).filter(Boolean) : [];
+          const known = COMMON_ENGINES.map((item) => item.id);
+          const set = new Set();
+          const result = [];
+          ids.forEach((id) => {
+            if (!known.includes(id) || set.has(id)) return;
+            set.add(id);
+            result.push(id);
+          });
+          known.forEach((id) => {
+            if (set.has(id)) return;
+            result.push(id);
+          });
+          return result;
+        }
+
+        function presetEngines(now) {
+          return COMMON_ENGINES
+            .filter((engine) => DEFAULT_ENGINE_IDS.has(engine.id))
+            .map((engine, index) => ({
+            id: engine.id,
+            name: engine.name,
+            searchUrl: engine.searchUrl,
+            homeUrl: engine.homeUrl,
+            order: (index + 1) * 10,
+            createdAt: now,
+            updatedAt: now,
+            }));
+        }
+
+        function normalizePlan(input, now) {
+          const source = input && typeof input === "object" ? input : {};
+          const selectedDate = parseYmd(safeString(source.selectedDate)) ? safeString(source.selectedDate) : formatYmd(new Date(now));
+          const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(source.calendarMonth)) ? safeString(source.calendarMonth) : selectedDate.slice(0, 7);
+          const weekStart = "mon";
+          const todos = (Array.isArray(source.todos) ? source.todos : [])
+            .map((todo, index) => normalizeTodo(todo, index, now))
+            .filter(Boolean)
+            .sort((a, b) => a.order - b.order);
+          const holidays = (Array.isArray(source.holidays) ? source.holidays : [])
+            .map((holiday, index) => normalizeHoliday(holiday, index, now))
+            .filter(Boolean)
+            .sort((a, b) => a.startDate.localeCompare(b.startDate));
+          return {
+            weekStart,
+            selectedDate,
+            calendarMonth,
+            todos,
+            holidays,
+          };
+        }
+
+        function normalizeTodo(todo, index, now) {
+          if (!todo || typeof todo !== "object") return null;
+          const title = safeString(todo.title);
+          if (!title) return null;
+          const date = parseYmd(safeString(todo.date)) ? safeString(todo.date) : "";
+          const dayRaw = safeString(todo.day);
+          const dayNum = Number(dayRaw);
+          const day = Number.isInteger(dayNum) && dayNum >= 1 && dayNum <= 7 ? String(dayNum) : "";
+          const fallbackDate = date ? parseYmd(date) : new Date(now);
+          const weekKey = /^\d{4}-W\d{2}$/.test(safeString(todo.weekKey)) ? safeString(todo.weekKey) : weekKeyForDate(fallbackDate);
+          const order = Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10;
+          return {
+            id: safeString(todo.id) || uid("todo"),
+            title,
+            date,
+            weekKey,
+            day,
+            done: Boolean(todo.done),
+            order,
+            createdAt: Number.isFinite(Number(todo.createdAt)) ? Number(todo.createdAt) : now,
+            updatedAt: Number.isFinite(Number(todo.updatedAt)) ? Number(todo.updatedAt) : now,
+          };
+        }
+
+        function normalizeHoliday(holiday, index, now) {
+          if (!holiday || typeof holiday !== "object") return null;
+          const name = safeString(holiday.name);
+          const startDate = safeString(holiday.startDate);
+          const endDate = safeString(holiday.endDate);
+          if (!name || !parseYmd(startDate) || !parseYmd(endDate) || startDate > endDate) return null;
+          return {
+            id: safeString(holiday.id) || uid("holiday"),
+            name,
+            startDate,
+            endDate,
+            createdAt: Number.isFinite(Number(holiday.createdAt)) ? Number(holiday.createdAt) : now,
+            updatedAt: Number.isFinite(Number(holiday.updatedAt)) ? Number(holiday.updatedAt) : now,
+            order: Number.isFinite(Number(holiday.order)) ? Number(holiday.order) : (index + 1) * 10,
+          };
+        }
+
+        function normalizeCategory(cat, index, now) {
+          if (!cat || typeof cat !== "object") return null;
+          const id = safeString(cat.id) || uid("cat");
+          const name = safeString(cat.name) || `分类 ${index + 1}`;
+          const colorToken = COLOR_TOKENS.has(cat.colorToken) ? cat.colorToken : "slate";
+          const order = Number.isFinite(Number(cat.order)) ? Number(cat.order) : (index + 1) * 10;
+          return {
+            id,
+            name,
+            order,
+            colorToken,
+            createdAt: Number.isFinite(Number(cat.createdAt)) ? Number(cat.createdAt) : now,
+            updatedAt: Number.isFinite(Number(cat.updatedAt)) ? Number(cat.updatedAt) : now,
+          };
+        }
+
+        function normalizeLink(link, index, now) {
+          if (!link || typeof link !== "object") return null;
+          const id = safeString(link.id) || uid("link");
+          const title = safeString(link.title) || "未命名链接";
+          const url = safeString(link.url);
+          if (!isValidHttpUrl(url)) return null;
+          const order = Number.isFinite(Number(link.order)) ? Number(link.order) : (index + 1) * 10;
+          return {
+            id,
+            categoryId: safeString(link.categoryId) || "",
+            title,
+            url,
+            note: safeString(link.note),
+            order,
+            createdAt: Number.isFinite(Number(link.createdAt)) ? Number(link.createdAt) : now,
+            updatedAt: Number.isFinite(Number(link.updatedAt)) ? Number(link.updatedAt) : now,
+          };
+        }
+
+        function bindEvents() {
+          if (els.searchForm) {
+            els.searchForm.addEventListener("submit", onSearchSubmit);
+          }
+
+          if (els.engineTabs) {
+            els.engineTabs.addEventListener("click", onEngineTabsClick);
+          }
+
+          if (els.openEngineModal) {
+            els.openEngineModal.addEventListener("click", fillEngineModal);
+          }
+
+          if (els.engineAddBtn) {
+            els.engineAddBtn.addEventListener("click", onEngineAdd);
+          }
+
+          if (els.engineOpenCustomFormBtn && els.engineCustomPanel) {
+            els.engineOpenCustomFormBtn.addEventListener("click", () => {
+              els.engineCustomPanel.hidden = !els.engineCustomPanel.hidden;
+            });
+          }
+
+          if (els.engineSelectAllBtn) {
+            els.engineSelectAllBtn.addEventListener("click", () => toggleAllPresetEngines(true));
+          }
+
+          if (els.engineSelectNoneBtn) {
+            els.engineSelectNoneBtn.addEventListener("click", () => toggleAllPresetEngines(false));
+          }
+
+          if (els.engineCustomAddBtn) {
+            els.engineCustomAddBtn.addEventListener("click", onEngineCustomAdd);
+          }
+
+          if (els.enginePresetList) {
+            els.enginePresetList.addEventListener("change", onEnginePresetCheckChange);
+          }
+
+          if (els.enginePresetList) {
+            els.enginePresetList.addEventListener("dragstart", onEnginePresetDragStart);
+            els.enginePresetList.addEventListener("dragover", onEnginePresetDragOver);
+            els.enginePresetList.addEventListener("drop", onEnginePresetDrop);
+            els.enginePresetList.addEventListener("dragend", onEnginePresetDragEnd);
+          }
+
+          if (els.modeBrowse) {
+            els.modeBrowse.addEventListener("change", onModeChange);
+          }
+          if (els.modeManage) {
+            els.modeManage.addEventListener("change", onModeChange);
+          }
+
+          if (els.cats) {
+            els.cats.addEventListener("click", (event) => {
+              const node = event.target.closest(".cat[data-cat-id]");
+              if (!node) return;
+              event.preventDefault();
+              const catId = node.getAttribute("data-cat-id");
+              if (!catId) return;
+
+              if (catId === state.db.activeCategoryId) return;
+              state.db.activeCategoryId = catId;
+              saveDb();
+              renderAll();
+            });
+
+            els.cats.addEventListener("dragstart", onCategoryDragStart);
+            els.cats.addEventListener("dragover", onCategoryDragOver);
+            els.cats.addEventListener("drop", onCategoryDrop);
+            els.cats.addEventListener("dragend", onCategoryDragEnd);
+          }
+
+          if (els.grid) {
+            els.grid.addEventListener("click", (event) => {
+              const actionNode = event.target.closest("[data-action][data-link-id]");
+              if (actionNode) {
+                const linkId = actionNode.getAttribute("data-link-id");
+                if (!linkId) return;
+                const action = actionNode.getAttribute("data-action");
+                if (action === "edit-link") {
+                  state.ui.editingLinkId = linkId;
+                }
+                if (action === "delete-link") {
+                  state.ui.deletingLinkId = linkId;
+                }
+                return;
+              }
+
+              if (event.target.closest("a.stretched")) {
+                return;
+              }
+
+              const card = event.target.closest(".linkcard[data-link-id]");
+              if (!card) return;
+              event.preventDefault();
+              if (isManageMode()) return;
+              const linkId = card.getAttribute("data-link-id");
+              const link = getLinkById(linkId);
+              if (link) {
+                openExternal(link.url);
+              }
+            });
+
+            els.grid.addEventListener("dragstart", onGridDragStart);
+            els.grid.addEventListener("dragover", onGridDragOver);
+            els.grid.addEventListener("drop", onGridDrop);
+            els.grid.addEventListener("dragend", onGridDragEnd);
+          }
+
+          if (els.openLinkModal) {
+            els.openLinkModal.addEventListener("click", () => {
+              state.ui.editingLinkId = null;
+            });
+          }
+
+          if (els.openCategoryDelete) {
+            els.openCategoryDelete.addEventListener("click", (event) => {
+              if (state.db.activeCategoryId === ALL_CATEGORY_ID) {
+                event.preventDefault();
+                toast("提示", "请先选择具体分类再删除。", true);
+                return;
+              }
+              if (state.db.categories.length <= 1) {
+                event.preventDefault();
+                toast("提示", "至少保留一个分类。");
+                return;
+              }
+              state.ui.deletingCategoryId = state.db.activeCategoryId;
+              fillCategoryDeleteDialog();
+            });
+          }
+
+          if (els.linkSaveBtn) {
+            els.linkSaveBtn.addEventListener("click", onLinkSave);
+          }
+
+          if (els.linkDeleteConfirmBtn) {
+            els.linkDeleteConfirmBtn.addEventListener("click", onLinkDeleteConfirm);
+          }
+
+          if (els.categoryConfirmBtn) {
+            els.categoryConfirmBtn.addEventListener("click", onCategoryConfirm);
+          }
+
+          if (els.categoryColorPalette && els.categoryColorSelect) {
+            els.categoryColorPalette.addEventListener("click", (event) => {
+              const swatch = event.target.closest(".color-swatch[data-color]");
+              if (!swatch) return;
+              const color = swatch.getAttribute("data-color");
+              if (!COLOR_TOKENS.has(color)) return;
+              els.categoryColorSelect.value = color;
+              syncColorPalette(color);
+            });
+          }
+
+          if (els.categoryDeleteConfirmBtn) {
+            els.categoryDeleteConfirmBtn.addEventListener("click", onCategoryDeleteConfirm);
+          }
+
+          if (els.dataExportBtn) {
+            els.dataExportBtn.addEventListener("click", onDataExport);
+          }
+
+          if (els.dataExportDirectBtn) {
+            els.dataExportDirectBtn.addEventListener("click", onDataExport);
+          }
+
+          if (els.dataImportApplyBtn) {
+            els.dataImportApplyBtn.addEventListener("click", onDataImportApply);
+          }
+
+          if (els.planPanel) {
+            els.planPanel.addEventListener("click", onPlanPanelClick);
+          }
+
+          if (els.todoQuickForm) {
+            els.todoQuickForm.addEventListener("submit", onTodoQuickSubmit);
+          }
+
+          if (els.todoGroups) {
+            els.todoGroups.addEventListener("click", onTodoGroupsClick);
+            els.todoGroups.addEventListener("change", onTodoGroupsChange);
+          }
+
+          if (els.todoSaveBtn) {
+            els.todoSaveBtn.addEventListener("click", onTodoSave);
+          }
+
+          if (els.todoDeleteConfirmBtn) {
+            els.todoDeleteConfirmBtn.addEventListener("click", onTodoDeleteConfirm);
+          }
+
+          if (els.holidayAddBtn) {
+            els.holidayAddBtn.addEventListener("click", onHolidayAdd);
+          }
+
+          if (els.holidayList) {
+            els.holidayList.addEventListener("click", onHolidayListClick);
+          }
+        }
+
+        function onModeChange() {
+          const mode = els.modeManage && els.modeManage.checked ? "manage" : "browse";
+          state.db.settings.ui.mode = mode;
+          saveDb();
+        }
+
+        async function onSearchSubmit(event) {
+          event.preventDefault();
+          const q = els.queryInput ? els.queryInput.value.trim() : "";
+          const engineId = getActiveEngineId();
+          const engine = getEngineById(engineId);
+          if (!engine) {
+            toast("提示", "请先添加搜索引擎。", true);
+            window.location.hash = "#modal-engine";
+            return;
+          }
+          const url = buildSearchUrl(engine, q);
+
+          if (q && shouldCopyQueryForEngine(engine)) {
+            const copied = await copyToClipboard(q);
+            if (copied) {
+              toast("已复制", `已复制关键词，前往「${engineLabel(engine)}」后按 Ctrl+V 粘贴即可。`);
+            } else {
+              toast("提示", `即将打开「${engineLabel(engine)}」，请手动复制关键词：${q}`);
+            }
+            window.setTimeout(() => {
+              openExternal(url);
+            }, 700);
+            return;
+          }
+
+          openExternal(url);
+          toast("已打开", q ? `在 ${engineLabel(engine)} 搜索：${q}` : `已打开 ${engineLabel(engine)} 首页`);
+        }
+
+        function buildSearchUrl(engine, query) {
+          const q = encodeURIComponent(query);
+          const template = safeString(engine.searchUrl);
+          const homeUrl = safeString(engine.homeUrl);
+          if (query) {
+            if (template.includes("{q}")) {
+              return template.replace(/\{q\}/g, q);
+            }
+            return template.includes("?") ? `${template}&q=${q}` : `${template}?q=${q}`;
+          }
+          if (homeUrl) return homeUrl;
+          if (template.includes("{q}")) return template.replace(/\{q\}/g, "");
+          return template;
+        }
+
+        function onEngineTabsClick(event) {
+          const tab = event.target.closest(".tab[data-engine-id]");
+          if (!tab || !els.engineTabs) return;
+          const id = tab.getAttribute("data-engine-id");
+          if (!id) return;
+          state.db.settings.activeEngineId = id;
+          saveDb();
+          renderHeader();
+        }
+
+        function onEngineAdd(event) {
+          event.preventDefault();
+          applyPresetEngineSelection();
+        }
+
+        function onEngineCustomAdd(event) {
+          event.preventDefault();
+          const name = safeString(els.engineNameInput && els.engineNameInput.value);
+          const searchUrl = safeString(els.engineSearchInput && els.engineSearchInput.value);
+          const homeUrl = safeString(els.engineHomeInput && els.engineHomeInput.value);
+          if (!name || !searchUrl) {
+            toast("校验失败", "请填写名称和搜索 URL 模板。", true);
+            return;
+          }
+          if (!isLikelyUrlTemplate(searchUrl)) {
+            toast("校验失败", "搜索 URL 模板必须是 http(s) 地址。", true);
+            return;
+          }
+          if (homeUrl && !isValidHttpUrl(homeUrl)) {
+            toast("校验失败", "主页 URL 必须是 http(s) 地址。", true);
+            return;
+          }
+          const now = Date.now();
+          const id = uid("eng");
+          state.db.settings.engines.push({
+            id,
+            name,
+            searchUrl,
+            homeUrl,
+            order: nextOrder(state.db.settings.engines),
+            createdAt: now,
+            updatedAt: now,
+          });
+          if (!state.db.settings.activeEngineId) {
+            state.db.settings.activeEngineId = id;
+          }
+          saveDb();
+          fillEngineModal();
+          renderHeader();
+          toast("已新增", `搜索引擎「${name}」已添加。`);
+        }
+
+        function toggleAllPresetEngines(checked) {
+          if (!els.enginePresetList) return;
+          const boxes = Array.from(els.enginePresetList.querySelectorAll("input[data-engine-preset-id]"));
+          boxes.forEach((box) => {
+            box.checked = checked;
+          });
+          onEnginePresetCheckChange();
+        }
+
+        function onEnginePresetCheckChange() {
+          if (!els.enginePresetList) return;
+          const selectedIds = new Set(
+            Array.from(els.enginePresetList.querySelectorAll("input[data-engine-preset-id]:checked"))
+              .map((node) => safeString(node.getAttribute("data-engine-preset-id")))
+              .filter(Boolean)
+          );
+          renderEnginePresetList(selectedIds);
+        }
+
+        function applyPresetEngineSelection() {
+          if (!els.enginePresetList) return;
+          const orderedNodes = Array.from(els.enginePresetList.querySelectorAll(".engine-preset-item[data-engine-preset-id]"));
+          const orderedIds = orderedNodes.map((node) => safeString(node.getAttribute("data-engine-preset-id"))).filter(Boolean);
+          const checkedIds = new Set(
+            orderedNodes
+              .filter((node) => {
+                const cb = node.querySelector("input[data-engine-preset-id]");
+                return cb && cb.checked;
+              })
+              .map((node) => safeString(node.getAttribute("data-engine-preset-id")))
+              .filter(Boolean)
+          );
+          const now = Date.now();
+          const byId = new Map(COMMON_ENGINES.map((engine) => [engine.id, engine]));
+          const selected = orderedIds
+            .map((id) => byId.get(id))
+            .filter(Boolean)
+            .filter((engine) => checkedIds.has(engine.id))
+            .map((engine, index) => ({
+              id: engine.id,
+              name: engine.name,
+              searchUrl: engine.searchUrl,
+              homeUrl: engine.homeUrl,
+              order: (index + 1) * 10,
+              createdAt: now,
+              updatedAt: now,
+            }));
+
+          const customs = sortedEngines().filter((engine) => !COMMON_ENGINES.some((item) => item.id === engine.id));
+          const merged = [...selected];
+          customs.forEach((engine) => {
+            merged.push({ ...engine, order: (merged.length + 1) * 10, updatedAt: now });
+          });
+
+          state.db.settings.engines = merged;
+          state.db.settings.enginePresetOrder = normalizeEnginePresetOrder(orderedIds);
+          if (!merged.some((item) => item.id === state.db.settings.activeEngineId)) {
+            state.db.settings.activeEngineId = (merged[0] && merged[0].id) || "";
+          }
+          saveDb();
+          renderHeader();
+          renderEnginePresetList();
+          toast("已保存", "默认引擎选择已更新。");
+          closeHashModal();
+        }
+
+        function onEnginePresetDragStart(event) {
+          const item = event.target.closest(".engine-preset-item[data-engine-preset-id]");
+          if (!item) return;
+          const id = item.getAttribute("data-engine-preset-id");
+          if (!id) return;
+          state.ui.draggingPresetEngineId = id;
+          item.classList.add("dragging");
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", id);
+          }
+        }
+
+        function onEnginePresetDragOver(event) {
+          if (!state.ui.draggingPresetEngineId || !els.enginePresetList) return;
+          const dragging = els.enginePresetList.querySelector(`.engine-preset-item[data-engine-preset-id="${CSS.escape(state.ui.draggingPresetEngineId)}"]`);
+          const target = event.target.closest(".engine-preset-item[data-engine-preset-id]");
+          if (!dragging || !target || dragging === target) return;
+          event.preventDefault();
+          const rect = target.getBoundingClientRect();
+          const before = event.clientY < rect.top + rect.height / 2;
+          const ref = before ? target : target.nextElementSibling;
+          if (ref !== dragging) {
+            target.parentElement.insertBefore(dragging, ref);
+          }
+        }
+
+        function onEnginePresetDrop(event) {
+          if (!state.ui.draggingPresetEngineId) return;
+          event.preventDefault();
+        }
+
+        function onEnginePresetDragEnd(_event) {
+          if (!els.enginePresetList) return;
+          const dragging = els.enginePresetList.querySelector(".engine-preset-item.dragging");
+          if (dragging) dragging.classList.remove("dragging");
+          const orderedIds = Array.from(els.enginePresetList.querySelectorAll(".engine-preset-item[data-engine-preset-id]"))
+            .map((node) => safeString(node.getAttribute("data-engine-preset-id")))
+            .filter(Boolean);
+          state.ui.draggingPresetEngineId = null;
+          state.db.settings.enginePresetOrder = normalizeEnginePresetOrder(orderedIds);
+          saveDb();
+        }
+
+        function onLinkSave(event) {
+          event.preventDefault();
+          const title = safeString(els.linkTitleInput && els.linkTitleInput.value);
+          const url = safeString(els.linkUrlInput && els.linkUrlInput.value);
+          const note = safeString(els.linkNoteInput && els.linkNoteInput.value);
+          const categoryId = safeString(els.linkCategorySelect && els.linkCategorySelect.value) || state.db.activeCategoryId;
+
+          if (!title) {
+            toast("校验失败", "请输入链接名称。", true);
+            return;
+          }
+          if (!isValidHttpUrl(url)) {
+            toast("校验失败", "请输入完整的 http(s) 链接。", true);
+            return;
+          }
+
+          const now = Date.now();
+          const existing = state.ui.editingLinkId ? getLinkById(state.ui.editingLinkId) : null;
+
+          if (existing) {
+            existing.title = title;
+            existing.url = url;
+            existing.note = note;
+            existing.categoryId = categoryId;
+            existing.updatedAt = now;
+          } else {
+            const order = nextOrderForLinks(categoryId);
+            state.db.links.push({
+              id: uid("link"),
+              categoryId,
+              title,
+              url,
+              note,
+              order,
+              createdAt: now,
+              updatedAt: now,
+            });
+          }
+
+          state.db.activeCategoryId = categoryId;
+          state.ui.editingLinkId = null;
+          saveDb();
+          renderAll();
+          closeHashModal();
+          toast("已保存", "链接已更新。", false);
+        }
+
+        function onLinkDeleteConfirm(event) {
+          event.preventDefault();
+          const id = state.ui.deletingLinkId;
+          if (!id) {
+            toast("提示", "未找到要删除的链接。", true);
+            return;
+          }
+          const idx = state.db.links.findIndex((item) => item.id === id);
+          if (idx < 0) {
+            toast("提示", "链接已不存在。", true);
+            closeHashModal();
+            return;
+          }
+          const removed = state.db.links[idx];
+          state.db.links.splice(idx, 1);
+          state.ui.deletingLinkId = null;
+          saveDb();
+          renderAll();
+          closeHashModal();
+          toast("已删除", `已删除：${removed.title}`);
+        }
+
+        function onCategoryConfirm(event) {
+          event.preventDefault();
+          const mode = safeString(els.categoryModeSelect && els.categoryModeSelect.value) || "add";
+          const name = safeString(els.categoryNameInput && els.categoryNameInput.value);
+          const colorToken = safeString(els.categoryColorSelect && els.categoryColorSelect.value);
+
+          if (!name) {
+            toast("校验失败", "请输入分类名称。", true);
+            return;
+          }
+
+          const now = Date.now();
+          if (mode === "rename") {
+            const cat = getCategoryById(state.db.activeCategoryId);
+            if (!cat) {
+              toast("失败", "当前分类不存在。", true);
+              return;
+            }
+            cat.name = name;
+            cat.colorToken = COLOR_TOKENS.has(colorToken) ? colorToken : cat.colorToken;
+            cat.updatedAt = now;
+            toast("已保存", "分类已更新。");
+          } else {
+            const exists = state.db.categories.some((cat) => cat.name === name);
+            if (exists) {
+              toast("校验失败", "分类名称已存在。", true);
+              return;
+            }
+            const id = uid("cat");
+            state.db.categories.push({
+              id,
+              name,
+              order: nextOrder(state.db.categories),
+              colorToken: COLOR_TOKENS.has(colorToken) ? colorToken : "slate",
+              createdAt: now,
+              updatedAt: now,
+            });
+            state.db.activeCategoryId = id;
+            toast("已新增", `分类「${name}」已创建。`);
+          }
+
+          saveDb();
+          renderAll();
+          closeHashModal();
+        }
+
+        function onCategoryDeleteConfirm(event) {
+          event.preventDefault();
+          if (state.db.categories.length <= 1) {
+            toast("提示", "至少保留一个分类。", true);
+            return;
+          }
+
+          const targetId = state.ui.deletingCategoryId || state.db.activeCategoryId;
+          const cat = getCategoryById(targetId);
+          if (!cat) {
+            toast("提示", "分类不存在。", true);
+            closeHashModal();
+            return;
+          }
+
+          const affected = state.db.links.filter((item) => item.categoryId === targetId).length;
+          state.db.links = state.db.links.filter((item) => item.categoryId !== targetId);
+          state.db.categories = state.db.categories.filter((item) => item.id !== targetId);
+          state.db.activeCategoryId = state.db.categories[0].id;
+          state.ui.deletingCategoryId = null;
+
+          saveDb();
+          renderAll();
+          closeHashModal();
+          toast("已删除", `删除分类「${cat.name}」，移除 ${affected} 条链接。`);
+        }
+
+        async function onDataExport(event) {
+          if (event) event.preventDefault();
+          const json = JSON.stringify(state.db, null, 2);
+          const date = new Date();
+          const fileName = `workhub-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}.json`;
+
+          if (window.isSecureContext && typeof window.showSaveFilePicker === "function") {
+            try {
+              const fileHandle = await window.showSaveFilePicker({
+                suggestedName: fileName,
+                types: [
+                  {
+                    description: "JSON Files",
+                    accept: { "application/json": [".json"] },
+                  },
+                ],
+              });
+              const writable = await fileHandle.createWritable();
+              await writable.write(json);
+              await writable.close();
+              toast("已导出", `已保存 ${fileName}`);
+              return;
+            } catch (error) {
+              if (error && error.name === "AbortError") {
+                return;
+              }
+            }
+          }
+
+          const blob = new Blob([json], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          toast("已导出", `下载 ${fileName}`);
+        }
+
+        async function onDataImportApply(event) {
+          event.preventDefault();
+          const strategy = safeString(els.importStrategy && els.importStrategy.value) || "overwrite";
+          if (strategy !== "overwrite") {
+            toast("提示", "首版仅支持覆盖导入。", true);
+            return;
+          }
+
+          const file = els.importInput && els.importInput.files && els.importInput.files[0];
+          if (!file) {
+            toast("导入失败", "请先选择 JSON 文件。", true);
+            return;
+          }
+
+          let text = "";
+          try {
+            text = await file.text();
+          } catch (_error) {
+            toast("导入失败", "读取文件失败。", true);
+            return;
+          }
+
+          let parsed;
+          try {
+            parsed = JSON.parse(text);
+          } catch (_error) {
+            toast("导入失败", "JSON 解析失败。", true);
+            return;
+          }
+
+          const normalized = validateAndNormalize(parsed);
+          if (!normalized.categories.length) {
+            toast("导入失败", "数据结构不合法。", true);
+            return;
+          }
+
+          state.db = normalized;
+          saveDb();
+          renderAll();
+          closeHashModal();
+          toast("导入成功", "已覆盖本地数据。", false);
+        }
+
+        function onPlanPanelClick(event) {
+          const actionBtn = event.target.closest("[data-action^='cal-']");
+          if (actionBtn) {
+            const action = actionBtn.getAttribute("data-action");
+            const current = parseYm(state.db.plan.calendarMonth) || new Date();
+            if (action === "cal-prev") {
+              state.db.plan.calendarMonth = formatYm(new Date(current.getFullYear(), current.getMonth() - 1, 1));
+            }
+            if (action === "cal-next") {
+              state.db.plan.calendarMonth = formatYm(new Date(current.getFullYear(), current.getMonth() + 1, 1));
+            }
+            if (action === "cal-today") {
+              const today = new Date();
+              state.db.plan.selectedDate = formatYmd(today);
+              state.db.plan.calendarMonth = formatYm(today);
+            }
+            saveDb();
+            renderPlanPanel();
+            return;
+          }
+
+          const dayBtn = event.target.closest(".calday[data-date]");
+          if (!dayBtn) return;
+          const date = safeString(dayBtn.getAttribute("data-date"));
+          if (!parseYmd(date)) return;
+          state.db.plan.selectedDate = date;
+          state.db.plan.calendarMonth = date.slice(0, 7);
+          saveDb();
+          renderPlanPanel();
+        }
+
+        function onTodoQuickSubmit(event) {
+          event.preventDefault();
+          const title = safeString(els.todoQuickTitle && els.todoQuickTitle.value);
+          if (!title) {
+            toast("提示", "请输入待办标题。", true);
+            return;
+          }
+          const now = Date.now();
+          const selectedDate = parseYmd(safeString(els.todoQuickDate && els.todoQuickDate.value))
+            || parseYmd(state.db.plan.selectedDate)
+            || new Date();
+          const date = formatYmd(selectedDate);
+          const weekKey = weekKeyForDate(selectedDate);
+          const day = String(weekdayMon(selectedDate));
+          state.db.plan.todos.push({
+            id: uid("todo"),
+            title,
+            date,
+            weekKey,
+            day,
+            done: false,
+            order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
+            createdAt: now,
+            updatedAt: now,
+          });
+          if (els.todoQuickTitle) els.todoQuickTitle.value = "";
+          if (els.todoQuickDate) els.todoQuickDate.value = date;
+          state.db.plan.selectedDate = date;
+          state.db.plan.calendarMonth = date.slice(0, 7);
+          saveDb();
+          renderPlanPanel();
+          toast("已新增", "待办已加入本周清单。");
+        }
+
+        function onTodoGroupsClick(event) {
+          const actionNode = event.target.closest("[data-action][data-todo-id]");
+          if (!actionNode) return;
+          const todoId = actionNode.getAttribute("data-todo-id");
+          if (!todoId) return;
+          const action = actionNode.getAttribute("data-action");
+          if (action === "edit-todo") {
+            state.ui.editingTodoId = todoId;
+          }
+          if (action === "delete-todo") {
+            state.ui.deletingTodoId = todoId;
+          }
+        }
+
+        function onTodoGroupsChange(event) {
+          const cb = event.target.closest("input[data-action='toggle-todo'][data-todo-id]");
+          if (!cb) return;
+          const todoId = cb.getAttribute("data-todo-id");
+          const todo = getTodoById(todoId);
+          if (!todo) return;
+          todo.done = Boolean(cb.checked);
+          todo.updatedAt = Date.now();
+          saveDb();
+          renderPlanPanel();
+        }
+
+        function onTodoSave(event) {
+          event.preventDefault();
+          const title = safeString(els.todoTitleInput && els.todoTitleInput.value);
+          const day = normalizeDayValue(els.todoDaySelect && els.todoDaySelect.value);
+          if (!title) {
+            toast("校验失败", "请输入待办标题。", true);
+            return;
+          }
+          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
+          const weekKey = weekKeyForDate(selected);
+          const baseWeekStart = startOfWeekMon(selected);
+          const date = day
+            ? formatYmd(new Date(baseWeekStart.getFullYear(), baseWeekStart.getMonth(), baseWeekStart.getDate() + Number(day) - 1))
+            : formatYmd(selected);
+          const now = Date.now();
+          const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
+          if (editing) {
+            editing.title = title;
+            editing.date = date;
+            editing.day = day;
+            editing.weekKey = weekKey;
+            editing.updatedAt = now;
+          } else {
+            state.db.plan.todos.push({
+              id: uid("todo"),
+              title,
+              date,
+              weekKey,
+              day,
+              done: false,
+              order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
+              createdAt: now,
+              updatedAt: now,
+            });
+          }
+          state.ui.editingTodoId = null;
+          saveDb();
+          renderPlanPanel();
+          closeHashModal();
+          toast("已保存", "待办已更新。", false);
+        }
+
+        function onTodoDeleteConfirm(event) {
+          event.preventDefault();
+          const id = state.ui.deletingTodoId;
+          if (!id) return;
+          const idx = state.db.plan.todos.findIndex((item) => item.id === id);
+          if (idx < 0) {
+            closeHashModal();
+            return;
+          }
+          const removed = state.db.plan.todos[idx];
+          state.db.plan.todos.splice(idx, 1);
+          state.ui.deletingTodoId = null;
+          saveDb();
+          renderPlanPanel();
+          closeHashModal();
+          toast("已删除", `已删除待办：${removed.title}`);
+        }
+
+        function onHolidayAdd(event) {
+          event.preventDefault();
+          const name = safeString(els.holidayNameInput && els.holidayNameInput.value);
+          const startDate = safeString(els.holidayStartInput && els.holidayStartInput.value);
+          const endDate = safeString(els.holidayEndInput && els.holidayEndInput.value);
+          if (!name || !parseYmd(startDate) || !parseYmd(endDate)) {
+            toast("校验失败", "请填写完整假日信息。", true);
+            return;
+          }
+          if (startDate > endDate) {
+            toast("校验失败", "结束日期不能早于开始日期。", true);
+            return;
+          }
+          const now = Date.now();
+          state.db.plan.holidays.push({
+            id: uid("holiday"),
+            name,
+            startDate,
+            endDate,
+            order: nextOrder(state.db.plan.holidays),
+            createdAt: now,
+            updatedAt: now,
+          });
+          saveDb();
+          renderPlanPanel();
+          fillHolidayModal();
+          toast("已新增", `已添加假日：${name}`);
+        }
+
+        function onHolidayListClick(event) {
+          const node = event.target.closest("[data-action='delete-holiday'][data-holiday-id]");
+          if (!node) return;
+          const holidayId = node.getAttribute("data-holiday-id");
+          if (!holidayId) return;
+          const idx = state.db.plan.holidays.findIndex((item) => item.id === holidayId);
+          if (idx < 0) return;
+          const removed = state.db.plan.holidays[idx];
+          state.db.plan.holidays.splice(idx, 1);
+          saveDb();
+          renderPlanPanel();
+          renderHolidayList();
+          toast("已删除", `已删除假日：${removed.name}`);
+        }
+
+        function syncModalWithHash() {
+          if (window.location.hash === "#modal-link") {
+            fillLinkModal();
+            return;
+          }
+          if (window.location.hash === "#modal-delete") {
+            fillLinkDeleteDialog();
+            return;
+          }
+          if (window.location.hash === "#modal-category") {
+            fillCategoryModal();
+            return;
+          }
+          if (window.location.hash === "#modal-category-danger") {
+            fillCategoryDeleteDialog();
+            return;
+          }
+          if (window.location.hash === "#modal-todo") {
+            fillTodoModal();
+            return;
+          }
+          if (window.location.hash === "#modal-todo-delete") {
+            fillTodoDeleteDialog();
+            return;
+          }
+          if (window.location.hash === "#modal-holidays") {
+            fillHolidayModal();
+            return;
+          }
+          if (window.location.hash === "#modal-engine") {
+            fillEngineModal();
+          }
+        }
+
+        function fillLinkModal() {
+          renderCategoryOptions();
+          const defaultCategoryId = state.db.activeCategoryId === ALL_CATEGORY_ID
+            ? ((sortedCategories()[0] && sortedCategories()[0].id) || "")
+            : state.db.activeCategoryId;
+          const editing = state.ui.editingLinkId ? getLinkById(state.ui.editingLinkId) : null;
+          if (editing) {
+            if (els.linkModalTitle) els.linkModalTitle.textContent = "编辑链接";
+            if (els.linkTitleInput) els.linkTitleInput.value = editing.title;
+            if (els.linkUrlInput) els.linkUrlInput.value = editing.url;
+            if (els.linkNoteInput) els.linkNoteInput.value = editing.note || "";
+            if (els.linkCategorySelect) els.linkCategorySelect.value = editing.categoryId;
+          } else {
+            if (els.linkModalTitle) els.linkModalTitle.textContent = "新增链接";
+            if (els.linkTitleInput) els.linkTitleInput.value = "";
+            if (els.linkUrlInput) els.linkUrlInput.value = "";
+            if (els.linkNoteInput) els.linkNoteInput.value = "";
+            if (els.linkCategorySelect) els.linkCategorySelect.value = defaultCategoryId;
+          }
+        }
+
+        function fillCategoryModal() {
+          const active = getCategoryById(state.db.activeCategoryId);
+          if (els.categoryNameInput) {
+            els.categoryNameInput.value = "";
+          }
+          if (els.categoryColorSelect) {
+            const nextColor = active ? active.colorToken : "sky";
+            els.categoryColorSelect.value = nextColor;
+            syncColorPalette(nextColor);
+          }
+          if (els.categoryModeSelect) {
+            els.categoryModeSelect.value = "add";
+          }
+        }
+
+        function syncColorPalette(selectedColor) {
+          if (!els.categoryColorPalette) return;
+          const chips = els.categoryColorPalette.querySelectorAll(".color-swatch[data-color]");
+          chips.forEach((chip) => {
+            const color = chip.getAttribute("data-color");
+            const isActive = color === selectedColor;
+            chip.setAttribute("aria-checked", isActive ? "true" : "false");
+          });
+        }
+
+        function fillCategoryDeleteDialog() {
+          const targetId = state.ui.deletingCategoryId || state.db.activeCategoryId;
+          const cat = getCategoryById(targetId);
+          if (!cat) return;
+          const affected = state.db.links.filter((item) => item.categoryId === targetId).length;
+          if (els.dangerCategoryName) els.dangerCategoryName.textContent = cat.name;
+          if (els.dangerCategoryCount) els.dangerCategoryCount.textContent = String(affected);
+        }
+
+        function fillLinkDeleteDialog() {
+          const link = state.ui.deletingLinkId ? getLinkById(state.ui.deletingLinkId) : null;
+          if (!link) return;
+          if (els.dangerLinkName) {
+            els.dangerLinkName.textContent = link.title;
+          }
+        }
+
+        function fillTodoModal() {
+          const selectedDate = parseYmd(state.db.plan.selectedDate) || new Date();
+          const defaultDay = String(weekdayMon(selectedDate));
+          const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
+          if (editing) {
+            if (els.todoModalTitle) els.todoModalTitle.textContent = "编辑待办";
+            if (els.todoTitleInput) els.todoTitleInput.value = editing.title;
+            if (els.todoDaySelect) els.todoDaySelect.value = editing.day || "";
+            return;
+          }
+          if (els.todoModalTitle) els.todoModalTitle.textContent = "新增待办";
+          if (els.todoTitleInput) els.todoTitleInput.value = "";
+          if (els.todoDaySelect) els.todoDaySelect.value = defaultDay;
+        }
+
+        function fillTodoDeleteDialog() {
+          const todo = state.ui.deletingTodoId ? getTodoById(state.ui.deletingTodoId) : null;
+          if (!todo) return;
+          if (els.dangerTodoName) els.dangerTodoName.textContent = todo.title;
+        }
+
+        function fillHolidayModal() {
+          if (els.holidayNameInput) els.holidayNameInput.value = "";
+          if (els.holidayStartInput) els.holidayStartInput.value = "";
+          if (els.holidayEndInput) els.holidayEndInput.value = "";
+          renderHolidayList();
+        }
+
+        function fillEngineModal() {
+          if (els.engineNameInput) els.engineNameInput.value = "";
+          if (els.engineSearchInput) els.engineSearchInput.value = "";
+          if (els.engineHomeInput) els.engineHomeInput.value = "";
+          if (els.engineCustomPanel) {
+            els.engineCustomPanel.hidden = true;
+          }
+          renderEnginePresetList();
+        }
+
+        function renderEnginePresetList(overrideSelectedIds) {
+          if (!els.enginePresetList) return;
+          const activeIds = overrideSelectedIds instanceof Set
+            ? overrideSelectedIds
+            : new Set((state.db.settings.engines || []).map((item) => item.id));
+          const order = normalizeEnginePresetOrder(state.db.settings.enginePresetOrder);
+          const byId = new Map(COMMON_ENGINES.map((item) => [item.id, item]));
+          const ordered = order.map((id) => byId.get(id)).filter(Boolean);
+          const selected = ordered.filter((item) => activeIds.has(item.id));
+          const unselected = ordered.filter((item) => !activeIds.has(item.id));
+          const list = [...selected, ...unselected];
+          els.enginePresetList.innerHTML = `<div class="engine-preset-grid">${list.map((engine) => `
+            <label class="engine-preset-item" draggable="true" data-engine-preset-id="${escAttr(engine.id)}">
+              <div class="engine-option">
+                <input type="checkbox" class="todo-cb" data-engine-preset-id="${escAttr(engine.id)}" ${activeIds.has(engine.id) ? "checked" : ""} />
+                <img class="fav" src="${escAttr(iconPlaceholder())}" data-engine-option-id="${escAttr(engine.id)}" alt="" decoding="async" referrerpolicy="no-referrer" />
+                <div class="engine-option-name">${escHtml(engine.name)}</div>
+              </div>
+            </label>
+          `).join("")}</div>`;
+
+          const optionIcons = Array.from(els.enginePresetList.querySelectorAll("img[data-engine-option-id]"));
+          optionIcons.forEach((img) => {
+            const id = safeString(img.getAttribute("data-engine-option-id"));
+            const engine = COMMON_ENGINES.find((item) => item.id === id) || null;
+            img.src = engineFallbackIcon(engine && engine.name);
+            if (state.ui.pageLoaded && engine) {
+              loadIconMaybe(img, engineIconUrl(engine));
+            }
+          });
+        }
+
+        function renderCategoryOptions() {
+          if (!els.linkCategorySelect) return;
+          const options = sortedCategories().map(
+            (cat) => `<option value="${escAttr(cat.id)}">${escHtml(cat.name)}</option>`
+          );
+          els.linkCategorySelect.innerHTML = options.join("");
+        }
+
+        function renderAll() {
+          renderMotto();
+          renderHeader();
+          renderCategories();
+          renderLinks();
+          renderPlanPanel();
+        }
+
+        function renderMotto() {
+          if (!els.mottoText) return;
+          const today = new Date();
+          const day = weekdayMon(today);
+          const motto = WEEKDAY_MOTTOS[day] || WEEKDAY_MOTTOS[1];
+          els.mottoText.textContent = motto.text;
+          if (els.mottoEmoji) {
+            els.mottoEmoji.textContent = motto.emoji;
+          }
+        }
+
+        function renderHeader() {
+          if (els.modeManage && els.modeBrowse) {
+            const mode = state.db.settings.ui.mode === "manage" ? "manage" : "browse";
+            els.modeManage.checked = mode === "manage";
+            els.modeBrowse.checked = mode !== "manage";
+          }
+
+          renderEngineTabs();
+          renderEngineIcons();
+
+          if (els.queryInput) {
+            const activeEngine = getEngineById(getActiveEngineId());
+            els.queryInput.placeholder = shouldCopyQueryForEngine(activeEngine)
+              ? `输入关键词...（${engineLabel(activeEngine)}暂不支持直接带入关键词，点击搜索后会自动复制，请打开后粘贴到${engineLabel(activeEngine)}输入框）`
+              : "输入关键词...（回车或点搜索）";
+          }
+
+          const currentCategory = getCategoryById(state.db.activeCategoryId);
+          if (els.linkTitle) {
+            els.linkTitle.textContent = currentCategory
+              ? `${currentCategory.name} · 常用链接`
+              : "全部 · 常用链接";
+          }
+        }
+
+        function renderEngineTabs() {
+          if (!els.engineTabs) return;
+          const engines = sortedEngines();
+          const activeId = getActiveEngineId();
+          const addBtnHtml = `
+            <a id="open-engine-modal" class="iconbtn sm" href="#modal-engine" title="管理引擎">
+              <span class="sr">管理引擎</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </a>
+          `;
+          if (!engines.length) {
+            els.engineTabs.innerHTML = `<span class="engine-manage-empty">暂无搜索引擎，请点击右侧 + 添加。</span>${addBtnHtml}`;
+            return;
+          }
+          els.engineTabs.innerHTML = engines.map((engine) => `
+            <div class="tab" role="button" tabindex="0" data-engine-id="${escAttr(engine.id)}" aria-current="${engine.id === activeId ? "true" : "false"}">
+              <span class="ico" aria-hidden="true">
+                <img class="fav engine-fav" data-engine-id="${escAttr(engine.id)}" src="${escAttr(iconPlaceholder())}" alt="" decoding="async" referrerpolicy="no-referrer" />
+              </span>
+              <span class="nm">${escHtml(engine.name)}</span>
+            </div>
+          `).join("") + addBtnHtml;
+        }
+
+        function renderCategories() {
+          if (!els.cats) return;
+          const counts = new Map();
+          state.db.links.forEach((link) => {
+            counts.set(link.categoryId, (counts.get(link.categoryId) || 0) + 1);
+          });
+
+          const totalCount = state.db.links.length;
+          const allMode = state.db.activeCategoryId === ALL_CATEGORY_ID;
+          const allActive = allMode;
+          const allItemHtml = `
+            <a class="cat" href="#" data-cat-id="${ALL_CATEGORY_ID}" data-color="aqua" aria-current="${allActive ? "true" : "false"}">
+              <div class="name">
+                <strong>全部</strong>
+                <span class="count">${totalCount}</span>
+              </div>
+            </a>
+          `;
+
+          const html = [allItemHtml, ...sortedCategories()
+            .map((cat) => {
+              const active = cat.id === state.db.activeCategoryId;
+              const count = counts.get(cat.id) || 0;
+              return `
+                <a class="cat" href="#" data-cat-id="${escAttr(cat.id)}" data-color="${escAttr(cat.colorToken)}" draggable="true" aria-current="${active ? "true" : "false"}">
+                  <div class="name">
+                    <strong>${escHtml(cat.name)}</strong>
+                    <span class="count">${count}</span>
+                  </div>
+                </a>
+              `;
+            })
+          ]
+            .join("");
+
+          els.cats.innerHTML = html;
+        }
+
+        function renderLinks() {
+          if (!els.grid) return;
+          const categoryId = state.db.activeCategoryId;
+          const categories = sortedCategories();
+          const categoryOrder = new Map(categories.map((cat) => [cat.id, cat.order]));
+          const links = state.db.links
+            .filter((link) => categoryId === ALL_CATEGORY_ID || link.categoryId === categoryId)
+            .sort((a, b) => {
+              const catDelta = (categoryOrder.get(a.categoryId) || 0) - (categoryOrder.get(b.categoryId) || 0);
+              if (catDelta !== 0) return catDelta;
+              return a.order - b.order;
+            });
+
+          if (categoryId === ALL_CATEGORY_ID) {
+            const grouped = new Map();
+            categories.forEach((cat) => grouped.set(cat.id, []));
+            links.forEach((link) => {
+              if (!grouped.has(link.categoryId)) return;
+              grouped.get(link.categoryId).push(link);
+            });
+
+            const groupedHtml = categories
+              .map((cat) => {
+                const catLinks = grouped.get(cat.id) || [];
+                if (!catLinks.length) return "";
+                const cardsHtml = catLinks.map((link) => renderLinkCard(link)).join("");
+                return `
+                  <section class="all-group" id="${escAttr(anchorIdForCategory(cat.id))}">
+                    <h3 class="all-group-title" style="--group-cat: var(--cat-${escAttr(cat.colorToken)});">${escHtml(cat.name)}</h3>
+                    <div class="all-group-links">${cardsHtml}</div>
+                  </section>
+                `;
+              })
+              .join("");
+
+            els.grid.classList.add("all-mode");
+            els.grid.classList.remove("site-grouped");
+            els.grid.innerHTML = groupedHtml;
+            if (state.ui.pageLoaded) hydrateLinkIcons();
+            return;
+          }
+
+          const grouped = new Map();
+          links.forEach((link) => {
+            const siteKey = siteKeyFromUrl(link.url) || "其他";
+            if (!grouped.has(siteKey)) grouped.set(siteKey, []);
+            grouped.get(siteKey).push(link);
+          });
+
+          const repeatedGroups = [];
+          const singleLinks = [];
+          Array.from(grouped.entries()).forEach(([siteKey, hostLinks]) => {
+            if (hostLinks.length > 1) {
+              repeatedGroups.push([siteKey, hostLinks]);
+            } else {
+              singleLinks.push(hostLinks[0]);
+            }
+          });
+
+          const repeatedHtml = repeatedGroups.map(([siteKey, hostLinks]) => {
+            const cards = hostLinks.map((link) => renderLinkCard(link)).join("");
+            return `
+              <section class="site-group">
+                <h4 class="site-group-title">同站点分组：<strong>${escHtml(siteKey)}</strong> · ${hostLinks.length} 条</h4>
+                <div class="site-group-links">${cards}</div>
+              </section>
+            `;
+          }).join("");
+
+          const singleHtml = singleLinks.length
+            ? `<section class="site-group"><div class="site-group-links">${singleLinks.map((link) => renderLinkCard(link)).join("")}</div></section>`
+            : "";
+
+          const html = singleHtml + repeatedHtml;
+
+          els.grid.classList.remove("all-mode");
+          els.grid.classList.add("site-grouped");
+          els.grid.innerHTML = html;
+          if (state.ui.pageLoaded) hydrateLinkIcons();
+        }
+
+        function renderPlanPanel() {
+          renderCountdown();
+          renderCalendar();
+          renderTodos();
+        }
+
+        function renderEngineIcons() {
+          const activeEngine = getEngineById(getActiveEngineId());
+          if (els.searchBtnIco) {
+            els.searchBtnIco.src = engineFallbackIcon(activeEngine && activeEngine.name);
+            if (state.ui.pageLoaded && activeEngine) {
+              loadIconMaybe(els.searchBtnIco, engineIconUrl(activeEngine));
+            }
+          }
+
+          const favs = Array.from(document.querySelectorAll(".engine-fav[data-engine-id]"));
+          favs.forEach((img) => {
+            const id = safeString(img.getAttribute("data-engine-id"));
+            const engine = getEngineById(id);
+            img.src = engineFallbackIcon(engine && engine.name);
+            if (state.ui.pageLoaded) {
+              loadIconMaybe(img, engineIconUrl(engine));
+            }
+          });
+        }
+
+        function renderCountdown() {
+          if (!els.weekendCountdown || !els.holidayCountdown) return;
+          const now = new Date();
+          const weekend = nextSaturdayStart(now);
+          els.weekendCountdown.textContent = formatCountdown(weekend, now, "周末开始啦，记得喘口气");
+
+          const holiday = getNearestHoliday(now);
+          if (!holiday) {
+            els.holidayCountdown.textContent = "尚未配置，点击右上角添加";
+            return;
+          }
+
+          if (holiday.inHoliday) {
+            els.holidayCountdown.textContent = `今天在放假：${holiday.name}`;
+            return;
+          }
+
+          els.holidayCountdown.textContent = `${holiday.name} 还有 ${holiday.days} 天`;
+        }
+
+        function renderCalendar() {
+          if (!els.calendarGrid || !els.calendarMonthTitle) return;
+          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
+          const monthDate = parseYm(state.db.plan.calendarMonth) || new Date(selected.getFullYear(), selected.getMonth(), 1);
+          const year = monthDate.getFullYear();
+          const month = monthDate.getMonth();
+          els.calendarMonthTitle.textContent = `${year}年${String(month + 1).padStart(2, "0")}月`;
+
+          const first = new Date(year, month, 1);
+          const firstOffset = (weekdayMon(first) + 6) % 7;
+          const start = new Date(year, month, 1 - firstOffset);
+          const selectedYmd = formatYmd(selected);
+          const todayYmd = formatYmd(new Date());
+
+          const counts = new Map();
+          state.db.plan.todos.forEach((todo) => {
+            const key = todoDateKey(todo);
+            if (!key) return;
+            counts.set(key, (counts.get(key) || 0) + 1);
+          });
+
+          const headers = ["一", "二", "三", "四", "五", "六", "日"].map(
+            (d) => `<div class="caldow" role="columnheader">${d}</div>`
+          );
+          const days = [];
+          for (let i = 0; i < 42; i += 1) {
+            const current = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+            const key = formatYmd(current);
+            const classes = ["calday"];
+            if (current.getMonth() !== month) classes.push("muted");
+            if (key === selectedYmd) classes.push("selected");
+            if (key === todayYmd) classes.push("today");
+            const dot = counts.get(key) ? "<span class=\"dot\" aria-hidden=\"true\"></span>" : "";
+            days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell">${current.getDate()}${dot}</button>`);
+          }
+          els.calendarGrid.innerHTML = headers.concat(days).join("");
+        }
+
+        function renderTodos() {
+          if (!els.todoGroups || !els.todoWeekLabel) return;
+          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
+          const weekStart = startOfWeekMon(selected);
+          const weekKey = weekKeyForDate(selected);
+          els.todoWeekLabel.textContent = `${formatYmd(weekStart)} 周`;
+
+          const todos = state.db.plan.todos
+            .filter((todo) => todo.weekKey === weekKey)
+            .sort((a, b) => a.order - b.order);
+
+          if (els.todoQuickDate) {
+            els.todoQuickDate.value = formatYmd(selected);
+          }
+
+          if (!todos.length) {
+            els.todoGroups.innerHTML = '<div class="todo-empty">还没有待办，先新增一条今天要推进的事。</div>';
+            return;
+          }
+
+          const grouped = new Map();
+          todos.forEach((todo) => {
+            const date = todoDateKey(todo) || "";
+            if (!grouped.has(date)) grouped.set(date, []);
+            grouped.get(date).push(todo);
+          });
+
+          const keys = Array.from(grouped.keys()).filter(Boolean).sort();
+          const html = keys.map((date) => {
+            const list = grouped.get(date) || [];
+            return `
+              <section class="todo-g">
+                <h4 class="todo-gh">${formatDateTitle(date)}</h4>
+                <div class="todo-list">${list.map((todo) => renderTodoItem(todo)).join("")}</div>
+              </section>
+            `;
+          }).join("");
+
+          els.todoGroups.innerHTML = html;
+        }
+
+        function renderTodoItem(todo) {
+          return `
+            <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}">
+              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
+              <div class="todo-t">${escHtml(todo.title)}</div>
+              <div class="acts">
+                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
+                  <span class="sr">编辑</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </a>
+                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
+                  <span class="sr">删除</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </a>
+              </div>
+            </article>
+          `;
+        }
+
+        function renderLinkCard(link) {
+          const icon = resolveIcon(link.url);
+          const secondaryText = link.note ? link.note : link.url;
+          const draggable = "true";
+          return `
+            <article class="card linkcard" role="listitem" data-link-id="${escAttr(link.id)}" data-category-id="${escAttr(link.categoryId)}" draggable="${draggable}" title="${escAttr(`${link.title} — ${link.url}`)}">
+              <div class="t">
+                <div>
+                  <div class="brandline">
+                    <img class="site-ico" src="${escAttr(iconPlaceholder())}" data-icon-url="${escAttr(icon)}" alt="" decoding="async" loading="lazy" referrerpolicy="no-referrer" />
+                    <h3><a class="stretched" href="${escAttr(link.url)}" target="_blank" rel="noreferrer noopener">${escHtml(link.title)}</a></h3>
+                  </div>
+                  <div class="u">${escHtml(secondaryText)}</div>
+                </div>
+                <div class="acts" aria-label="管理操作">
+                  <a class="toolbtn sm" href="#modal-link" title="编辑" data-action="edit-link" data-link-id="${escAttr(link.id)}">
+                    <span class="sr">编辑</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                  <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除" data-action="delete-link" data-link-id="${escAttr(link.id)}">
+                    <span class="sr">删除</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          `;
+        }
+
+        function anchorIdForCategory(catId) {
+          return `links-cat-${catId}`;
+        }
+
+        function onGridDragStart(event) {
+          const card = event.target.closest(".linkcard[data-link-id]");
+          if (!card) return;
+          const linkId = card.getAttribute("data-link-id");
+          if (!linkId) return;
+          state.ui.draggingLinkId = linkId;
+          state.ui.draggingContainer = card.parentElement;
+          state.ui.dragDirty = false;
+          card.classList.add("dragging");
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", linkId);
+          }
+        }
+
+        function onGridDragOver(event) {
+          if (!state.ui.draggingLinkId) return;
+          const sourceCard = getCardElementById(state.ui.draggingLinkId);
+          if (!sourceCard) return;
+          const targetCard = event.target.closest(".linkcard[data-link-id]");
+
+          if (targetCard) {
+            if (targetCard === sourceCard) return;
+            if (targetCard.parentElement !== sourceCard.parentElement) return;
+            if (targetCard.getAttribute("data-category-id") !== sourceCard.getAttribute("data-category-id")) return;
+            event.preventDefault();
+            const rect = targetCard.getBoundingClientRect();
+            const insertBefore = event.clientY < rect.top + rect.height / 2;
+            const ref = insertBefore ? targetCard : targetCard.nextElementSibling;
+            if (ref !== sourceCard) {
+              targetCard.parentElement.insertBefore(sourceCard, ref);
+              state.ui.dragDirty = true;
+            }
+            return;
+          }
+
+          const container = event.target.closest(".all-group-links, .site-group-links, .grid");
+          if (!container || container !== sourceCard.parentElement) return;
+          event.preventDefault();
+          container.appendChild(sourceCard);
+          state.ui.dragDirty = true;
+        }
+
+        function onGridDrop(event) {
+          if (!state.ui.draggingLinkId) return;
+          event.preventDefault();
+        }
+
+        function onGridDragEnd(_event) {
+          const draggingId = state.ui.draggingLinkId;
+          const draggingContainer = state.ui.draggingContainer;
+          const shouldPersist = state.ui.dragDirty;
+
+          const card = draggingId ? getCardElementById(draggingId) : null;
+          if (card) {
+            card.classList.remove("dragging");
+          }
+
+          state.ui.draggingLinkId = null;
+          state.ui.draggingContainer = null;
+          state.ui.dragDirty = false;
+
+          if (!shouldPersist || !draggingContainer) return;
+          persistOrderFromContainer(draggingContainer);
+        }
+
+        function persistOrderFromContainer(container) {
+          const cards = Array.from(container.querySelectorAll(".linkcard[data-link-id]"));
+          if (!cards.length) return;
+          const now = Date.now();
+          cards.forEach((card, index) => {
+            const linkId = card.getAttribute("data-link-id");
+            const link = getLinkById(linkId);
+            if (!link) return;
+            link.order = (index + 1) * 10;
+            link.updatedAt = now;
+          });
+          saveDb();
+          renderAll();
+          toast("已排序", "链接顺序已更新。");
+        }
+
+        function getCardElementById(linkId) {
+          if (!els.grid || !linkId) return null;
+          return Array.from(els.grid.querySelectorAll(".linkcard[data-link-id]"))
+            .find((node) => node.getAttribute("data-link-id") === linkId) || null;
+        }
+
+        function onCategoryDragStart(event) {
+          const cat = event.target.closest(".cat[data-cat-id][draggable='true']");
+          if (!cat) return;
+          const catId = cat.getAttribute("data-cat-id");
+          if (!catId || catId === ALL_CATEGORY_ID) return;
+          state.ui.draggingCategoryId = catId;
+          state.ui.categoryDragDirty = false;
+          cat.classList.add("dragging");
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", catId);
+          }
+        }
+
+        function onCategoryDragOver(event) {
+          const draggingId = state.ui.draggingCategoryId;
+          if (!draggingId || !els.cats) return;
+          const source = els.cats.querySelector(`.cat[data-cat-id="${CSS.escape(draggingId)}"]`);
+          const target = event.target.closest(".cat[data-cat-id][draggable='true']");
+          if (!source || !target || source === target) return;
+          const targetId = target.getAttribute("data-cat-id");
+          if (!targetId || targetId === ALL_CATEGORY_ID) return;
+          event.preventDefault();
+          const rect = target.getBoundingClientRect();
+          const before = event.clientY < rect.top + rect.height / 2;
+          const ref = before ? target : target.nextElementSibling;
+          if (ref !== source) {
+            target.parentElement.insertBefore(source, ref);
+            state.ui.categoryDragDirty = true;
+          }
+        }
+
+        function onCategoryDrop(event) {
+          if (!state.ui.draggingCategoryId) return;
+          event.preventDefault();
+        }
+
+        function onCategoryDragEnd(_event) {
+          if (!els.cats) return;
+          const draggingId = state.ui.draggingCategoryId;
+          const dirty = state.ui.categoryDragDirty;
+          const node = draggingId
+            ? els.cats.querySelector(`.cat[data-cat-id="${CSS.escape(draggingId)}"]`)
+            : null;
+          if (node) node.classList.remove("dragging");
+          state.ui.draggingCategoryId = null;
+          state.ui.categoryDragDirty = false;
+          if (!dirty) return;
+
+          const ids = Array.from(els.cats.querySelectorAll(".cat[data-cat-id][draggable='true']"))
+            .map((item) => safeString(item.getAttribute("data-cat-id")))
+            .filter((id) => id && id !== ALL_CATEGORY_ID);
+          const now = Date.now();
+          ids.forEach((id, index) => {
+            const cat = getCategoryById(id);
+            if (!cat) return;
+            cat.order = (index + 1) * 10;
+            cat.updatedAt = now;
+          });
+          saveDb();
+          renderAll();
+          toast("已排序", "分类顺序已更新。");
+        }
+
+        function isManageMode() {
+          return state.db && state.db.settings && state.db.settings.ui && state.db.settings.ui.mode === "manage";
+        }
+
+        function resolveIcon(url) {
+          try {
+            const parsed = new URL(url);
+            const host = safeString(parsed.hostname);
+            if (!host) return "assets/icons/chrome.png";
+            return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+          } catch (_error) {
+            return "assets/icons/chrome.png";
+          }
+        }
+
+        function hostFromUrl(url) {
+          try {
+            const parsed = new URL(url);
+            return safeString(parsed.hostname).toLowerCase().replace(/^www\./, "");
+          } catch (_error) {
+            const text = safeString(url).toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "");
+            const host = text.split("/")[0];
+            return host || "";
+          }
+        }
+
+        function siteKeyFromUrl(url) {
+          const host = hostFromUrl(url);
+          if (!host) return "";
+          const parts = host.split(".").filter(Boolean);
+          if (parts.length <= 2) return host;
+          const suffix2 = parts.slice(-2).join(".");
+          const suffix3 = parts.slice(-3).join(".");
+          const cnSuffixes = new Set(["com.cn", "net.cn", "org.cn", "gov.cn", "edu.cn"]);
+          if (cnSuffixes.has(suffix2) && parts.length >= 3) {
+            return suffix3;
+          }
+          return suffix2;
+        }
+
+        function engineLabel(engine) {
+          if (!engine) return "搜索引擎";
+          return safeString(engine.name) || "搜索引擎";
+        }
+
+        function shouldCopyQueryForEngine(engine) {
+          if (!engine) return false;
+          const id = safeString(engine.id);
+          return COPY_QUERY_ENGINE_IDS.has(id);
+        }
+
+        async function copyToClipboard(text) {
+          const value = safeString(text);
+          if (!value) return false;
+
+          try {
+            const textarea = document.createElement("textarea");
+            textarea.value = value;
+            textarea.setAttribute("readonly", "true");
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            textarea.style.top = "0";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            const ok = document.execCommand("copy");
+            textarea.remove();
+            return Boolean(ok);
+          } catch (_error) {
+            return false;
+          }
+        }
+
+        function getActiveEngineId() {
+          return safeString(state.db && state.db.settings && state.db.settings.activeEngineId);
+        }
+
+        function getEngineById(id) {
+          if (!id || !state.db || !state.db.settings || !Array.isArray(state.db.settings.engines)) return null;
+          return state.db.settings.engines.find((item) => item.id === id) || null;
+        }
+
+        function sortedEngines() {
+          const list = state.db && state.db.settings && Array.isArray(state.db.settings.engines)
+            ? state.db.settings.engines
+            : [];
+          return [...list].sort((a, b) => a.order - b.order);
+        }
+
+        function nextOrder(items) {
+          let max = 0;
+          items.forEach((item) => {
+            max = Math.max(max, Number(item.order) || 0);
+          });
+          return max + 10;
+        }
+
+        function nextOrderForLinks(categoryId) {
+          let max = 0;
+          state.db.links.forEach((item) => {
+            if (item.categoryId === categoryId) {
+              max = Math.max(max, Number(item.order) || 0);
+            }
+          });
+          return max + 10;
+        }
+
+        function sortedCategories() {
+          return [...state.db.categories].sort((a, b) => a.order - b.order);
+        }
+
+        function getCategoryById(id) {
+          return state.db.categories.find((item) => item.id === id) || null;
+        }
+
+        function getLinkById(id) {
+          return state.db.links.find((item) => item.id === id) || null;
+        }
+
+        function getTodoById(id) {
+          return state.db.plan.todos.find((item) => item.id === id) || null;
+        }
+
+        function renderHolidayList() {
+          if (!els.holidayList) return;
+          const holidays = [...state.db.plan.holidays].sort((a, b) => a.startDate.localeCompare(b.startDate));
+          if (!holidays.length) {
+            els.holidayList.innerHTML = '<div class="todo-empty">还没配置法定假日。</div>';
+            return;
+          }
+          els.holidayList.innerHTML = holidays.map((holiday) => `
+            <article class="todo-item">
+              <div class="dot" aria-hidden="true"></div>
+              <div class="todo-t">${escHtml(holiday.name)} · ${escHtml(holiday.startDate)} - ${escHtml(holiday.endDate)}</div>
+              <button type="button" class="toolbtn sm ghost danger" data-action="delete-holiday" data-holiday-id="${escAttr(holiday.id)}" title="删除">
+                <span class="sr">删除</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </button>
+            </article>
+          `).join("");
+        }
+
+        function normalizeDayValue(value) {
+          const v = safeString(value);
+          const n = Number(v);
+          return Number.isInteger(n) && n >= 1 && n <= 7 ? String(n) : "";
+        }
+
+        function formatYmd(date) {
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        }
+
+        function formatYm(date) {
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        }
+
+        function parseYm(text) {
+          if (!/^\d{4}-\d{2}$/.test(text)) return null;
+          const [y, m] = text.split("-").map(Number);
+          if (m < 1 || m > 12) return null;
+          return new Date(y, m - 1, 1);
+        }
+
+        function parseYmd(text) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null;
+          const [y, m, d] = text.split("-").map(Number);
+          const date = new Date(y, m - 1, d);
+          if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+          return date;
+        }
+
+        function weekdayMon(date) {
+          const day = date.getDay();
+          return day === 0 ? 7 : day;
+        }
+
+        function startOfWeekMon(date) {
+          const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          const offset = weekdayMon(d) - 1;
+          return new Date(d.getFullYear(), d.getMonth(), d.getDate() - offset);
+        }
+
+        function weekKeyForDate(date) {
+          const ws = startOfWeekMon(date);
+          const year = ws.getFullYear();
+          const first = startOfWeekMon(new Date(year, 0, 1));
+          const diff = Math.floor((ws - first) / 86400000);
+          const week = Math.floor(diff / 7) + 1;
+          return `${year}-W${String(week).padStart(2, "0")}`;
+        }
+
+        function todoDateKey(todo) {
+          const direct = safeString(todo && todo.date);
+          if (parseYmd(direct)) return direct;
+          const day = Number(todo && todo.day);
+          const m = /^([0-9]{4})-W([0-9]{2})$/.exec(safeString(todo && todo.weekKey));
+          if (!m || !Number.isInteger(day) || day < 1 || day > 7) return "";
+          const year = Number(m[1]);
+          const week = Number(m[2]);
+          const firstWeek = startOfWeekMon(new Date(year, 0, 1));
+          const target = new Date(firstWeek.getFullYear(), firstWeek.getMonth(), firstWeek.getDate() + (week - 1) * 7 + day - 1);
+          return formatYmd(target);
+        }
+
+        function formatDateTitle(dateText) {
+          const d = parseYmd(dateText);
+          if (!d) return "未指定日期";
+          const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+          return `${dateText} ${weekdays[d.getDay()]}`;
+        }
+
+        function engineIconUrl(engine) {
+          if (!engine) return "";
+          const target = safeString(engine.homeUrl) || safeString(engine.searchUrl);
+          const host = hostFromUrl(target);
+          if (!host) return "";
+          return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+        }
+
+        function engineFallbackIcon(name) {
+          const text = safeString(name).slice(0, 1) || "·";
+          return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#eef3f6"/><text x="32" y="40" font-size="28" text-anchor="middle" fill="#223236" font-family="Segoe UI, PingFang SC, Microsoft YaHei">${text}</text></svg>`)}`;
+        }
+
+        function hydrateLinkIcons() {
+          if (!els.grid) return;
+          const nodes = Array.from(els.grid.querySelectorAll(".site-ico[data-icon-url]"));
+          nodes.forEach((img) => {
+            const url = safeString(img.getAttribute("data-icon-url"));
+            if (!url) return;
+            img.src = iconPlaceholder();
+            loadIconMaybe(img, url);
+          });
+        }
+
+        function loadIconMaybe(img, url) {
+          if (!img || !url) return;
+          if (img.dataset.loadedIcon === url) return;
+          img.dataset.loadedIcon = url;
+          const probe = new Image();
+          let done = false;
+          const timer = window.setTimeout(() => {
+            done = true;
+          }, 1200);
+          probe.onload = () => {
+            if (done) return;
+            done = true;
+            window.clearTimeout(timer);
+            img.src = url;
+          };
+          probe.onerror = () => {
+            done = true;
+            window.clearTimeout(timer);
+          };
+          probe.src = url;
+        }
+
+        function iconPlaceholder() {
+          return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        }
+
+        function nextSaturdayStart(now) {
+          const day = now.getDay();
+          const delta = (6 - day + 7) % 7;
+          const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + delta, 0, 0, 0, 0);
+          if (target <= now) {
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate() + delta + 7, 0, 0, 0, 0);
+          }
+          return target;
+        }
+
+        function formatCountdown(target, now, doneText) {
+          const diff = target.getTime() - now.getTime();
+          if (diff <= 0) return doneText;
+          const days = Math.ceil(diff / 86400000);
+          return `还有 ${days} 天`;
+        }
+
+        function getNearestHoliday(now) {
+          const today = formatYmd(now);
+          const holidays = [...state.db.plan.holidays].sort((a, b) => a.startDate.localeCompare(b.startDate));
+          if (!holidays.length) return null;
+
+          const inHoliday = holidays.find((h) => h.startDate <= today && h.endDate >= today);
+          if (inHoliday) {
+            return { inHoliday: true, name: inHoliday.name, days: 0 };
+          }
+
+          const next = holidays.find((h) => h.startDate >= today);
+          if (!next) return null;
+          const target = parseYmd(next.startDate);
+          if (!target) return null;
+          const days = Math.ceil((target.getTime() - new Date(formatYmd(now)).getTime()) / 86400000);
+          return { inHoliday: false, name: next.name, days };
+        }
+
+        function saveDb() {
+          if (state.ui.readOnly) return false;
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
+            return true;
+          } catch (_error) {
+            state.ui.readOnly = true;
+            toast("存储不可用", "本地存储写入失败，已进入只读模式。", true);
+            return false;
+          }
+        }
+
+        function safeReadStorage(key) {
+          try {
+            return localStorage.getItem(key);
+          } catch (_error) {
+            return null;
+          }
+        }
+
+        function closeHashModal() {
+          if (!window.location.hash) return;
+          window.location.hash = "";
+        }
+
+        function openExternal(url) {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+
+        function toast(title, message, isError) {
+          if (!els.toast || !els.toastTitle) return;
+          els.toastTitle.textContent = message || title;
+          els.toast.style.display = "block";
+          els.toast.style.opacity = isError ? "0.98" : "0.92";
+          if (state.ui.toastTimer) {
+            window.clearTimeout(state.ui.toastTimer);
+          }
+          state.ui.toastTimer = window.setTimeout(() => {
+            els.toast.style.display = "none";
+          }, 2200);
+        }
+
+        function isValidHttpUrl(value) {
+          if (!value) return false;
+          try {
+            const url = new URL(value);
+            return url.protocol === "http:" || url.protocol === "https:";
+          } catch (_error) {
+            return false;
+          }
+        }
+
+        function isLikelyUrlTemplate(value) {
+          if (!value) return false;
+          const sample = value.includes("{q}") ? value.replace(/\{q\}/g, "test") : value;
+          return isValidHttpUrl(sample);
+        }
+
+        function uid(prefix) {
+          if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return `${prefix}-${window.crypto.randomUUID()}`;
+          }
+          return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        }
+
+        function safeString(value) {
+          if (typeof value !== "string") return "";
+          return value.trim();
+        }
+
+        function escHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function escAttr(value) {
+          return escHtml(value);
+        }
+
+        function hashCode(text) {
+          let hash = 0;
+          for (let i = 0; i < text.length; i += 1) {
+            hash = (hash << 5) - hash + text.charCodeAt(i);
+            hash |= 0;
+          }
+          return hash;
+        }
+      })();
+    </script>
+  </body>
+</html>
