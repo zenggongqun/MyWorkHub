@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <title>WorkHub · 快速搜索与常用链接</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e9f7f8'/%3E%3Ccircle cx='20' cy='22' r='8' fill='%230ea5a5'/%3E%3Cpath d='M17 22h6M20 19v6' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3Ctext x='34' y='42' font-size='24' font-weight='700' font-family='Segoe UI, Arial, sans-serif' fill='%23122126'%3EW%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e9f7f8'/%3E%3Ccircle cx='20' cy='22' r='8' fill='%230ea5a5'/%3E%3Cpath d='M17 22h6M20 19v6' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3Ctext x='34' y='42' font-size='24' font-weight='700' font-family='Segoe UI, Arial, sans-serif' fill='%23122126'%3EW%3C/text%3E%3C/svg%3E"
+    />
 
     <style>
       /*
@@ -207,6 +217,12 @@
         gap: 0;
       }
 
+      .panel.hero .hd .row {
+        justify-content: flex-start;
+        align-items: center;
+        gap: 14px;
+      }
+
       .panel .hd {
         padding: 12px 14px;
         border-bottom: 1px solid var(--rule);
@@ -405,6 +421,32 @@
         box-shadow: none;
       }
 
+      .calday .mark {
+        position: absolute;
+        right: 3px;
+        top: 3px;
+        width: 12px;
+        height: 12px;
+        border-radius: 99px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        line-height: 1;
+      }
+
+      .calday .mark.holiday {
+        background: color-mix(in oklab, #22c55e 24%, white);
+        color: #166534;
+        border: 1px solid color-mix(in oklab, #22c55e 45%, transparent);
+      }
+
+      .calday .mark.workday {
+        background: color-mix(in oklab, #f59e0b 22%, white);
+        color: #92400e;
+        border: 1px solid color-mix(in oklab, #f59e0b 45%, transparent);
+      }
+
       .todoquick {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -544,8 +586,13 @@
       }
 
       .catpanel .hd .row {
-        justify-content: flex-start;
+        justify-content: space-between;
         gap: 10px;
+      }
+
+      .catpanel .title {
+        white-space: nowrap;
+        flex: 0 0 auto;
       }
 
       .kicker {
@@ -625,37 +672,32 @@
       }
 
       .motto {
-        max-width: 460px;
+        max-width: none;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        border-radius: 999px;
-        border: 1px solid color-mix(in oklab, var(--rule) 70%, transparent);
-        background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.66),
-            rgba(255, 255, 255, 0.38)
-          );
-        backdrop-filter: blur(8px);
-        box-shadow: 0 16px 40px rgba(12, 27, 29, 0.10);
+        gap: 0;
+        padding: 0;
         color: color-mix(in oklab, var(--ink) 82%, var(--muted));
       }
 
       .brand-name {
-        font-size: 13px;
-        font-weight: 700;
+        font-family: "Fraunces", "Noto Sans SC", serif;
+        font-size: 29px;
+        font-weight: 650;
+        line-height: 1;
         letter-spacing: 0.02em;
+        color: color-mix(in oklab, var(--ink) 92%, #103d45);
+        text-shadow: 0 6px 20px rgba(14, 165, 165, 0.16);
       }
 
       .hero-note {
-        margin-left: auto;
-        max-width: 420px;
-        text-align: right;
+        margin-left: 0;
+        max-width: 560px;
+        text-align: left;
         color: color-mix(in oklab, var(--ink) 72%, var(--muted));
         display: inline-flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: flex-start;
         gap: 8px;
         padding: 7px 12px;
         border-radius: 999px;
@@ -701,17 +743,6 @@
       @keyframes textShimmer {
         0% { background-position: 0% 50%; }
         100% { background-position: 180% 50%; }
-      }
-
-      .spark {
-        width: 10px;
-        height: 10px;
-        border-radius: 99px;
-        background: radial-gradient(circle at 30% 30%, #fff 0 35%, transparent 36%),
-          linear-gradient(135deg, var(--accent-3), var(--accent));
-        box-shadow:
-          0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent),
-          0 14px 30px rgba(58, 123, 213, 0.18);
       }
 
       .motto-t {
@@ -1133,6 +1164,15 @@
         box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
       }
 
+      .field .modeToggle {
+        width: 100%;
+      }
+
+      .field .modeToggle label {
+        flex: 1;
+        text-align: center;
+      }
+
       .modeToggle input {
         position: absolute;
         width: 1px;
@@ -1157,7 +1197,9 @@
       }
 
       #mode-browse:checked ~ label[for="mode-browse"],
-      #mode-manage:checked ~ label[for="mode-manage"] {
+      #mode-manage:checked ~ label[for="mode-manage"],
+      #cm-add:checked ~ label[for="cm-add"],
+      #cm-edit:checked ~ label[for="cm-edit"] {
         background: color-mix(in oklab, white 70%, var(--cream));
         color: var(--ink);
         border-color: color-mix(in oklab, var(--accent) 26%, var(--rule));
@@ -1486,6 +1528,17 @@
         overflow: hidden;
       }
 
+      #modal-holidays .sheet {
+        max-height: min(86vh, 860px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      #modal-holidays .sheet .bd {
+        overflow: auto;
+        min-height: 0;
+      }
+
       .sheet .hd {
         padding: 16px 18px;
         display: flex;
@@ -1516,6 +1569,12 @@
         color: var(--muted);
         letter-spacing: 0.06em;
         text-transform: uppercase;
+      }
+
+      .field .hint {
+        margin-top: 2px;
+        font-size: 12px;
+        color: color-mix(in oklab, var(--muted) 85%, var(--ink));
       }
 
       .field input,
@@ -1690,10 +1749,9 @@
           <div class="hd">
             <div class="row">
               <div class="motto" role="note" title="MyWorkHub">
-                <span class="spark" aria-hidden="true"></span>
                 <span class="brand-name">MyWorkHub</span>
               </div>
-              <div class="hero-note" role="note" title="每日一句（示意）">
+              <div class="hero-note" role="note" title="每日一句">
                 <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
                 <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
               </div>
@@ -1729,20 +1787,22 @@
               <div class="row">
                 <div class="title">分类</div>
                 <div class="sidebar-actions">
-                  <a id="open-category-manage" class="iconbtn sm" href="#modal-category" title="新增/重命名分类">
-                    <span class="sr">管理分类</span>
+                  <a id="open-category-manage" class="iconbtn sm" href="#modal-category" title="分类管理">
+                    <span class="sr">分类管理</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5.2 8h13.6" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5.2 16h13.6" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <circle cx="9.3" cy="8" r="1.9" stroke="#14120d" stroke-width="1.8" />
+                      <circle cx="14.7" cy="16" r="1.9" stroke="#14120d" stroke-width="1.8" />
                     </svg>
                   </a>
-                  <a id="open-category-delete" class="iconbtn sm" href="#modal-category-danger" title="删除分类（示意）">
+                  <a id="open-category-delete" class="iconbtn sm" href="#modal-category-danger" title="删除分类">
                     <span class="sr">删除分类</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M6.5 8.2h11" stroke="#b1402a" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M9.2 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M14.8 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M8.4 6.3h7.2" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
                     </svg>
                   </a>
                 </div>
@@ -1797,17 +1857,17 @@
                   <a class="toolbtn ghost" href="#modal-data-import" title="导入">
                     <span class="sr">导入</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 4v10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
-                      <path d="M8.5 10.5 12 14l3.5-3.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M6.5 19h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M12 20V10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M15.5 13.5 12 10 8.5 13.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M6.5 5h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
                     </svg>
                   </a>
                   <a id="data-export-direct-btn" class="toolbtn ghost" href="#" title="导出">
                     <span class="sr">导出</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 20V10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
-                      <path d="M15.5 13.5 12 10 8.5 13.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M6.5 5h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M12 4v10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M8.5 10.5 12 14l3.5-3.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M6.5 19h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
                     </svg>
                   </a>
 
@@ -2152,7 +2212,7 @@
       <a class="overlay" href="#" aria-label="关闭"></a>
       <div class="sheet" role="dialog" aria-modal="true">
         <div class="hd">
-          <strong>分类管理</strong>
+          <strong id="category-modal-title">分类管理</strong>
           <a class="iconbtn" href="#" title="关闭">
             <span class="sr">关闭</span>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2162,6 +2222,16 @@
           </a>
         </div>
         <div class="bd">
+          <div class="field">
+            <label>操作</label>
+            <div class="modeToggle" aria-label="分类操作类型">
+              <input type="radio" name="category-mode" id="cm-add" checked />
+              <input type="radio" name="category-mode" id="cm-edit" />
+              <label for="cm-add">新增分类</label>
+              <label for="cm-edit">修改已有分类</label>
+            </div>
+            <div id="category-mode-hint" class="hint"></div>
+          </div>
           <div class="field">
             <label for="cn">分类名</label>
             <input id="cn" type="text" placeholder="例如：开发 / AI 工具 / 协作" />
@@ -2178,13 +2248,6 @@
               <button type="button" class="color-swatch" data-color="slate" aria-checked="false" title="slate"></button>
             </div>
             <input id="cc" type="hidden" value="sky" />
-          </div>
-          <div class="field">
-            <label for="cm">操作</label>
-            <select id="cm">
-              <option value="add">新增</option>
-              <option value="rename">重命名当前分类</option>
-            </select>
           </div>
         </div>
         <div class="ft">
@@ -2488,6 +2551,14 @@
         const HOLIDAY_CACHE_PREFIX = "workhub.holidays.cache.v1.";
         const HOLIDAY_CACHE_TTL_MS = 86400000 * 90;
         const HOLIDAY_MANUAL_KEY = "workhub.holidays.manual.v1";
+        const CN_2026_WORKDAY_OVERRIDES = new Set([
+          "2026-02-15",
+          "2026-02-28",
+          "2026-04-26",
+          "2026-05-09",
+          "2026-09-27",
+          "2026-10-10",
+        ]);
         const ALL_CATEGORY_ID = "all";
         const COLOR_TOKENS = new Set(["mint", "sky", "aqua", "coral", "lemon", "lilac", "slate"]);
         const COMMON_ENGINES = [
@@ -2538,13 +2609,48 @@
           "eng-lechat",
         ]);
         const WEEKDAY_MOTTOS = {
-          1: { emoji: "☕", text: "周一开机中，先把第一颗小齿轮转起来。" },
-          2: { emoji: "🚀", text: "周二冲刺位，今天适合把一个小目标打穿。" },
-          3: { emoji: "🎯", text: "周三稳住节奏，先拿下一件最关键的事。" },
-          4: { emoji: "💡", text: "周四灵感日，想到就记下，做到就加分。" },
-          5: { emoji: "🎉", text: "周五收官局，清掉一件事，周末更轻松。" },
-          6: { emoji: "🌿", text: "周六慢一点，把待办和心情都整理干净。" },
-          7: { emoji: "🌞", text: "周日预热中，给下周的自己留一点从容。" },
+          1: [
+            { id: "mon-1", emoji: "☕", text: "周一先别卷宇宙，先卷完第一件小事。" },
+            { id: "mon-2", emoji: "🧩", text: "周一任务像拼图，先拼边角，心态就稳了。" },
+            { id: "mon-3", emoji: "🛠", text: "周一开机中：先修情绪bug，再修需求bug。" },
+            { id: "mon-4", emoji: "🎯", text: "周一秘诀：目标别定太大，先定能做完的。" },
+          ],
+          2: [
+            { id: "tue-1", emoji: "🚀", text: "周二战斗力上线，先打最难那关，后面全是奖励。" },
+            { id: "tue-2", emoji: "⚡", text: "周二效率buff：先做10分钟，灵感会自己续费。" },
+            { id: "tue-3", emoji: "🥤", text: "周二别硬扛，喝口水再开干，思路会更听话。" },
+            { id: "tue-4", emoji: "🏁", text: "周二小冲刺：今天赢一局，明天就轻松一格。" },
+          ],
+          3: [
+            { id: "wed-1", emoji: "🧠", text: "周三脑力赛：专注25分钟，摸鱼5分钟，科学快乐。" },
+            { id: "wed-2", emoji: "📌", text: "周三先钉住一件关键事，其他噪音自动静音。" },
+            { id: "wed-3", emoji: "😎", text: "周三稳住别慌，你不是拖延，你是在蓄力。" },
+            { id: "wed-4", emoji: "🎮", text: "周三像打副本，先清主线，再捡支线经验。" },
+          ],
+          4: [
+            { id: "thu-1", emoji: "💡", text: "周四灵感日：想到就记，做完就悄悄炫耀。" },
+            { id: "thu-2", emoji: "📝", text: "周四记下三个小胜利，下班路都更有风。" },
+            { id: "thu-3", emoji: "🔧", text: "周四修修补补，周五就能体面收官。" },
+            { id: "thu-4", emoji: "🍀", text: "周四好运姿势：先动手，灵感才会跟上来。" },
+          ],
+          5: [
+            { id: "fri-1", emoji: "🎉", text: "周五收官局：清掉一件大事，周末直接加糖。" },
+            { id: "fri-2", emoji: "📦", text: "周五打包烦恼，给自己留个干净的下周一。" },
+            { id: "fri-3", emoji: "🏆", text: "周五不求满分，求一个“我尽力了而且挺好”。" },
+            { id: "fri-4", emoji: "🌈", text: "周五进度条快满了，别忘了给自己点个赞。" },
+          ],
+          6: [
+            { id: "sat-1", emoji: "😌", text: "周六慢速模式：做一点，歇一点，快乐多一点。" },
+            { id: "sat-2", emoji: "🌿", text: "周六把待办减半，把心情加倍。" },
+            { id: "sat-3", emoji: "☀️", text: "周六不内耗，今天的KPI是“轻松且有序”。" },
+            { id: "sat-4", emoji: "🍵", text: "周六先整理桌面，再整理脑子，效率会回礼。" },
+          ],
+          7: [
+            { id: "sun-1", emoji: "🌞", text: "周日预热：今天多一点从容，明天少一点慌张。" },
+            { id: "sun-2", emoji: "🧭", text: "周日定个轻计划，下周就不会被计划反杀。" },
+            { id: "sun-3", emoji: "💤", text: "周日该充电就充电，效率来自电量而非意志力。" },
+            { id: "sun-4", emoji: "🎈", text: "周日小目标：把明天的自己安排得像VIP。" },
+          ],
         };
 
         const state = {
@@ -2596,7 +2702,10 @@
           engineAddBtn: document.getElementById("engine-add-btn"),
           engineCustomAddBtn: document.getElementById("engine-custom-add-btn"),
           openLinkModal: document.getElementById("open-link-modal"),
+          openCategoryManage: document.getElementById("open-category-manage"),
           openCategoryDelete: document.getElementById("open-category-delete"),
+          categoryModalTitle: document.getElementById("category-modal-title"),
+          categoryModeHint: document.getElementById("category-mode-hint"),
           linkModalTitle: document.getElementById("link-modal-title"),
           linkTitleInput: document.getElementById("lt"),
           linkUrlInput: document.getElementById("lu"),
@@ -2606,7 +2715,8 @@
           categoryNameInput: document.getElementById("cn"),
           categoryColorSelect: document.getElementById("cc"),
           categoryColorPalette: document.getElementById("cc-palette"),
-          categoryModeSelect: document.getElementById("cm"),
+          categoryModeAdd: document.getElementById("cm-add"),
+          categoryModeEdit: document.getElementById("cm-edit"),
           categoryConfirmBtn: document.getElementById("category-confirm-btn"),
           dangerCategoryName: document.getElementById("danger-category-name"),
           dangerCategoryCount: document.getElementById("danger-category-count"),
@@ -2649,6 +2759,8 @@
 
         function init() {
           state.db = loadDb();
+          rotateMottoForSession();
+          applyHolidayPresetIfNeeded();
           saveDb();
           bindEvents();
           renderAll();
@@ -2666,10 +2778,10 @@
         function defaultDb() {
           const now = Date.now();
           const categories = [
-            { id: "cat-dev", name: "开发", order: 10, colorToken: "sky", createdAt: now, updatedAt: now },
-            { id: "cat-ai", name: "AI 工具", order: 20, colorToken: "mint", createdAt: now, updatedAt: now },
-            { id: "cat-collab", name: "协作", order: 30, colorToken: "lilac", createdAt: now, updatedAt: now },
-            { id: "cat-ops", name: "运营", order: 40, colorToken: "coral", createdAt: now, updatedAt: now },
+            { id: "cat-dev", name: "开发", icon: "🧰", order: 10, colorToken: "sky", createdAt: now, updatedAt: now },
+            { id: "cat-ai", name: "AI 工具", icon: "🤖", order: 20, colorToken: "mint", createdAt: now, updatedAt: now },
+            { id: "cat-collab", name: "协作", icon: "🤝", order: 30, colorToken: "lilac", createdAt: now, updatedAt: now },
+            { id: "cat-ops", name: "运营", icon: "📈", order: 40, colorToken: "coral", createdAt: now, updatedAt: now },
           ];
           const links = [
             { id: uid("link"), categoryId: "cat-dev", title: "GitHub", url: "https://github.com/", note: "", order: 10, createdAt: now, updatedAt: now },
@@ -2712,12 +2824,43 @@
               calendarMonth: formatYm(new Date(now)),
               todoView: "week",
               todos: [],
-              holidays: [
-                { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now },
-                { id: uid("holiday"), name: "劳动节", startDate: "2026-05-01", endDate: "2026-05-05", createdAt: now, updatedAt: now },
-              ],
+              holidays: defaultCnHolidays2026(now),
             },
           };
+        }
+
+        function defaultCnHolidays2026(now) {
+          return [
+            { id: uid("holiday"), name: "元旦", startDate: "2026-01-01", endDate: "2026-01-01", createdAt: now, updatedAt: now, order: 10 },
+            { id: uid("holiday"), name: "春节", startDate: "2026-02-16", endDate: "2026-02-22", createdAt: now, updatedAt: now, order: 20 },
+            { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now, order: 30 },
+            { id: uid("holiday"), name: "劳动节", startDate: "2026-05-01", endDate: "2026-05-05", createdAt: now, updatedAt: now, order: 40 },
+            { id: uid("holiday"), name: "端午节", startDate: "2026-06-19", endDate: "2026-06-21", createdAt: now, updatedAt: now, order: 50 },
+            { id: uid("holiday"), name: "中秋节", startDate: "2026-09-25", endDate: "2026-09-27", createdAt: now, updatedAt: now, order: 60 },
+            { id: uid("holiday"), name: "国庆节", startDate: "2026-10-01", endDate: "2026-10-08", createdAt: now, updatedAt: now, order: 70 },
+          ];
+        }
+
+        function applyHolidayPresetIfNeeded() {
+          if (!state.db || !state.db.plan) return;
+          if (isHolidayManual()) return;
+          const holidays = Array.isArray(state.db.plan.holidays) ? state.db.plan.holidays : [];
+          const byName = new Map(holidays.map((item) => [safeString(item.name), item]));
+          const invalidYear = holidays.some((item) => !safeString(item.startDate).startsWith("2026-"));
+          const presetMismatch = [
+            ["春节", "2026-02-16", "2026-02-22"],
+            ["劳动节", "2026-05-01", "2026-05-05"],
+            ["国庆节", "2026-10-01", "2026-10-08"],
+          ].some(([name, startDate, endDate]) => {
+            const row = byName.get(name);
+            if (!row) return true;
+            return row.startDate !== startDate || row.endDate !== endDate;
+          });
+          const shouldReplace = !holidays.length || invalidYear || presetMismatch;
+          if (!shouldReplace) return;
+          const now = Date.now();
+          state.db.plan.holidays = defaultCnHolidays2026(now);
+          state.ui.holidayAutoStatus = "ok";
         }
 
         function loadDb() {
@@ -2967,16 +3110,24 @@
           if (!cat || typeof cat !== "object") return null;
           const id = safeString(cat.id) || uid("cat");
           const name = safeString(cat.name) || `分类 ${index + 1}`;
+          const icon = normalizeCategoryIcon(cat.icon);
           const colorToken = COLOR_TOKENS.has(cat.colorToken) ? cat.colorToken : "slate";
           const order = Number.isFinite(Number(cat.order)) ? Number(cat.order) : (index + 1) * 10;
           return {
             id,
             name,
+            icon,
             order,
             colorToken,
             createdAt: Number.isFinite(Number(cat.createdAt)) ? Number(cat.createdAt) : now,
             updatedAt: Number.isFinite(Number(cat.updatedAt)) ? Number(cat.updatedAt) : now,
           };
+        }
+
+        function normalizeCategoryIcon(rawIcon) {
+          const text = safeString(rawIcon);
+          if (!text) return "📁";
+          return Array.from(text)[0] || "📁";
         }
 
         function normalizeLink(link, index, now) {
@@ -3114,6 +3265,15 @@
             });
           }
 
+          if (els.openCategoryManage) {
+            els.openCategoryManage.addEventListener("click", () => {
+              if (!els.categoryModeAdd || !els.categoryModeEdit) return;
+              const useEdit = state.db.activeCategoryId !== ALL_CATEGORY_ID;
+              els.categoryModeEdit.checked = useEdit;
+              els.categoryModeAdd.checked = !useEdit;
+            });
+          }
+
           if (els.openCategoryDelete) {
             els.openCategoryDelete.addEventListener("click", (event) => {
               if (state.db.activeCategoryId === ALL_CATEGORY_ID) {
@@ -3141,6 +3301,20 @@
 
           if (els.categoryConfirmBtn) {
             els.categoryConfirmBtn.addEventListener("click", onCategoryConfirm);
+          }
+
+          if (els.categoryModeAdd) {
+            els.categoryModeAdd.addEventListener("change", fillCategoryModal);
+          }
+          if (els.categoryModeEdit) {
+            els.categoryModeEdit.addEventListener("change", () => {
+              if (els.categoryModeEdit.checked && state.db.activeCategoryId === ALL_CATEGORY_ID) {
+                toast("提示", "请先选择具体分类再修改。", true);
+                if (els.categoryModeAdd) els.categoryModeAdd.checked = true;
+                els.categoryModeEdit.checked = false;
+              }
+              fillCategoryModal();
+            });
           }
 
           if (els.categoryColorPalette && els.categoryColorSelect) {
@@ -3483,7 +3657,7 @@
 
         function onCategoryConfirm(event) {
           event.preventDefault();
-          const mode = safeString(els.categoryModeSelect && els.categoryModeSelect.value) || "add";
+          const mode = els.categoryModeEdit && els.categoryModeEdit.checked ? "edit" : "add";
           const name = safeString(els.categoryNameInput && els.categoryNameInput.value);
           const colorToken = safeString(els.categoryColorSelect && els.categoryColorSelect.value);
 
@@ -3493,10 +3667,19 @@
           }
 
           const now = Date.now();
-          if (mode === "rename") {
+          if (mode === "edit") {
+            if (state.db.activeCategoryId === ALL_CATEGORY_ID) {
+              toast("提示", "请先选择具体分类再修改。", true);
+              return;
+            }
             const cat = getCategoryById(state.db.activeCategoryId);
             if (!cat) {
               toast("失败", "当前分类不存在。", true);
+              return;
+            }
+            const exists = state.db.categories.some((item) => item.id !== cat.id && item.name === name);
+            if (exists) {
+              toast("校验失败", "分类名称已存在。", true);
               return;
             }
             cat.name = name;
@@ -3513,6 +3696,7 @@
             state.db.categories.push({
               id,
               name,
+              icon: "📁",
               order: nextOrder(state.db.categories),
               colorToken: COLOR_TOKENS.has(colorToken) ? colorToken : "slate",
               createdAt: now,
@@ -3980,16 +4164,26 @@
 
         function fillCategoryModal() {
           const active = getCategoryById(state.db.activeCategoryId);
+          const canEdit = !!active;
+          const requestedMode = els.categoryModeEdit && els.categoryModeEdit.checked ? "edit" : "add";
+          const editMode = requestedMode === "edit" && canEdit;
+          if (els.categoryModeAdd) els.categoryModeAdd.checked = !editMode;
+          if (els.categoryModeEdit) els.categoryModeEdit.checked = editMode;
+          if (els.categoryModalTitle) {
+            els.categoryModalTitle.textContent = editMode ? "修改已有分类" : "新增分类";
+          }
+          if (els.categoryModeHint) {
+            els.categoryModeHint.textContent = editMode
+              ? `当前正在修改：${active.name}`
+              : "将创建一个新的分类，并自动切换到该分类。";
+          }
           if (els.categoryNameInput) {
-            els.categoryNameInput.value = "";
+            els.categoryNameInput.value = editMode ? active.name : "";
           }
           if (els.categoryColorSelect) {
-            const nextColor = active ? active.colorToken : "sky";
+            const nextColor = editMode && active ? active.colorToken : "sky";
             els.categoryColorSelect.value = nextColor;
             syncColorPalette(nextColor);
-          }
-          if (els.categoryModeSelect) {
-            els.categoryModeSelect.value = "add";
           }
         }
 
@@ -4128,11 +4322,44 @@
           renderPlanPanel();
         }
 
-        function renderMotto() {
-          if (!els.mottoText) return;
+        function mottoListForDay(day) {
+          const list = Array.isArray(WEEKDAY_MOTTOS[day]) ? WEEKDAY_MOTTOS[day] : WEEKDAY_MOTTOS[1];
+          return list.length ? list : [{ id: "fallback", emoji: "✨", text: "今天也稳稳推进一点点。" }];
+        }
+
+        function currentMottoItem() {
           const today = new Date();
           const day = weekdayMon(today);
-          const motto = WEEKDAY_MOTTOS[day] || WEEKDAY_MOTTOS[1];
+          const list = mottoListForDay(day);
+          const mottoCfg = state.db && state.db.settings && state.db.settings.motto ? state.db.settings.motto : {};
+          const quoteId = safeString(mottoCfg.quoteId);
+          return list.find((item) => item.id === quoteId) || list[0];
+        }
+
+        function rotateMottoForSession() {
+          if (!state.db || !state.db.settings) return;
+          if (!state.db.settings.motto || typeof state.db.settings.motto !== "object") {
+            state.db.settings.motto = { mode: "daily", lastDate: "", quoteId: "" };
+          }
+          const cfg = state.db.settings.motto;
+          const now = new Date();
+          const today = formatYmd(now);
+          const day = weekdayMon(now);
+          const list = mottoListForDay(day);
+
+          if (cfg.lastDate !== today) {
+            cfg.lastDate = today;
+            cfg.quoteId = "";
+          }
+
+          const index = list.findIndex((item) => item.id === cfg.quoteId);
+          const next = list[(index + 1 + list.length) % list.length];
+          cfg.quoteId = next.id;
+        }
+
+        function renderMotto() {
+          if (!els.mottoText) return;
+          const motto = currentMottoItem();
           els.mottoText.textContent = motto.text;
           if (els.mottoEmoji) {
             els.mottoEmoji.textContent = motto.emoji;
@@ -4498,6 +4725,34 @@
           return (next.getTime() - prev.getTime()) === 86400000;
         }
 
+        function getHolidayByDate(ymd) {
+          const list = state.db && state.db.plan && Array.isArray(state.db.plan.holidays)
+            ? state.db.plan.holidays
+            : [];
+          return list.find((item) => item.startDate <= ymd && item.endDate >= ymd) || null;
+        }
+
+        function isWeekendYmd(ymd) {
+          const date = parseYmd(ymd);
+          if (!date) return false;
+          const day = date.getDay();
+          return day === 0 || day === 6;
+        }
+
+        function calendarMarkHtmlByDate(ymd) {
+          if (CN_2026_WORKDAY_OVERRIDES.has(ymd)) {
+            return '<span class="mark workday" aria-hidden="true" title="调休上班">班</span>';
+          }
+          const holiday = getHolidayByDate(ymd);
+          if (holiday) {
+            return `<span class="mark holiday" aria-hidden="true" title="${escAttr(holiday.name)}">休</span>`;
+          }
+          if (isWeekendYmd(ymd)) {
+            return '<span class="mark holiday" aria-hidden="true" title="周末休息">休</span>';
+          }
+          return "";
+        }
+
         function renderCalendar() {
           if (!els.calendarGrid || !els.calendarMonthTitle) return;
           const selected = parseYmd(state.db.plan.selectedDate) || new Date();
@@ -4531,7 +4786,8 @@
             if (key === selectedYmd) classes.push("selected");
             if (key === todayYmd) classes.push("today");
             const dot = counts.get(key) ? "<span class=\"dot\" aria-hidden=\"true\"></span>" : "";
-            days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell">${current.getDate()}${dot}</button>`);
+            const mark = calendarMarkHtmlByDate(key);
+            days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell">${current.getDate()}${dot}${mark}</button>`);
           }
           els.calendarGrid.innerHTML = headers.concat(days).join("");
         }
