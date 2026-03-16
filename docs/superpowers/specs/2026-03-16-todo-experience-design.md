@@ -114,7 +114,7 @@ Ordering rules are deterministic:
 - Dragging inside a group rewrites `order` and becomes the primary display order for that group.
 - Priority and date act as default placement hints only when a task first enters a group or re-enters a different group.
 - Editing a task without changing its group preserves its manual order.
-- Changing a task's date or scene can move it into another group; once moved, it is inserted using the destination group's default placement rule and can then be manually reordered there.
+- Changing a task's date can move it into another group; once moved, it is inserted using the destination group's default placement rule and can then be manually reordered there.
 
 ### Calendar Time Navigation
 
@@ -132,13 +132,14 @@ Each task should support these default fields:
 - `scene`: lightweight grouping tag with enum `work | life | study | other`
 - `done`: completion state
 - `order`: group-local manual ordering signal
+- `createdAt`: creation timestamp used for stable fallback ordering
 
 Behavioral rules:
 
 - Tasks without a date belong in `Later`.
 - Tasks with a current-day date belong in `Today`.
 - Tasks within the current week but not today belong in `This Week`.
-- Changing date or scene can move the task into a new visible group.
+- Changing date can move the task into a new visible group.
 
 Field semantics:
 
@@ -170,10 +171,12 @@ Default assumptions should reduce effort:
 - Default priority: medium
 - Default scene: reuse last selection when practical
 - Default time placement follows explicit context rules:
-  - no selected date and no special browsing context: add to `Today`
+  - no selected date and no special browsing context: create the task with today's date so it lands in `Today`
   - selected future date in the current week: add to that date and show in `This Week`
   - selected date outside the current week: add to that explicit date and surface it under `Later`
   - browsing another month without a selected date: keep default capture in `Today` to avoid accidental future scheduling
+
+If the user explicitly clears the date in expanded editing, the task becomes undated and moves to `Later`.
 
 ### Edit Task
 
@@ -190,7 +193,7 @@ Default assumptions should reduce effort:
 ### Reorder and Move
 
 - Drag sorting applies inside a group for manual prioritization.
-- Cross-group movement should map to changing time placement or scene, not ambiguous freeform drag semantics.
+- Cross-group movement should map to changing time placement, not ambiguous freeform drag semantics.
 - When a task changes date or group, it re-enters the target group according to that group's sorting rules.
 
 ## View State Model
@@ -204,11 +207,18 @@ The todo experience should have a small explicit state model so planning stays t
 
 Behavior rules:
 
-- On initial load, `selectedDate` is today and `viewedMonth` is the current month.
+- On initial load, `selectedDate` is empty and `viewedMonth` is the current month.
 - In `week` mode, the todo panel emphasizes `Today`, `This Week`, and `Later` using the current Monday-Sunday week.
 - In `month` mode, the same three groups remain, but `This Week` is replaced by `This Month` for the currently viewed month while preserving `Today` and `Later`.
 - When a specific date is selected, the header shows that date and the list is filtered to make that date's tasks and surrounding scope clear.
 - Clearing date focus returns the panel to the default scope-driven grouping.
+
+Month-mode placement rules:
+
+- `Today` still contains only tasks dated today.
+- `This Month` contains dated tasks in `viewedMonth` except those already in `Today`.
+- `Later` contains undated tasks plus tasks dated after the end of `viewedMonth`.
+- Tasks dated before the start of `viewedMonth` are shown only when explicitly browsing their date or month; they are not mixed into the active forward-looking groups.
 
 ## Calendar and Todo Linkage
 
@@ -245,6 +255,7 @@ The calendar should communicate task relevance instead of acting as decoration. 
 - In `month` mode, visible groups are `Today`, `This Month`, and `Later`.
 - Quick capture defaults follow the currently selected date if there is one; otherwise they still default to `Today`.
 - Switching scope mode never creates a second storage model; it only changes how the same tasks are grouped and filtered.
+- Group ordering rules stay the same in both modes: manual order first inside a group, then priority/date only for default insertion.
 
 ## Visual and UX Principles
 
