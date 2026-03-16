@@ -14,8 +14,6 @@
         - CSS-only modals via :target
       */
 
-      @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,350;9..144,650;9..144,800&family=Noto+Sans+SC:wght@400;500;600&display=swap");
-
       :root {
         --bg0: #f2fbff;
         --bg1: #ecfbf6;
@@ -76,7 +74,7 @@
           radial-gradient(900px 680px at 80% 10%, rgba(14, 165, 165, 0.18), transparent 55%),
           radial-gradient(800px 620px at 55% 110%, rgba(255, 153, 107, 0.14), transparent 60%),
           linear-gradient(180deg, var(--bg0), var(--bg1));
-        font-family: "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
         letter-spacing: 0.1px;
         overflow-x: hidden;
       }
@@ -106,6 +104,14 @@
         text-decoration: none;
       }
 
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
       .wrap {
         position: relative;
         max-width: var(--max);
@@ -116,7 +122,7 @@
 
       .shell {
         display: grid;
-        grid-template-columns: 176px minmax(0, 2fr) minmax(320px, 1fr);
+        grid-template-columns: 176px minmax(0, 1.85fr) minmax(420px, 1.18fr);
         grid-template-rows: auto 1fr;
         column-gap: 14px;
         row-gap: var(--s3);
@@ -331,7 +337,7 @@
       }
 
       .calmonth {
-        font-family: "Fraunces", Georgia, serif;
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
         font-size: 14px;
         letter-spacing: 0.02em;
       }
@@ -380,7 +386,10 @@
       }
 
       .calday.today {
-        border-color: color-mix(in oklab, var(--accent-2) 45%, var(--rule));
+        border-color: #24373b;
+        background: linear-gradient(180deg, #d8e8ff, #c7dcff);
+        color: #16252f;
+        box-shadow: inset 0 0 0 1px rgba(36, 55, 59, 0.22);
       }
 
       .calday.selected {
@@ -395,63 +404,184 @@
 
       .calday .dot {
         position: absolute;
-        width: 5px;
-        height: 5px;
+        width: 7px;
+        height: 7px;
         border-radius: 99px;
         left: 50%;
         bottom: 4px;
         transform: translateX(-50%);
-        background: var(--accent);
-        box-shadow: none;
+        background: color-mix(in oklab, var(--accent) 88%, white);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
+      }
+
+      .calday .dot.overdue-severe {
+        background: #ff5a47;
+        box-shadow: 0 0 0 3px color-mix(in oklab, #ff5a47 22%, transparent);
+      }
+
+      .calday .dot.overdue {
+        background: #ff9a63;
+        box-shadow: 0 0 0 3px color-mix(in oklab, #ff9a63 22%, transparent);
+      }
+
+      .calday .dot.today {
+        background: #f59f00;
+        box-shadow: 0 0 0 3px color-mix(in oklab, #f59f00 20%, transparent);
+      }
+
+      .calday .dot.future-near {
+        background: #20c997;
+        box-shadow: 0 0 0 3px color-mix(in oklab, #20c997 20%, transparent);
+      }
+
+      .calday .dot.future-far {
+        background: #6ea8e5;
+        box-shadow: 0 0 0 3px color-mix(in oklab, #6ea8e5 18%, transparent);
+      }
+
+      .todo-card-shell {
+        position: relative;
+        overflow: visible;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 252, 250, 0.86)),
+          radial-gradient(320px 180px at 100% 0%, rgba(58, 123, 213, 0.05), transparent 72%);
+      }
+
+      .todo-shell-head {
+        display: none;
+      }
+
+      .todo-head {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 2px 5px 2px 2px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(244, 251, 249, 0.7));
+        border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
       }
 
       .todoquick {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 9px;
-        margin-bottom: 12px;
+        grid-template-columns: minmax(0, 1fr) 122px 74px 46px;
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 9px;
+        border-radius: 16px;
+        border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 251, 248, 0.74)),
+          radial-gradient(280px 140px at 0% 0%, rgba(14, 165, 165, 0.06), transparent 72%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
       }
 
       .todoquick input,
-      .todoquick select {
+      .todoquick select,
+      .todo-date-link,
+      .todo-scene-chip,
+      .todo-priority-chip {
         border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
         background: linear-gradient(180deg, color-mix(in oklab, white 82%, var(--cream)), color-mix(in oklab, white 74%, var(--cream)));
-        border-radius: 12px;
-        padding: 9px 11px;
-        font-size: 12px;
-        transition: border-color 160ms ease, box-shadow 160ms ease;
+        border-radius: 11px;
+        padding: 7px 10px;
+        font-size: 11.5px;
+        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
       }
 
       .todoquick input:focus-visible,
-      .todoquick select:focus-visible {
+      .todoquick select:focus-visible,
+      .todo-date-link:focus-visible,
+      .todo-scene-filter:focus-visible {
         outline: none;
         border-color: color-mix(in oklab, var(--accent) 42%, var(--rule));
         box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
       }
 
+      .todoquick-title {
+        grid-column: 1;
+        min-width: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+      }
+
       .todoquick input[type="date"] {
-        grid-column: 1 / -1;
+        grid-column: 2;
+        min-width: 0;
+        width: 122px;
+      }
+
+      input[type="date"],
+      input[type="month"] {
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
+      input[type="date"]::-webkit-datetime-edit,
+      input[type="month"]::-webkit-datetime-edit,
+      input[type="date"]::-webkit-datetime-edit-text,
+      input[type="month"]::-webkit-datetime-edit-text,
+      input[type="date"]::-webkit-datetime-edit-year-field,
+      input[type="date"]::-webkit-datetime-edit-month-field,
+      input[type="date"]::-webkit-datetime-edit-day-field,
+      input[type="month"]::-webkit-datetime-edit-year-field,
+      input[type="month"]::-webkit-datetime-edit-month-field {
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
+      .todoquick select {
+        grid-column: 3;
+        width: 74px;
+      }
+
+      .todoquick-submit {
+        grid-column: 4;
+        min-width: 46px;
+        width: 46px;
+        justify-self: end;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .todoquick-submit svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .todo-groups {
+        display: grid;
+        gap: 10px;
       }
 
       .todo-g {
-        margin-top: 10px;
-        padding: 8px;
-        border-radius: 14px;
+        padding: 10px;
+        border-radius: 18px;
         border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(241, 252, 248, 0.66));
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(241, 252, 248, 0.74)),
+          radial-gradient(260px 160px at 100% 0%, rgba(14, 165, 165, 0.08), transparent 70%);
+        box-shadow: 0 10px 20px rgba(12, 27, 29, 0.04);
       }
 
       .todo-gh {
         font-size: 11px;
         color: color-mix(in oklab, var(--muted) 76%, var(--ink));
-        letter-spacing: 0.06em;
+        letter-spacing: 0.08em;
         margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .todo-gh-main {
         display: inline-flex;
         align-items: center;
         gap: 7px;
       }
 
-      .todo-gh::before {
+      .todo-gh-main::before {
         content: "";
         width: 8px;
         height: 8px;
@@ -460,19 +590,24 @@
         box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
       }
 
+      .todo-group-meta {
+        font-size: 10.5px;
+        color: color-mix(in oklab, var(--muted) 80%, var(--ink));
+      }
+
       .todo-list {
         display: grid;
-        gap: 7px;
+        gap: 8px;
       }
 
       .todo-item {
         border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
-        border-radius: 14px;
-        background: linear-gradient(180deg, color-mix(in oklab, white 83%, var(--cream)), color-mix(in oklab, white 75%, var(--cream)));
-        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.08);
-        padding: 8px 9px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, color-mix(in oklab, white 87%, var(--cream)), color-mix(in oklab, white 77%, var(--cream)));
+        box-shadow: 0 12px 24px rgba(12, 27, 29, 0.07);
+        padding: 10px;
         display: grid;
-        grid-template-columns: auto 1fr auto;
+        grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: center;
         gap: 8px;
         transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
@@ -482,13 +617,38 @@
       .todo-item:hover {
         transform: translateY(-1px);
         border-color: color-mix(in oklab, var(--accent) 34%, var(--rule));
-        box-shadow: 0 14px 28px rgba(12, 27, 29, 0.1);
+        box-shadow: 0 16px 28px rgba(12, 27, 29, 0.1);
       }
 
       .todo-item.done {
-        border-color: color-mix(in oklab, var(--accent) 24%, var(--rule));
-        background: linear-gradient(180deg, color-mix(in oklab, #dff8ed 70%, white), color-mix(in oklab, #dff8ed 58%, var(--cream)));
-        box-shadow: 0 10px 20px rgba(18, 121, 94, 0.12);
+        border-color: color-mix(in oklab, var(--cat-mint) 22%, var(--rule));
+        background: linear-gradient(180deg, color-mix(in oklab, #dff8ed 76%, white), color-mix(in oklab, #dff8ed 58%, var(--cream)));
+        box-shadow: 0 10px 20px rgba(18, 121, 94, 0.09);
+      }
+
+      .todo-main {
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 44px 96px;
+        align-items: center;
+        gap: 5px;
+        overflow: hidden;
+      }
+
+      .todo-title-row {
+        grid-column: 1;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .todo-t {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .todo-item.done .todo-t {
@@ -497,9 +657,113 @@
         color: color-mix(in oklab, var(--muted) 70%, var(--ink));
       }
 
+      .todo-meta {
+        display: contents;
+      }
+
+      .todo-priority-chip,
+      .todo-date-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 5px 7px;
+        font-size: 10.5px;
+        line-height: 1;
+        border-radius: 999px;
+        justify-self: stretch;
+        min-width: 0;
+      }
+
+      .todo-date-link {
+        cursor: pointer;
+        color: inherit;
+        white-space: nowrap;
+        border: 1px solid color-mix(in oklab, var(--accent-3) 16%, var(--rule));
+        background: color-mix(in oklab, white 82%, var(--accent-3));
+      }
+
+      .todo-date-link[data-tone="overdue-severe"] {
+        background: #ffe0db;
+        border-color: #ff8c79;
+        color: #76180f;
+      }
+
+      .todo-date-link[data-tone="overdue"] {
+        background: #ffe7d6;
+        border-color: #ffb184;
+        color: #8b3f16;
+      }
+
+      .todo-date-link[data-tone="today"] {
+        background: #fff0cf;
+        border-color: #f0c36b;
+        color: #745200;
+      }
+
+      .todo-date-link[data-tone="future-near"] {
+        background: #dcf7ed;
+        border-color: #86d9bc;
+        color: #17614d;
+      }
+
+      .todo-date-link[data-tone="future-far"] {
+        background: #e2efff;
+        border-color: #9dc2f1;
+        color: #285f92;
+      }
+
+      .todo-priority-chip[data-priority="high"] {
+        background: color-mix(in oklab, white 66%, #ff7a59);
+        border-color: color-mix(in oklab, #ff7a59 42%, var(--rule));
+        color: #7f2f10;
+      }
+
+      .todo-priority-chip[data-priority="medium"] {
+        background: color-mix(in oklab, white 70%, #62cbd0);
+        border-color: color-mix(in oklab, #0ea5a5 26%, var(--rule));
+        color: #165d63;
+      }
+
+      .todo-priority-chip[data-priority="low"] {
+        background: color-mix(in oklab, white 86%, #cfd8e3);
+        border-color: color-mix(in oklab, #94a3b8 24%, var(--rule));
+        color: #4f5f70;
+      }
+
+      #todo-quick-priority[data-priority="high"],
+      #tp[data-priority="high"] {
+        background: color-mix(in oklab, white 74%, #ffe1d8);
+        border-color: color-mix(in oklab, #ff7a59 34%, var(--rule));
+        color: #8a3514;
+      }
+
+      #todo-quick-priority[data-priority="medium"],
+      #tp[data-priority="medium"] {
+        background: color-mix(in oklab, white 74%, #dff7f4);
+        border-color: color-mix(in oklab, #0ea5a5 24%, var(--rule));
+        color: #185f63;
+      }
+
+      #todo-quick-priority[data-priority="low"],
+      #tp[data-priority="low"] {
+        background: color-mix(in oklab, white 80%, #edf2f7);
+        border-color: color-mix(in oklab, #94a3b8 20%, var(--rule));
+        color: #536171;
+      }
+
+      .todo-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding-left: 2px;
+        flex-shrink: 0;
+      }
+
       .todo-cb {
-        width: 17px;
-        height: 17px;
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
         accent-color: color-mix(in oklab, var(--accent) 78%, #0f766e);
         cursor: pointer;
         transition: transform 140ms ease;
@@ -509,18 +773,30 @@
         transform: scale(1.08);
       }
 
-      .todo-t {
-        font-size: 12.5px;
-        font-weight: 600;
-        line-height: 1.35;
+      .todo-completed {
+        margin-top: 8px;
+        border-top: 1px dashed color-mix(in oklab, var(--rule) 84%, transparent);
+        padding-top: 8px;
+      }
+
+      .todo-completed summary {
+        cursor: pointer;
+        font-size: 11px;
+        color: color-mix(in oklab, var(--muted) 84%, var(--ink));
+        list-style: none;
+      }
+
+      .todo-completed summary::-webkit-details-marker {
+        display: none;
       }
 
       .todo-empty {
         margin-top: 4px;
         border: 1px dashed color-mix(in oklab, var(--accent) 26%, var(--rule));
-        border-radius: 12px;
-        padding: 10px;
-        font-size: 11.5px;
+        border-radius: 14px;
+        padding: 11px 12px;
+        font-size: 11px;
+        line-height: 1.45;
         color: color-mix(in oklab, var(--muted) 86%, var(--ink));
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(230, 250, 244, 0.5));
       }
@@ -533,6 +809,99 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1100px) {
+        .todo-shell-head {
+          grid-template-columns: 1fr;
+        }
+
+        .todo-head {
+          justify-self: start;
+        }
+
+        .hero-countdown {
+          min-width: 0;
+          max-width: none;
+          width: 100%;
+          grid-template-columns: auto 1fr;
+        }
+
+        .hero-countdown .plan-link {
+          grid-column: 2;
+        }
+
+        .hero-countdown-values {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px 12px;
+        }
+
+        .hero-countdown-item {
+          overflow: hidden;
+        }
+
+        .hero-countdown .countdown-v {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .todoquick {
+          grid-template-columns: minmax(0, 1fr) 122px 74px 46px;
+        }
+
+        .todoquick-title { grid-column: 1; }
+        .todoquick input[type="date"] { grid-column: 2; width: 122px; }
+        .todoquick select { grid-column: 3; width: 74px; }
+        .todoquick-submit { grid-column: 4; }
+      }
+
+      @media (max-width: 720px) {
+        .panel.hero .hd .row {
+          flex-wrap: wrap;
+        }
+
+        .hero-note {
+          margin-left: 0;
+          width: 100%;
+          justify-content: flex-start;
+          text-align: left;
+        }
+
+        .hero-countdown {
+          margin-left: 0;
+          max-width: none;
+          width: 100%;
+        }
+
+        .hero-countdown-values {
+          grid-template-columns: 1fr;
+        }
+
+        .todoquick {
+          grid-template-columns: 1fr;
+          padding: 8px;
+        }
+
+        .todoquick input[type="date"],
+        .todoquick select,
+        .todoquick-submit {
+          grid-column: 1 / -1;
+        }
+
+        .todoquick-title {
+          grid-column: 1 / -1;
+        }
+
+        .todo-item {
+          grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .todo-item-actions {
+          grid-column: 2;
+          justify-content: flex-end;
         }
       }
 
@@ -649,7 +1018,7 @@
       }
 
       .hero-note {
-        margin-left: auto;
+        margin-left: 18px;
         max-width: 420px;
         text-align: right;
         color: color-mix(in oklab, var(--ink) 72%, var(--muted));
@@ -658,10 +1027,102 @@
         justify-content: flex-end;
         gap: 8px;
         padding: 7px 12px;
+        min-height: 40px;
         border-radius: 999px;
         background: linear-gradient(120deg, rgba(255, 255, 255, 0.72), rgba(213, 241, 235, 0.55));
         border: 1px solid color-mix(in oklab, var(--accent-3) 22%, var(--rule));
         animation: noteGlow 2.8s ease-in-out infinite, noteFloat 4.8s ease-in-out infinite;
+      }
+
+      .hero-countdown {
+        margin-left: auto;
+        min-width: 0;
+        max-width: none;
+        width: max-content;
+        padding: 7px 12px;
+        min-height: 40px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--accent) 16%, var(--rule));
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(239, 251, 246, 0.7)),
+          radial-gradient(180px 120px at 100% 0%, rgba(14, 165, 165, 0.08), transparent 70%);
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+      }
+
+      .hero-countdown-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 0 1 auto;
+      }
+
+      .hero-countdown-values {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        overflow: hidden;
+        flex: 0 1 auto;
+      }
+
+      .hero-countdown-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+        flex: 0 1 auto;
+        overflow: visible;
+      }
+
+      .hero-countdown .countdown-k {
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+      }
+
+      .hero-countdown .plan-link {
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--accent-3) 18%, var(--rule));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 250, 249, 0.84));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 8px 16px rgba(12, 27, 29, 0.08);
+      }
+
+      .hero-countdown .countdown-v {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: visible;
+      }
+
+      .hero-countdown-item.compact {
+        gap: 0;
+      }
+
+      .hero-countdown-head > .hero-countdown-item .countdown-k,
+      .hero-countdown-head > .hero-countdown-item .countdown-v {
+        color: #1c6b77;
+      }
+
+      .hero-countdown-values .hero-countdown-item .countdown-v {
+        color: #1f7f69;
+      }
+
+      .hero-countdown .plan-link svg {
+        width: 12px;
+        height: 12px;
       }
 
       .motto-emoji {
@@ -1589,13 +2050,17 @@
         bottom: 18px;
         right: 18px;
         z-index: 40;
-        width: 200px;
-        pointer-events: none;
+        max-width: 320px;
+        pointer-events: auto;
         opacity: 0.92;
         display: none;
+        align-items: center;
+        gap: 10px;
       }
 
       .toast .msg {
+        flex: 1;
+        min-width: 0;
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         background: color-mix(in oklab, white 78%, var(--cream));
         border-radius: var(--radius-2);
@@ -1622,9 +2087,20 @@
       }
 
       .toast .msg span {
-        display: none !important;
+        display: block;
         font-size: 12px;
         color: var(--muted);
+      }
+
+      .toast-action {
+        border: 1px solid color-mix(in oklab, var(--accent-3) 20%, var(--rule));
+        background: linear-gradient(180deg, color-mix(in oklab, white 82%, var(--accent-3)), white);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 11px;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(12, 27, 29, 0.12);
       }
 
       /* page load */
@@ -1693,6 +2169,25 @@
                 <span class="spark" aria-hidden="true"></span>
                 <span class="brand-name">MyWorkHub</span>
               </div>
+              <section class="hero-countdown" aria-label="放假倒计时">
+                <div class="hero-countdown-head">
+                  <div class="hero-countdown-item">
+                    <span class="countdown-k">周末</span>
+                    <span class="countdown-v" id="weekend-countdown">计算中...</span>
+                  </div>
+                  <div class="hero-countdown-values">
+                  <div class="hero-countdown-item compact">
+                    <span class="countdown-v" id="holiday-countdown">尚未配置</span>
+                  </div>
+                  </div>
+                </div>
+                <a href="#modal-holidays" class="plan-link" id="open-holidays-modal-hero" title="管理假日" aria-label="管理假日">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3.8 14 5l2.3-.2.9 2.1 2 1.1-.5 2.2 1.2 2-1.2 2 .5 2.2-2 1.1-.9 2.1-2.3-.2-2 1.2-2-1.2-2.3.2-.9-2.1-2-1.1.5-2.2-1.2-2 1.2-2-.5-2.2 2-1.1.9-2.1L10 5l2-1.2Z" stroke="#2f6572" stroke-width="1.4" stroke-linejoin="round" />
+                    <path d="M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" stroke="#2f6572" stroke-width="1.4" />
+                  </svg>
+                </a>
+              </section>
               <div class="hero-note" role="note" title="每日一句（示意）">
                 <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
                 <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
@@ -2039,21 +2534,6 @@
 
           <aside class="panel reveal d3 planpanel" aria-label="周计划">
             <div class="planbody">
-              <section class="plancard" aria-label="放假倒计时">
-                <div class="plan-h">
-                  <strong>放假倒计时</strong>
-                  <a href="#modal-holidays" class="plan-link" id="open-holidays-modal">管理假日</a>
-                </div>
-                <div class="countdown-row">
-                  <span class="countdown-k">周末</span>
-                  <span class="countdown-v" id="weekend-countdown">计算中...</span>
-                </div>
-                <div class="countdown-row">
-                  <span class="countdown-k">法定假日</span>
-                  <span class="countdown-v" id="holiday-countdown">尚未配置</span>
-                </div>
-              </section>
-
               <section class="plancard" aria-label="日历">
                 <div class="calbar">
                   <div class="calmonth" id="calendar-month-title">2026年03月</div>
@@ -2076,9 +2556,8 @@
                 <div class="calgrid" id="calendar-grid" role="grid" aria-label="月历"></div>
               </section>
 
-              <section class="plancard" aria-label="待办">
-                <div class="plan-h">
-                  <strong id="todo-panel-title">待办</strong>
+              <section class="plancard todo-card-shell" aria-label="待办">
+                <div class="plan-h todo-shell-head">
                   <span class="todo-head">
                     <span class="seg" role="tablist" aria-label="待办维度">
                       <button id="todo-view-week-btn" class="segbtn" type="button" data-action="todo-view-week" aria-selected="true">周</button>
@@ -2090,13 +2569,24 @@
 
                 <form class="todoquick" id="todo-quick-form">
                   <label class="sr" for="todo-quick-title">新增待办</label>
-                  <input id="todo-quick-title" type="text" placeholder="记录一件要推进的事..." />
-                  <button class="btn tight" type="submit">新增</button>
+                  <input id="todo-quick-title" class="todoquick-title" type="text" placeholder="写下下一件要推进的小事..." />
                   <label class="sr" for="todo-quick-date">指定日期</label>
                   <input id="todo-quick-date" type="date" />
+                  <label class="sr" for="todo-quick-priority">优先级</label>
+                  <select id="todo-quick-priority">
+                    <option value="high">高</option>
+                    <option value="medium" selected>中</option>
+                    <option value="low">低</option>
+                  </select>
+                  <button class="btn tight todoquick-submit" type="submit" title="新增待办" aria-label="新增待办">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 5v14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                      <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                    </svg>
+                  </button>
                 </form>
 
-                <div id="todo-groups"></div>
+                <div id="todo-groups" class="todo-groups"></div>
               </section>
             </div>
           </aside>
@@ -2379,21 +2869,25 @@
             <input id="tt" type="text" placeholder="例如：整理需求说明并发给团队" />
           </div>
           <div class="field">
-            <label for="td">安排到周几</label>
-            <select id="td">
-              <option value="">本周未安排</option>
-              <option value="1">周一</option>
-              <option value="2">周二</option>
-              <option value="3">周三</option>
-              <option value="4">周四</option>
-              <option value="5">周五</option>
-              <option value="6">周六</option>
-              <option value="7">周日</option>
+            <label for="tdt">日期（可留空）</label>
+            <input id="tdt" type="date" />
+          </div>
+          <div class="field">
+            <label for="tp">优先级</label>
+            <select id="tp">
+              <option value="high">高</option>
+              <option value="medium">中</option>
+              <option value="low">低</option>
             </select>
           </div>
           <div class="field">
-            <label for="tm">所属月份</label>
-            <input id="tm" type="month" />
+            <label for="ts">场景</label>
+            <select id="ts">
+              <option value="work">工作</option>
+              <option value="life">生活</option>
+              <option value="study">学习</option>
+              <option value="other">其他</option>
+            </select>
           </div>
         </div>
         <div class="ft">
@@ -2475,6 +2969,7 @@
           <span>保存成功 / 导入失败 / URL 不合法 等反馈会出现在这里。</span>
         </div>
       </div>
+      <button type="button" class="toast-action" hidden>撤销</button>
     </div>
 
     <script>
@@ -2568,6 +3063,8 @@
             pageLoaded: false,
             toastTimer: null,
             holidayAutoStatus: "idle", // idle | loading | ok | error | manual
+            lastCompletedTodo: null,
+            toastActionHandler: null,
           },
         };
 
@@ -2629,10 +3126,12 @@
           todoQuickForm: document.getElementById("todo-quick-form"),
           todoQuickTitle: document.getElementById("todo-quick-title"),
           todoQuickDate: document.getElementById("todo-quick-date"),
+          todoQuickPriority: document.getElementById("todo-quick-priority"),
           todoModalTitle: document.getElementById("todo-modal-title"),
           todoTitleInput: document.getElementById("tt"),
-          todoDaySelect: document.getElementById("td"),
-          todoMonthInput: document.getElementById("tm"),
+          todoDateInput: document.getElementById("tdt"),
+          todoPrioritySelect: document.getElementById("tp"),
+          todoSceneSelect: document.getElementById("ts"),
           todoSaveBtn: document.getElementById("todo-save-btn"),
           dangerTodoName: document.getElementById("danger-todo-name"),
           todoDeleteConfirmBtn: document.getElementById("todo-delete-confirm-btn"),
@@ -2643,6 +3142,8 @@
           holidayAddBtn: document.getElementById("holiday-add-btn"),
           toast: document.querySelector(".toast"),
           toastTitle: document.querySelector(".toast .msg strong"),
+          toastText: document.querySelector(".toast .msg span"),
+          toastActionBtn: document.querySelector(".toast-action"),
         };
 
         init();
@@ -2708,9 +3209,10 @@
             activeCategoryId: "cat-dev",
             plan: {
               weekStart: "mon",
-              selectedDate: formatYmd(new Date(now)),
+              selectedDate: "",
               calendarMonth: formatYm(new Date(now)),
               todoView: "week",
+              sceneFilter: "",
               todos: [],
               holidays: [
                 { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now },
@@ -2847,10 +3349,13 @@
 
         function normalizePlan(input, now) {
           const source = input && typeof input === "object" ? input : {};
-          const selectedDate = parseYmd(safeString(source.selectedDate)) ? safeString(source.selectedDate) : formatYmd(new Date(now));
-          const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(source.calendarMonth)) ? safeString(source.calendarMonth) : selectedDate.slice(0, 7);
+          const selectedDate = parseYmd(safeString(source.selectedDate)) ? safeString(source.selectedDate) : "";
+          const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(source.calendarMonth)) ? safeString(source.calendarMonth) : formatYm(new Date(now));
           const weekStart = "mon";
           const todoView = safeString(source.todoView) === "month" ? "month" : "week";
+          const sceneFilter = ["", "work", "life", "study", "other"].includes(safeString(source.sceneFilter))
+            ? safeString(source.sceneFilter)
+            : "";
           const todos = (Array.isArray(source.todos) ? source.todos : [])
             .map((todo, index) => normalizeTodo(todo, index, now))
             .filter(Boolean);
@@ -2858,19 +3363,17 @@
           const legacyMonthTodos = (Array.isArray(source.monthTodos) ? source.monthTodos : [])
             .map((todo, index) => normalizeMonthTodo(todo, index, now))
             .filter(Boolean)
-            .map((todo, index) => ({
+            .map((todo, index) => normalizeTodo({
               id: todo.id,
               title: todo.title,
               date: lastDayOfMonthYmd(todo.monthKey),
-              weekKey: "",
-              day: "",
-              monthKey: todo.monthKey,
-              scope: "month",
+              priority: "medium",
+              scene: "other",
               done: todo.done,
               order: Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10,
               createdAt: todo.createdAt,
               updatedAt: todo.updatedAt,
-            }));
+            }, index, now));
 
           const mergedTodos = [...todos, ...legacyMonthTodos]
             .sort((a, b) => a.order - b.order);
@@ -2883,6 +3386,7 @@
             selectedDate,
             calendarMonth,
             todoView,
+            sceneFilter,
             todos: mergedTodos,
             holidays,
           };
@@ -2892,23 +3396,29 @@
           if (!todo || typeof todo !== "object") return null;
           const title = safeString(todo.title);
           if (!title) return null;
-          const date = parseYmd(safeString(todo.date)) ? safeString(todo.date) : "";
-          const dayRaw = safeString(todo.day);
-          const dayNum = Number(dayRaw);
-          const day = Number.isInteger(dayNum) && dayNum >= 1 && dayNum <= 7 ? String(dayNum) : "";
-          const fallbackDate = date ? parseYmd(date) : new Date(now);
-          const weekKey = /^\d{4}-W\d{2}$/.test(safeString(todo.weekKey)) ? safeString(todo.weekKey) : weekKeyForDate(fallbackDate);
-          const scope = safeString(todo.scope) === "month" ? "month" : "week";
-          const monthKey = /^\d{4}-\d{2}$/.test(safeString(todo.monthKey)) ? safeString(todo.monthKey) : "";
+          let date = parseYmd(safeString(todo.date)) ? safeString(todo.date) : "";
+          if (!date) {
+            const monthKey = /^\d{4}-\d{2}$/.test(safeString(todo.monthKey)) ? safeString(todo.monthKey) : "";
+            if (monthKey) {
+              date = lastDayOfMonthYmd(monthKey);
+            } else {
+              const dayRaw = safeString(todo.day);
+              const dayNum = Number(dayRaw);
+              const weekKey = /^\d{4}-W\d{2}$/.test(safeString(todo.weekKey)) ? safeString(todo.weekKey) : "";
+              if (weekKey && Number.isInteger(dayNum) && dayNum >= 1 && dayNum <= 7) {
+                date = dateFromWeekKeyAndDay(weekKey, dayNum);
+              }
+            }
+          }
           const order = Number.isFinite(Number(todo.order)) ? Number(todo.order) : (index + 1) * 10;
+          const priority = ["high", "medium", "low"].includes(safeString(todo.priority)) ? safeString(todo.priority) : "medium";
+          const scene = ["work", "life", "study", "other"].includes(safeString(todo.scene)) ? safeString(todo.scene) : "other";
           return {
             id: safeString(todo.id) || uid("todo"),
             title,
             date,
-            weekKey,
-            day,
-            monthKey,
-            scope,
+            priority,
+            scene,
             done: Boolean(todo.done),
             order,
             createdAt: Number.isFinite(Number(todo.createdAt)) ? Number(todo.createdAt) : now,
@@ -3178,9 +3688,17 @@
             els.todoQuickForm.addEventListener("submit", onTodoQuickSubmit);
           }
 
+          if (els.todoQuickPriority) {
+            els.todoQuickPriority.addEventListener("change", syncPrioritySelectStyles);
+          }
+
           if (els.todoGroups) {
             els.todoGroups.addEventListener("click", onTodoGroupsClick);
             els.todoGroups.addEventListener("change", onTodoGroupsChange);
+          }
+
+          if (els.todoPrioritySelect) {
+            els.todoPrioritySelect.addEventListener("change", syncPrioritySelectStyles);
           }
 
           if (els.todoSaveBtn) {
@@ -3668,6 +4186,15 @@
             return;
           }
 
+          const sceneBtn = event.target.closest("button[data-action='todo-scene-filter']");
+          if (sceneBtn) {
+            const scene = safeString(sceneBtn.getAttribute("data-scene"));
+            state.db.plan.sceneFilter = state.db.plan.sceneFilter === scene ? "" : scene;
+            saveDb();
+            renderPlanPanel();
+            return;
+          }
+
           const dayBtn = event.target.closest(".calday[data-date]");
           if (!dayBtn) return;
           const date = safeString(dayBtn.getAttribute("data-date"));
@@ -3687,73 +4214,54 @@
           }
           const now = Date.now();
 
-          const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
-          if (view === "month") {
-            const monthKey = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
-              ? safeString(state.db.plan.calendarMonth)
-              : formatYm(new Date(now));
-            state.db.plan.todos.push({
-              id: uid("todo"),
-              title,
-              date: lastDayOfMonthYmd(monthKey),
-              weekKey: "",
-              day: "",
-              monthKey,
-              scope: "month",
-              done: false,
-              order: nextOrder(state.db.plan.todos.filter((item) => item.scope === "month" && item.monthKey === monthKey)),
-              createdAt: now,
-              updatedAt: now,
-            });
-            if (els.todoQuickTitle) els.todoQuickTitle.value = "";
-            saveDb();
-            renderPlanPanel();
-            toast("已新增", "本月待办已加入清单。", false);
-            return;
-          }
-
           const selectedDate = parseYmd(safeString(els.todoQuickDate && els.todoQuickDate.value))
             || parseYmd(state.db.plan.selectedDate)
             || new Date();
           const date = formatYmd(selectedDate);
-          const weekKey = weekKeyForDate(selectedDate);
-          const day = String(weekdayMon(selectedDate));
+          const priority = ["high", "medium", "low"].includes(safeString(els.todoQuickPriority && els.todoQuickPriority.value))
+            ? safeString(els.todoQuickPriority && els.todoQuickPriority.value)
+            : "medium";
           state.db.plan.todos.push({
             id: uid("todo"),
             title,
             date,
-            weekKey,
-            day,
-            monthKey: "",
-            scope: "week",
+            priority,
+            scene: "work",
             done: false,
-            order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
+            order: nextOrder(state.db.plan.todos),
             createdAt: now,
             updatedAt: now,
           });
           if (els.todoQuickTitle) els.todoQuickTitle.value = "";
-          if (els.todoQuickDate) els.todoQuickDate.value = date;
+          if (els.todoQuickDate) els.todoQuickDate.value = "";
           state.db.plan.selectedDate = date;
           state.db.plan.calendarMonth = date.slice(0, 7);
           saveDb();
           renderPlanPanel();
-          toast("已新增", "小目标已加入清单，今天继续稳稳推进。", false);
+          toast("已新增", "新的行动项已经放进清单。", false);
         }
 
         function onTodoGroupsClick(event) {
+          const dateNode = event.target.closest("[data-action='select-todo-date'][data-date]");
+          if (dateNode) {
+            const date = safeString(dateNode.getAttribute("data-date"));
+            if (!parseYmd(date)) return;
+            state.db.plan.selectedDate = date;
+            state.db.plan.calendarMonth = date.slice(0, 7);
+            saveDb();
+            renderPlanPanel();
+            return;
+          }
           const actionNode = event.target.closest("[data-action][data-todo-id]");
           if (!actionNode) return;
           const todoId = actionNode.getAttribute("data-todo-id");
           if (!todoId) return;
           const action = actionNode.getAttribute("data-action");
-          const scope = safeString(actionNode.getAttribute("data-todo-scope")) === "month" ? "month" : "week";
           if (action === "edit-todo") {
             state.ui.editingTodoId = todoId;
-            state.ui.editingTodoScope = scope;
           }
           if (action === "delete-todo") {
             state.ui.deletingTodoId = todoId;
-            state.ui.deletingTodoScope = scope;
           }
         }
 
@@ -3763,99 +4271,70 @@
           const todoId = cb.getAttribute("data-todo-id");
           const todo = getTodoById(todoId);
           if (!todo) return;
+          const previous = { ...todo };
           todo.done = Boolean(cb.checked);
           todo.updatedAt = Date.now();
+          state.ui.lastCompletedTodo = todo.done ? previous : null;
           saveDb();
           renderPlanPanel();
           if (todo.done) {
-            toast("已完成", "太棒了，又完成一件事。", false);
+            toast("已完成", "太棒了，又完成一件事。", false, {
+              label: "撤销",
+              onClick: () => {
+                const target = getTodoById(previous.id);
+                if (!target) return;
+                target.done = false;
+                target.updatedAt = Date.now();
+                saveDb();
+                renderPlanPanel();
+                toast("已撤销", "任务已回到进行中。", false);
+              },
+            });
+            return;
           }
+          toast("已更新", "任务已恢复为进行中。", false);
         }
 
         function onTodoSave(event) {
           event.preventDefault();
           const title = safeString(els.todoTitleInput && els.todoTitleInput.value);
-          const scope = state.ui.editingTodoScope === "month" || (state.db.plan && state.db.plan.todoView === "month") ? "month" : "week";
-          const day = normalizeDayValue(els.todoDaySelect && els.todoDaySelect.value);
+          const date = parseYmd(safeString(els.todoDateInput && els.todoDateInput.value)) ? safeString(els.todoDateInput && els.todoDateInput.value) : "";
+          const priority = ["high", "medium", "low"].includes(safeString(els.todoPrioritySelect && els.todoPrioritySelect.value))
+            ? safeString(els.todoPrioritySelect && els.todoPrioritySelect.value)
+            : "medium";
+          const scene = ["work", "life", "study", "other"].includes(safeString(els.todoSceneSelect && els.todoSceneSelect.value))
+            ? safeString(els.todoSceneSelect && els.todoSceneSelect.value)
+            : "other";
           if (!title) {
             toast("校验失败", "请输入待办标题。", true);
             return;
           }
           const now = Date.now();
-
-          if (scope === "month") {
-            const monthKey = /^\d{4}-\d{2}$/.test(safeString(els.todoMonthInput && els.todoMonthInput.value))
-              ? safeString(els.todoMonthInput && els.todoMonthInput.value)
-              : (/^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth)) ? safeString(state.db.plan.calendarMonth) : formatYm(new Date(now)));
-            const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
-            if (editing) {
-              editing.title = title;
-              editing.scope = "month";
-              editing.monthKey = monthKey;
-              editing.date = lastDayOfMonthYmd(monthKey);
-              editing.weekKey = "";
-              editing.day = "";
-              editing.updatedAt = now;
-            } else {
-              state.db.plan.todos.push({
-                id: uid("todo"),
-                title,
-                date: lastDayOfMonthYmd(monthKey),
-                weekKey: "",
-                day: "",
-                monthKey,
-                scope: "month",
-                done: false,
-                order: nextOrder(state.db.plan.todos.filter((item) => item.scope === "month" && item.monthKey === monthKey)),
-                createdAt: now,
-                updatedAt: now,
-              });
-            }
-            state.ui.editingTodoId = null;
-            state.ui.editingTodoScope = "week";
-            saveDb();
-            renderPlanPanel();
-            closeHashModal();
-            toast("已保存", "本月待办已更新。", false);
-            return;
-          }
-
-          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
-          const weekKey = weekKeyForDate(selected);
-          const baseWeekStart = startOfWeekMon(selected);
-          const date = day
-            ? formatYmd(new Date(baseWeekStart.getFullYear(), baseWeekStart.getMonth(), baseWeekStart.getDate() + Number(day) - 1))
-            : formatYmd(endOfWeekMon(selected));
           const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
           if (editing) {
             editing.title = title;
             editing.date = date;
-            editing.day = day;
-            editing.weekKey = weekKey;
-            editing.scope = "week";
-            editing.monthKey = "";
+            editing.priority = priority;
+            editing.scene = scene;
             editing.updatedAt = now;
           } else {
             state.db.plan.todos.push({
               id: uid("todo"),
               title,
               date,
-              weekKey,
-              day,
-              monthKey: "",
-              scope: "week",
+              priority,
+              scene,
               done: false,
-              order: nextOrder(state.db.plan.todos.filter((item) => item.weekKey === weekKey && todoDateKey(item) === date)),
+              order: nextOrder(state.db.plan.todos),
               createdAt: now,
               updatedAt: now,
             });
           }
           state.ui.editingTodoId = null;
-          state.ui.editingTodoScope = "week";
           saveDb();
           renderPlanPanel();
           closeHashModal();
-          toast("已保存", "安排已更新，节奏很稳。", false);
+          toast("已保存", "任务已经更新到行动清单。", false);
         }
 
         function onTodoDeleteConfirm(event) {
@@ -4021,40 +4500,24 @@
         }
 
         function fillTodoModal() {
-          const selectedDate = parseYmd(state.db.plan.selectedDate) || new Date();
-          const defaultDay = "7";
-          const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
-          const scope = state.ui.editingTodoScope === "month" ? "month" : view;
-          if (!state.ui.editingTodoId) {
-            state.ui.editingTodoScope = scope;
-          }
           const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
 
-          const monthKey = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
-            ? safeString(state.db.plan.calendarMonth)
-            : formatYm(selectedDate);
-          if (els.todoMonthInput) {
-            els.todoMonthInput.value = monthKey;
-            els.todoMonthInput.closest(".field").hidden = scope !== "month";
-          }
-          if (els.todoDaySelect) {
-            els.todoDaySelect.closest(".field").hidden = scope === "month";
-          }
-
           if (editing) {
-            if (els.todoModalTitle) els.todoModalTitle.textContent = scope === "month" ? "编辑本月待办" : "编辑待办";
+            if (els.todoModalTitle) els.todoModalTitle.textContent = "编辑待办";
             if (els.todoTitleInput) els.todoTitleInput.value = editing.title;
-            if (scope === "month") {
-              if (els.todoMonthInput) els.todoMonthInput.value = editing.monthKey;
-            } else {
-              if (els.todoDaySelect) els.todoDaySelect.value = editing.day || "";
-            }
+            if (els.todoDateInput) els.todoDateInput.value = editing.date || "";
+            if (els.todoPrioritySelect) els.todoPrioritySelect.value = editing.priority || "medium";
+            if (els.todoSceneSelect) els.todoSceneSelect.value = editing.scene || "other";
+            syncPrioritySelectStyles();
             return;
           }
 
-          if (els.todoModalTitle) els.todoModalTitle.textContent = scope === "month" ? "新增本月待办" : "新增待办";
+          if (els.todoModalTitle) els.todoModalTitle.textContent = "新增待办";
           if (els.todoTitleInput) els.todoTitleInput.value = "";
-          if (els.todoDaySelect) els.todoDaySelect.value = defaultDay;
+          if (els.todoDateInput) els.todoDateInput.value = safeString(els.todoQuickDate && els.todoQuickDate.value) || safeString(state.db.plan.selectedDate);
+          if (els.todoPrioritySelect) els.todoPrioritySelect.value = safeString(els.todoQuickPriority && els.todoQuickPriority.value) || "medium";
+          if (els.todoSceneSelect) els.todoSceneSelect.value = "work";
+          syncPrioritySelectStyles();
         }
 
         function fillTodoDeleteDialog() {
@@ -4500,8 +4963,8 @@
 
         function renderCalendar() {
           if (!els.calendarGrid || !els.calendarMonthTitle) return;
-          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
-          const monthDate = parseYm(state.db.plan.calendarMonth) || new Date(selected.getFullYear(), selected.getMonth(), 1);
+          const selected = parseYmd(state.db.plan.selectedDate);
+          const monthDate = parseYm(state.db.plan.calendarMonth) || new Date();
           const year = monthDate.getFullYear();
           const month = monthDate.getMonth();
           els.calendarMonthTitle.textContent = `${year}年${String(month + 1).padStart(2, "0")}月`;
@@ -4509,15 +4972,9 @@
           const first = new Date(year, month, 1);
           const firstOffset = (weekdayMon(first) + 6) % 7;
           const start = new Date(year, month, 1 - firstOffset);
-          const selectedYmd = formatYmd(selected);
+          const selectedYmd = selected ? formatYmd(selected) : "";
           const todayYmd = formatYmd(new Date());
-
-          const counts = new Map();
-          state.db.plan.todos.forEach((todo) => {
-            const key = todoDateKey(todo);
-            if (!key) return;
-            counts.set(key, (counts.get(key) || 0) + 1);
-          });
+          const markers = buildCalendarMarkers();
 
           const headers = ["一", "二", "三", "四", "五", "六", "日"].map(
             (d) => `<div class="caldow" role="columnheader">${d}</div>`
@@ -4528,109 +4985,94 @@
             const key = formatYmd(current);
             const classes = ["calday"];
             if (current.getMonth() !== month) classes.push("muted");
-            if (key === selectedYmd) classes.push("selected");
+            if (selectedYmd && key === selectedYmd) classes.push("selected");
             if (key === todayYmd) classes.push("today");
-            const dot = counts.get(key) ? "<span class=\"dot\" aria-hidden=\"true\"></span>" : "";
+            const marker = markers.get(key) || "";
+            const dot = marker ? `<span class="dot ${marker}" aria-hidden="true"></span>` : "";
             days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell">${current.getDate()}${dot}</button>`);
           }
           els.calendarGrid.innerHTML = headers.concat(days).join("");
         }
 
         function renderTodos() {
-          if (!els.todoGroups || !els.todoWeekLabel) return;
+          if (!els.todoGroups) return;
           const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
 
           if (els.todoViewWeekBtn) els.todoViewWeekBtn.setAttribute("aria-selected", view === "week" ? "true" : "false");
           if (els.todoViewMonthBtn) els.todoViewMonthBtn.setAttribute("aria-selected", view === "month" ? "true" : "false");
+          syncPrioritySelectStyles();
 
-          if (els.todoQuickDate) {
-            els.todoQuickDate.hidden = view === "month";
-          }
+          const selected = parseYmd(state.db.plan.selectedDate);
+          const selectedYmd = selected ? formatYmd(selected) : "";
+          const today = new Date();
+          const todayYmd = formatYmd(today);
           if (els.todoQuickTitle) {
-            els.todoQuickTitle.placeholder = view === "month" ? "记录一件本月要推进的事..." : "记录一件要推进的事...";
+            els.todoQuickTitle.placeholder = view === "month" ? "写下这月要推进的一件事..." : "写下下一件要推进的小事...";
           }
-
-          const selected = parseYmd(state.db.plan.selectedDate) || new Date();
+          if (els.todoQuickDate && document.activeElement !== els.todoQuickDate) {
+            els.todoQuickDate.value = selectedYmd || "";
+          }
           const calendarMonth = /^\d{4}-\d{2}$/.test(safeString(state.db.plan.calendarMonth))
             ? safeString(state.db.plan.calendarMonth)
-            : formatYm(selected);
+            : formatYm(today);
+
+          const allTodos = (state.db.plan.todos || [])
+            .map((todo) => ({ ...todo, date: todoDateKey(todo) || "" }))
+            .sort((a, b) => a.order - b.order);
 
           if (view === "month") {
             els.todoWeekLabel.textContent = `${calendarMonth} 月`;
-            const todos = (state.db.plan.todos || [])
-              .filter((todo) => todo.scope === "month" && todo.monthKey === calendarMonth)
-              .sort((a, b) => a.order - b.order);
-            if (!todos.length) {
-              els.todoGroups.innerHTML = '<div class="todo-empty">本月还没有待办，写下一件最重要的月度目标吧。</div>';
-              return;
-            }
-            els.todoGroups.innerHTML = `
-              <section class="todo-g">
-                <h4 class="todo-gh">${calendarMonth} 月目标</h4>
-                <div class="todo-list">${todos.map((todo, index) => renderMonthTodoItem(todo, index)).join("")}</div>
-              </section>
-            `;
-            return;
+          } else {
+            const weekBase = selected || today;
+            const weekStart = startOfWeekMon(weekBase);
+            els.todoWeekLabel.textContent = `${formatYmd(weekStart)} 周`;
           }
 
-          const weekStart = startOfWeekMon(selected);
-          const weekKey = weekKeyForDate(selected);
-          els.todoWeekLabel.textContent = `${formatYmd(weekStart)} 周`;
-
-          const todos = state.db.plan.todos
-            .filter((todo) => todo.scope !== "month" && todo.weekKey === weekKey)
-            .sort((a, b) => a.order - b.order);
-
-          if (els.todoQuickDate) {
-            els.todoQuickDate.value = formatYmd(endOfWeekMon(selected));
-          }
-
-          if (!todos.length) {
-            const selectedKey = formatYmd(selected);
-            const todayKey = formatYmd(new Date());
-            const text = selectedKey === todayKey
-              ? "今天还没安排，先写下一件最想推进的小事。"
-              : "这一天暂时空白，给它放一件轻松可完成的小目标吧。";
-            els.todoGroups.innerHTML = `<div class="todo-empty">${text}</div>`;
-            return;
-          }
-
-          const grouped = new Map();
-          todos.forEach((todo) => {
-            const date = todoDateKey(todo) || "";
-            if (!grouped.has(date)) grouped.set(date, []);
-            grouped.get(date).push(todo);
+          const groups = buildTodoGroups(allTodos, {
+            view,
+            todayYmd,
+            selectedYmd,
+            calendarMonth,
           });
 
-          const keys = Array.from(grouped.keys()).filter(Boolean).sort();
-          const html = keys.map((date) => {
-            const list = grouped.get(date) || [];
-            return `
-              <section class="todo-g">
-                <h4 class="todo-gh">${formatDateTitle(date)}</h4>
-                <div class="todo-list">${list.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>
-              </section>
-            `;
-          }).join("");
+          if (!groups.some((group) => group.active.length || group.completed.length)) {
+            els.todoGroups.innerHTML = '<div class="todo-empty">今天还没有行动项，先记下一件最想推进的小事。</div>';
+            return;
+          }
 
-          els.todoGroups.innerHTML = html;
+          els.todoGroups.innerHTML = groups
+            .filter((group) => group.active.length || group.completed.length)
+            .map((group) => renderTodoGroup(group))
+            .join("");
         }
 
         function renderTodoItem(todo, index) {
           const delay = Math.min(index * 28, 180);
+          const dateBadge = todo.date ? formatTodoDateBadge(todo.date) : { label: "稍后安排", tone: "later", title: "未指定日期" };
+          const dateMeta = todo.date
+            ? `<button type="button" class="todo-date-link" data-tone="${escAttr(dateBadge.tone)}" data-action="select-todo-date" data-date="${escAttr(todo.date)}" title="${escAttr(dateBadge.title)}">${escHtml(dateBadge.label)}</button>`
+            : `<span class="todo-date-link" data-tone="${escAttr(dateBadge.tone)}">${escHtml(dateBadge.label)}</span>`;
           return `
             <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
-              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
-              <div class="todo-t">${escHtml(todo.title)}</div>
-              <div class="acts">
-                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}">
+              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
+              <div class="todo-main">
+                <div class="todo-title-row">
+                  <div class="todo-t" title="${escAttr(todo.title)}">${escHtml(todo.title)}</div>
+                </div>
+                <div class="todo-meta">
+                  <span class="todo-priority-chip" data-priority="${escAttr(todo.priority || "medium")}">${escHtml(priorityLabel(todo.priority))}</span>
+                  ${dateMeta}
+                </div>
+              </div>
+              <div class="todo-item-actions">
+                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">编辑</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
                     <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
                   </svg>
                 </a>
-                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-scope="week" data-todo-id="${escAttr(todo.id)}">
+                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">删除</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -4644,32 +5086,142 @@
           `;
         }
 
-        function renderMonthTodoItem(todo, index) {
-          const delay = Math.min(index * 28, 180);
+        function renderTodoGroup(group) {
+          const activeHtml = group.active.length
+            ? `<div class="todo-list">${group.active.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>`
+            : "";
+          const completedHtml = group.completed.length
+            ? `
+              <details class="todo-completed">
+                <summary>已完成 ${group.completed.length} 项</summary>
+                <div class="todo-list">${group.completed.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>
+              </details>
+            `
+            : "";
           return `
-            <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
-              <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
-              <div class="todo-t">${escHtml(todo.title)}</div>
-              <div class="acts">
-                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}">
-                  <span class="sr">编辑</span>
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
-                    <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
-                  </svg>
-                </a>
-                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-scope="month" data-todo-id="${escAttr(todo.id)}">
-                  <span class="sr">删除</span>
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
-                    <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
-                    <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
-                    <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
-                  </svg>
-                </a>
-              </div>
-            </article>
+            <section class="todo-g">
+              <h4 class="todo-gh">
+                <span class="todo-gh-main">${escHtml(group.label)}</span>
+                <span class="todo-group-meta">${group.active.length} 项待推进</span>
+              </h4>
+              ${activeHtml}
+              ${completedHtml}
+            </section>
           `;
+        }
+
+        function buildTodoGroups(todos, options) {
+          const view = options.view === "month" ? "month" : "week";
+          const todayYmd = options.todayYmd;
+          const selectedYmd = options.selectedYmd || "";
+          const calendarMonth = options.calendarMonth;
+          const currentMonthKey = todayYmd.slice(0, 7);
+          const todayDate = parseYmd(todayYmd) || new Date();
+          const endOfWeek = formatYmd(endOfWeekMon(todayDate));
+          const monthBase = parseYm(currentMonthKey) || new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+          const monthEnd = formatYmd(new Date(monthBase.getFullYear(), monthBase.getMonth() + 1, 0));
+          const monthStart = formatYmd(monthBase);
+          const defs = view === "month"
+            ? [
+              { id: "overdue", label: "逾期", emptyText: "没有逾期项，节奏很好。" },
+              { id: "today", label: "今天", emptyText: "今天还没安排，先放一件最关键的事。" },
+              { id: "month", label: "本月", emptyText: "本月区还是空的，适合放一个正在推进的目标。" },
+              { id: "later", label: "稍后", emptyText: "稍后区暂时空着，也是一种轻盈。" },
+            ]
+            : [
+              { id: "overdue", label: "逾期", emptyText: "没有逾期项，继续保持。" },
+              { id: "today", label: "今天", emptyText: "今天还没安排，先写下一件最想推进的小事。" },
+              { id: "month", label: "本月", emptyText: "本月区还是空的，适合放一个正在推进的目标。" },
+              { id: "later", label: "稍后", emptyText: "稍后区现在空着，说明注意力很集中。" },
+            ];
+          const groups = new Map(defs.map((group) => [group.id, { ...group, active: [], completed: [] }]));
+
+          todos.forEach((todo) => {
+            const date = todo.date;
+            let groupId = "later";
+            if (date) {
+              if (date < todayYmd) {
+                groupId = "overdue";
+              } else if (date === todayYmd) {
+                groupId = "today";
+              } else if (view === "month") {
+                groupId = date.slice(0, 7) === currentMonthKey ? "month" : (date > monthEnd ? "later" : (date < monthStart ? "later" : "month"));
+              } else {
+                groupId = date <= monthEnd ? "month" : "later";
+              }
+            }
+            const bucket = groups.get(groupId) || groups.get("later");
+            if (todo.done) {
+              bucket.completed.push(todo);
+            } else {
+              bucket.active.push(todo);
+            }
+          });
+
+          return defs.map((group) => {
+            const bucket = groups.get(group.id);
+            return {
+              ...bucket,
+              active: sortTodosByTimeline(bucket.active),
+              completed: sortTodosByTimeline(bucket.completed),
+            };
+          });
+        }
+
+        function sortTodosByTimeline(items) {
+          return [...items].sort((a, b) => {
+            const dateA = todoDateKey(a) || "9999-12-31";
+            const dateB = todoDateKey(b) || "9999-12-31";
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            const createdA = Number.isFinite(Number(a.createdAt)) ? Number(a.createdAt) : 0;
+            const createdB = Number.isFinite(Number(b.createdAt)) ? Number(b.createdAt) : 0;
+            if (createdA !== createdB) return createdA - createdB;
+            return (a.order || 0) - (b.order || 0);
+          });
+        }
+
+        function syncPrioritySelectStyles() {
+          const sync = (node) => {
+            if (!node) return;
+            const value = ["high", "medium", "low"].includes(safeString(node.value)) ? safeString(node.value) : "medium";
+            node.setAttribute("data-priority", value);
+          };
+          sync(els.todoQuickPriority);
+          sync(els.todoPrioritySelect);
+        }
+
+        function buildCalendarMarkers() {
+          const markers = new Map();
+          const buckets = new Map();
+          (state.db.plan.todos || []).forEach((todo) => {
+            const key = todoDateKey(todo);
+            if (!key || todo.done) return;
+            if (!buckets.has(key)) buckets.set(key, []);
+            buckets.get(key).push(todo);
+          });
+          buckets.forEach((items, key) => {
+            const tones = items.map((item) => formatTodoDateBadge(key).tone);
+            markers.set(key, pickMostUrgentTone(tones));
+          });
+          return markers;
+        }
+
+        function pickMostUrgentTone(tones) {
+          const rank = {
+            "overdue-severe": 0,
+            overdue: 1,
+            today: 2,
+            "future-near": 3,
+            "future-far": 4,
+            later: 5,
+          };
+          return [...tones].sort((a, b) => (rank[a] ?? 99) - (rank[b] ?? 99))[0] || "future-far";
+        }
+
+        function priorityLabel(priority) {
+          if (priority === "high") return "高";
+          if (priority === "low") return "低";
+          return "中";
         }
 
         function renderLinkCard(link) {
@@ -5065,17 +5617,20 @@
           return `${year}-W${String(week).padStart(2, "0")}`;
         }
 
-        function todoDateKey(todo) {
-          const direct = safeString(todo && todo.date);
-          if (parseYmd(direct)) return direct;
-          const day = Number(todo && todo.day);
-          const m = /^([0-9]{4})-W([0-9]{2})$/.exec(safeString(todo && todo.weekKey));
-          if (!m || !Number.isInteger(day) || day < 1 || day > 7) return "";
+        function dateFromWeekKeyAndDay(weekKey, day) {
+          const m = /^([0-9]{4})-W([0-9]{2})$/.exec(safeString(weekKey));
+          const dayNum = Number(day);
+          if (!m || !Number.isInteger(dayNum) || dayNum < 1 || dayNum > 7) return "";
           const year = Number(m[1]);
           const week = Number(m[2]);
           const firstWeek = startOfWeekMon(new Date(year, 0, 1));
-          const target = new Date(firstWeek.getFullYear(), firstWeek.getMonth(), firstWeek.getDate() + (week - 1) * 7 + day - 1);
+          const target = new Date(firstWeek.getFullYear(), firstWeek.getMonth(), firstWeek.getDate() + (week - 1) * 7 + dayNum - 1);
           return formatYmd(target);
+        }
+
+        function todoDateKey(todo) {
+          const direct = safeString(todo && todo.date);
+          return parseYmd(direct) ? direct : "";
         }
 
         function formatDateTitle(dateText) {
@@ -5083,6 +5638,38 @@
           if (!d) return "未指定日期";
           const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
           return `${dateText} ${weekdays[d.getDay()]}`;
+        }
+
+        function formatTodoDateBadge(dateText) {
+          const d = parseYmd(dateText);
+          if (!d) {
+            return { label: "稍后安排", tone: "later", title: "未指定日期" };
+          }
+          const today = new Date();
+          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const targetStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+          const diffDays = Math.round((targetStart.getTime() - todayStart.getTime()) / 86400000);
+          const mmdd = `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+          if (diffDays < 0) {
+            const overdueDays = Math.abs(diffDays);
+            return {
+              label: `${mmdd} 逾期${overdueDays}天`,
+              tone: overdueDays >= 7 ? "overdue-severe" : "overdue",
+              title: `${formatDateTitle(dateText)}，已逾期 ${overdueDays} 天`,
+            };
+          }
+          if (diffDays === 0) {
+            return {
+              label: `${mmdd} 今天`,
+              tone: "today",
+              title: `${formatDateTitle(dateText)}，今天到期`,
+            };
+          }
+          return {
+            label: `${mmdd} 还差${diffDays}天`,
+            tone: diffDays <= 7 ? "future-near" : "future-far",
+            title: `${formatDateTitle(dateText)}，距离今天还有 ${diffDays} 天`,
+          };
         }
 
         function engineIconUrl(engine) {
@@ -5199,17 +5786,36 @@
           window.open(url, "_blank", "noopener,noreferrer");
         }
 
-        function toast(title, message, isError) {
+        function toast(title, message, isError, action) {
           if (!els.toast || !els.toastTitle) return;
-          els.toastTitle.textContent = message || title;
-          els.toast.style.display = "block";
+          els.toastTitle.textContent = title || "提示";
+          if (els.toastText) {
+            els.toastText.textContent = message || title;
+          }
+          if (els.toastActionBtn) {
+            els.toastActionBtn.hidden = !(action && typeof action.onClick === "function");
+            els.toastActionBtn.textContent = action && action.label ? action.label : "撤销";
+            els.toastActionBtn.onclick = action && typeof action.onClick === "function"
+              ? () => {
+                const fn = action.onClick;
+                els.toastActionBtn.hidden = true;
+                els.toast.style.display = "none";
+                fn();
+              }
+              : null;
+          }
+          els.toast.style.display = "flex";
           els.toast.style.opacity = isError ? "0.98" : "0.92";
           if (state.ui.toastTimer) {
             window.clearTimeout(state.ui.toastTimer);
           }
           state.ui.toastTimer = window.setTimeout(() => {
+            if (els.toastActionBtn) {
+              els.toastActionBtn.hidden = true;
+              els.toastActionBtn.onclick = null;
+            }
             els.toast.style.display = "none";
-          }, 2200);
+          }, action ? 4200 : 2200);
         }
 
         function isValidHttpUrl(value) {
