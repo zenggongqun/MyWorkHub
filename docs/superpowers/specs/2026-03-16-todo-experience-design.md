@@ -94,11 +94,12 @@ The right column becomes an action sidebar with three layers:
 
 Default grouping is:
 
+- Overdue
 - Today
 - This Week
 - Later
 
-This replaces the current feeling of a flat list with a more action-oriented structure. Users should open the page and immediately understand what belongs now versus later.
+This replaces the current feeling of a flat list with a more action-oriented structure. Users should open the page and immediately understand what is overdue, what belongs now, and what belongs later.
 
 Within each group, ordering follows:
 
@@ -137,6 +138,7 @@ Each task should support these default fields:
 Behavioral rules:
 
 - Tasks without a date belong in `Later`.
+- Tasks with a past date that are not completed belong in `Overdue`.
 - Tasks with a current-day date belong in `Today`.
 - Tasks within the current week but not today belong in `This Week`.
 - Changing date can move the task into a new visible group.
@@ -152,6 +154,7 @@ Week definition:
 
 - A week starts on Monday and ends on Sunday, matching the current calendar presentation.
 - `Today` always overrides week placement.
+- `Overdue` always overrides week placement for incomplete past-due tasks.
 - `This Week` means dates from tomorrow through the end of the current Monday-Sunday week.
 - Any later dated task belongs in `Later` unless the user is explicitly browsing another date context.
 
@@ -208,18 +211,19 @@ The todo experience should have a small explicit state model so planning stays t
 Behavior rules:
 
 - On initial load, `selectedDate` is empty and `viewedMonth` is the current month.
-- In `week` mode, the todo panel emphasizes `Today`, `This Week`, and `Later` using the current Monday-Sunday week.
-- In `month` mode, the same three groups remain, but `This Week` is replaced by `This Month` for the currently viewed month while preserving `Today` and `Later`.
+- In `week` mode, the todo panel emphasizes `Overdue`, `Today`, `This Week`, and `Later` using the current Monday-Sunday week.
+- In `month` mode, the same structure remains, but `This Week` is replaced by `This Month` for the currently viewed month while preserving `Overdue`, `Today`, and `Later`.
 - When a specific date is selected in `week` mode, the header shows that date, the selected date's tasks are pinned at the top of the relevant group, and the remaining groups stay visible for surrounding context.
-- When a specific date is selected in `month` mode, the header shows that date, the selected date's tasks are pinned at the top of `This Month`, and other `This Month` tasks remain visible below them.
+- When a specific date is selected in `month` mode, the header shows that date, the selected date's tasks are pinned at the top of their natural group (`Overdue`, `Today`, or `This Month`), and the rest of the groups remain visible below.
 - Clearing date focus returns the panel to the default scope-driven grouping.
 
 Month-mode placement rules:
 
+- `Overdue` contains incomplete tasks dated before today.
 - `Today` still contains only tasks dated today.
 - `This Month` contains dated tasks in `viewedMonth` except those already in `Today`.
 - `Later` contains undated tasks plus tasks dated after the end of `viewedMonth`.
-- Tasks dated before the start of `viewedMonth` are shown only when explicitly browsing their date or month; they are not mixed into the active forward-looking groups.
+- Tasks dated before the start of `viewedMonth` that are not overdue are shown only when explicitly browsing their date or month; they are not mixed into the active forward-looking groups.
 
 ## Calendar and Todo Linkage
 
@@ -232,7 +236,7 @@ The relationship is dual-entry, with todos as the primary action surface and the
 
 ### From Todos to Calendar
 
-- Clicking a task date should highlight or jump to the corresponding calendar date.
+- Clicking a task date updates `selectedDate`, switches `viewedMonth` if needed, and highlights the corresponding calendar date.
 
 ### Calendar Visual Signals
 
@@ -252,8 +256,8 @@ The calendar should communicate task relevance instead of acting as decoration. 
 ### Week / Month Toggle
 
 - Keep the existing week/month control, but redefine it as a view filter over task scope rather than two disconnected todo systems.
-- In `week` mode, visible groups are `Today`, `This Week`, and `Later`.
-- In `month` mode, visible groups are `Today`, `This Month`, and `Later`.
+- In `week` mode, visible groups are `Overdue`, `Today`, `This Week`, and `Later`.
+- In `month` mode, visible groups are `Overdue`, `Today`, `This Month`, and `Later`.
 - Quick capture defaults follow the currently selected date if there is one; otherwise they still default to `Today`.
 - Switching scope mode never creates a second storage model; it only changes how the same tasks are grouped and filtered.
 - Group ordering rules stay the same in both modes: manual order first inside a group, then priority/date only for default insertion.
@@ -296,7 +300,8 @@ The calendar should communicate task relevance instead of acting as decoration. 
 The design should remain modular enough for planning and implementation:
 
 - `QuickCapture`: capture-first input with progressive disclosure
-- `TodoGroupList`: renders the active scope groups (`Today`, `This Week` or `This Month`, and `Later`), including each group's folded completed subsection
+- `TodoViewModel`: owns normalization, placement, grouping, ordering fallback, and calendar marker derivation before data reaches rendering components
+- `TodoGroupList`: renders the active scope groups (`Overdue`, `Today`, `This Week` or `This Month`, and `Later`), including each group's folded completed subsection
 - `TodoCard`: displays the lightweight task card and in-place edits
 - `TodoFiltersContext`: owns `selectedDate`, `viewedMonth`, `scopeMode`, and `sceneFilter`, and exposes read/update methods to the rest of the todo area
 - `TodoCalendarNavigator`: renders the calendar using `TodoFiltersContext`, updates date/month state, and consumes derived per-day task markers
@@ -305,6 +310,7 @@ The design should remain modular enough for planning and implementation:
 Interface expectations:
 
 - `QuickCapture` creates tasks through a single create-task action and does not own list ordering logic.
+- `TodoViewModel` is the only unit that turns raw tasks plus filter state into grouped lists and calendar markers.
 - `TodoGroupList` receives already grouped task data plus callbacks for reorder, edit, complete, and delete.
 - The grouped-data contract is: an ordered array of visible groups, where each group has `id`, `label`, `activeItems`, and `completedItems`.
 - `TodoCard` does not compute placement rules; it edits task fields and delegates moves to higher-level state.
@@ -329,11 +335,19 @@ The redesign succeeds if it clearly improves these outcomes:
 ## Integration Notes
 
 - The redesign should build on the existing todo and calendar data already present in `MyWorkHub.html`, rather than introducing a parallel storage system.
+- Legacy normalization runs once when existing saved data is first loaded into the new task model.
 - Existing persisted tasks should migrate into the new grouping logic without requiring user cleanup.
 - Legacy tasks that do not have `priority` or `scene` should be normalized to `medium` and `other`.
 - Legacy tasks that do not have `order` should derive a stable initial order from existing list position.
 - Legacy tasks that do not have `createdAt` should receive a deterministic migration timestamp or fallback sequence value during normalization.
 - Existing date-based todo data should continue to render correctly under the new grouping and filtering rules.
+
+## Persistence Lifecycle
+
+- Create, edit, complete, delete, and reorder actions save immediately after the local UI updates.
+- The UI may update optimistically, but a failed save must roll the affected task back to its last persisted state and show a retry affordance.
+- Reorder saves happen after drag end, not on every hover movement.
+- Normalization and migration happen at load time before any grouping or calendar markers are derived.
 
 ## Testing Guidance for Planning
 
