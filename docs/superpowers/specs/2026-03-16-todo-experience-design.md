@@ -112,7 +112,7 @@ Completed items are visually separated from active items in a folded completed s
 Ordering rules are deterministic:
 
 - New tasks created from quick capture insert at the top of the active destination group, then receive a stable `order` value.
-- Dragging inside a group rewrites `order` and becomes the primary display order for that group.
+- Dragging inside a group rewrites `order` for the affected active tasks and becomes the primary display order for that filtered view.
 - Priority and date act as default placement hints only when a task first enters a group or re-enters a different group.
 - Editing a task without changing its group preserves its manual order.
 - Changing a task's date can move it into another group; once moved, it is inserted using the destination group's default placement rule and can then be manually reordered there.
@@ -133,7 +133,7 @@ Each task should support these default fields:
 - `priority`: lightweight priority signal with enum `high | medium | low`
 - `scene`: lightweight grouping tag with enum `work | life | study | other`
 - `done`: completion state
-- `order`: group-local manual ordering signal
+- `order`: global manual ordering signal for active tasks
 - `createdAt`: creation timestamp used for stable fallback ordering
 
 Behavioral rules:
@@ -150,7 +150,7 @@ Field semantics:
 - `high` marks urgent or important work, `medium` is the default, and `low` is for non-urgent backlog.
 - `scene` is visible as a compact chip on the task card and available as a lightweight filter in the todo header or expanded editor.
 - `scene` does not create separate top-level groups in this iteration; it exists to help scanning, filtering, and light organization.
-- `order` is persisted per visible destination group, not per scope mode. A task keeps its manual order while it remains in the same semantic group (`Overdue`, `Today`, `This Week`, `This Month`, or `Later`), and receives a new default insertion order only when it moves to a different group because of a date change.
+- `order` is one shared manual rank used across all active tasks, not a separate order per scope mode. Group views filter the same ordered task set instead of storing separate week/month arrangements.
 
 Week definition:
 
@@ -177,6 +177,7 @@ Default assumptions should reduce effort:
 - Default scene: reuse last selection when practical
 - Default time placement follows explicit context rules:
   - no selected date and no special browsing context: create the task with today's date so it lands in `Today`
+  - selected past date: add to that date and show in `Overdue`
   - selected future date in the current week: add to that date and show in `This Week`
   - selected date outside the current week: add to that explicit date and surface it under `Later`
   - browsing another month without a selected date: keep default capture in `Today` to avoid accidental future scheduling
@@ -215,9 +216,15 @@ Behavior rules:
 - On initial load, `selectedDate` is empty and `viewedMonth` is the current month.
 - In `week` mode, the todo panel emphasizes `Overdue`, `Today`, `This Week`, and `Later` using the current Monday-Sunday week.
 - In `month` mode, the same structure remains, but `This Week` is replaced by `This Month` for the currently viewed month while preserving `Overdue`, `Today`, and `Later`.
-- When a specific date is selected in `week` mode, the header shows that date, the selected date's tasks are pinned at the top of the relevant group, and the remaining groups stay visible for surrounding context.
-- When a specific date is selected in `month` mode, the header shows that date, the selected date's tasks are pinned at the top of their natural group (`Overdue`, `Today`, or `This Month`), and the rest of the groups remain visible below.
+- When a specific date is selected in `week` mode, the header shows that date, the selected date's active tasks are pinned at the top of the relevant group while preserving their existing manual order, and the remaining groups stay visible for surrounding context.
+- When a specific date is selected in `month` mode, the header shows that date, the selected date's active tasks are pinned at the top of their natural group (`Overdue`, `Today`, or `This Month`) while preserving their existing manual order, and the rest of the groups remain visible below.
 - Clearing date focus returns the panel to the default scope-driven grouping.
+
+Selected-date pinning rules:
+
+- Pinning lasts only while `selectedDate` is set.
+- Pinning affects active items only; completed items remain in the group's folded completed subsection.
+- Clearing `selectedDate` restores the normal unpinned group order immediately.
 
 Scene filter rules:
 
