@@ -106,11 +106,11 @@ Within each group, ordering follows:
 2. Priority
 3. Date
 
-Completed items are visually separated from active items, either collapsed at the bottom of each group or collected in a folded completed area.
+Completed items are visually separated from active items in a folded completed subsection at the bottom of each visible group.
 
 Ordering rules are deterministic:
 
-- New tasks enter a group at the top or bottom based on the active quick-capture rule, then receive a stable `order` value.
+- New tasks created from quick capture insert at the top of the active destination group, then receive a stable `order` value.
 - Dragging inside a group rewrites `order` and becomes the primary display order for that group.
 - Priority and date act as default placement hints only when a task first enters a group or re-enters a different group.
 - Editing a task without changing its group preserves its manual order.
@@ -210,7 +210,8 @@ Behavior rules:
 - On initial load, `selectedDate` is empty and `viewedMonth` is the current month.
 - In `week` mode, the todo panel emphasizes `Today`, `This Week`, and `Later` using the current Monday-Sunday week.
 - In `month` mode, the same three groups remain, but `This Week` is replaced by `This Month` for the currently viewed month while preserving `Today` and `Later`.
-- When a specific date is selected, the header shows that date and the list is filtered to make that date's tasks and surrounding scope clear.
+- When a specific date is selected in `week` mode, the header shows that date, the selected date's tasks are pinned at the top of the relevant group, and the remaining groups stay visible for surrounding context.
+- When a specific date is selected in `month` mode, the header shows that date, the selected date's tasks are pinned at the top of `This Month`, and other `This Month` tasks remain visible below them.
 - Clearing date focus returns the panel to the default scope-driven grouping.
 
 Month-mode placement rules:
@@ -295,7 +296,7 @@ The calendar should communicate task relevance instead of acting as decoration. 
 The design should remain modular enough for planning and implementation:
 
 - `QuickCapture`: capture-first input with progressive disclosure
-- `TodoGroupList`: renders Today / This Week / Later groups
+- `TodoGroupList`: renders the active scope groups (`Today`, `This Week` or `This Month`, and `Later`), including each group's folded completed subsection
 - `TodoCard`: displays the lightweight task card and in-place edits
 - `TodoFiltersContext`: owns `selectedDate`, `viewedMonth`, `scopeMode`, and `sceneFilter`, and exposes read/update methods to the rest of the todo area
 - `TodoCalendarNavigator`: renders the calendar using `TodoFiltersContext`, updates date/month state, and consumes derived per-day task markers
@@ -305,6 +306,7 @@ Interface expectations:
 
 - `QuickCapture` creates tasks through a single create-task action and does not own list ordering logic.
 - `TodoGroupList` receives already grouped task data plus callbacks for reorder, edit, complete, and delete.
+- The grouped-data contract is: an ordered array of visible groups, where each group has `id`, `label`, `activeItems`, and `completedItems`.
 - `TodoCard` does not compute placement rules; it edits task fields and delegates moves to higher-level state.
 - `TodoFiltersContext` is the single source of truth for time/filter state shared by list and calendar.
 - `TodoCalendarNavigator` never mutates tasks directly; it only changes browsing context.
@@ -329,6 +331,8 @@ The redesign succeeds if it clearly improves these outcomes:
 - The redesign should build on the existing todo and calendar data already present in `MyWorkHub.html`, rather than introducing a parallel storage system.
 - Existing persisted tasks should migrate into the new grouping logic without requiring user cleanup.
 - Legacy tasks that do not have `priority` or `scene` should be normalized to `medium` and `other`.
+- Legacy tasks that do not have `order` should derive a stable initial order from existing list position.
+- Legacy tasks that do not have `createdAt` should receive a deterministic migration timestamp or fallback sequence value during normalization.
 - Existing date-based todo data should continue to render correctly under the new grouping and filtering rules.
 
 ## Testing Guidance for Planning
