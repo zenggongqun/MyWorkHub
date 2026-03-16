@@ -127,6 +127,7 @@ Ordering rules are deterministic:
 
 Each task should support these default fields:
 
+- `id`: stable unique identifier
 - `title`: required primary label
 - `date`: optional explicit date
 - `priority`: lightweight priority signal with enum `high | medium | low`
@@ -149,6 +150,7 @@ Field semantics:
 - `high` marks urgent or important work, `medium` is the default, and `low` is for non-urgent backlog.
 - `scene` is visible as a compact chip on the task card and available as a lightweight filter in the todo header or expanded editor.
 - `scene` does not create separate top-level groups in this iteration; it exists to help scanning, filtering, and light organization.
+- `order` is persisted per visible destination group, not per scope mode. A task keeps its manual order while it remains in the same semantic group (`Overdue`, `Today`, `This Week`, `This Month`, or `Later`), and receives a new default insertion order only when it moves to a different group because of a date change.
 
 Week definition:
 
@@ -217,6 +219,14 @@ Behavior rules:
 - When a specific date is selected in `month` mode, the header shows that date, the selected date's tasks are pinned at the top of their natural group (`Overdue`, `Today`, or `This Month`), and the rest of the groups remain visible below.
 - Clearing date focus returns the panel to the default scope-driven grouping.
 
+Scene filter rules:
+
+- `sceneFilter` is a single-select optional filter exposed as compact chips in the todo header.
+- The default is no filter.
+- Applying a scene filter narrows visible tasks in all groups but does not change group definitions.
+- Calendar markers continue to reflect all tasks, not the filtered subset, so calendar density remains stable.
+- Clearing the filter restores the full grouped list.
+
 Month-mode placement rules:
 
 - `Overdue` contains incomplete tasks dated before today.
@@ -245,6 +255,12 @@ The calendar should communicate task relevance instead of acting as decoration. 
 - Dates with tasks
 - Dates with high-priority tasks
 - Dates whose tasks are all completed
+
+Marker precedence rules:
+
+- `high-priority tasks` overrides the generic `has tasks` marker.
+- `all completed` is shown only when a date has tasks and every task on that date is complete.
+- If a date has both completed and incomplete tasks, it uses the strongest incomplete-state marker (`high-priority tasks` first, then `has tasks`).
 
 ### Month Navigation Behavior
 
@@ -311,6 +327,7 @@ Interface expectations:
 
 - `QuickCapture` creates tasks through a single create-task action and does not own list ordering logic.
 - `TodoViewModel` is the only unit that turns raw tasks plus filter state into grouped lists and calendar markers.
+- Legacy migration is separate from `TodoViewModel`: migration runs once at load time to fill missing schema fields, while `TodoViewModel` only derives render-time grouping and markers from already normalized tasks.
 - `TodoGroupList` receives already grouped task data plus callbacks for reorder, edit, complete, and delete.
 - The grouped-data contract is: an ordered array of visible groups, where each group has `id`, `label`, `activeItems`, and `completedItems`.
 - `TodoCard` does not compute placement rules; it edits task fields and delegates moves to higher-level state.
@@ -331,6 +348,8 @@ The redesign succeeds if it clearly improves these outcomes:
 5. Completed tasks are visually separated from active tasks and support undo after completion.
 6. Undated tasks consistently appear in `Later`.
 7. The right sidebar presents a visible task structure even when one or more groups are empty.
+8. Switching between `week` and `month` mode changes grouping without creating a separate task store or losing ordering.
+9. Applying and clearing the scene filter updates visible tasks consistently without changing calendar markers.
 
 ## Integration Notes
 
@@ -347,6 +366,7 @@ The redesign succeeds if it clearly improves these outcomes:
 - Create, edit, complete, delete, and reorder actions save immediately after the local UI updates.
 - The UI may update optimistically, but a failed save must roll the affected task back to its last persisted state and show a retry affordance.
 - Reorder saves happen after drag end, not on every hover movement.
+- If a reorder save fails, the whole affected group rolls back to its last persisted order rather than leaving a partial mixed state.
 - Normalization and migration happen at load time before any grouping or calendar markers are derived.
 
 ## Testing Guidance for Planning
