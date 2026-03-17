@@ -112,6 +112,12 @@
         font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
       }
 
+      input::placeholder,
+      textarea::placeholder {
+        font: inherit;
+        font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
       .wrap {
         position: relative;
         max-width: var(--max);
@@ -1026,12 +1032,13 @@
         align-items: center;
         justify-content: flex-end;
         gap: 8px;
-        padding: 7px 12px;
-        min-height: 40px;
+        height: 40px;
+        padding: 0 12px;
         border-radius: 999px;
         background: linear-gradient(120deg, rgba(255, 255, 255, 0.72), rgba(213, 241, 235, 0.55));
         border: 1px solid color-mix(in oklab, var(--accent-3) 22%, var(--rule));
         animation: noteGlow 2.8s ease-in-out infinite, noteFloat 4.8s ease-in-out infinite;
+        box-sizing: border-box;
       }
 
       .hero-countdown {
@@ -1039,8 +1046,8 @@
         min-width: 0;
         max-width: none;
         width: max-content;
-        padding: 7px 12px;
-        min-height: 40px;
+        height: 40px;
+        padding: 0 12px;
         border-radius: 999px;
         border: 1px solid color-mix(in oklab, var(--accent) 16%, var(--rule));
         background:
@@ -1051,6 +1058,7 @@
         align-items: center;
         gap: 6px;
         overflow: hidden;
+        box-sizing: border-box;
       }
 
       .hero-countdown-head {
@@ -1126,7 +1134,7 @@
       }
 
       .motto-emoji {
-        font-size: 15px;
+        font-size: 13px;
         line-height: 1;
         animation: emojiHop 1.8s ease-in-out infinite;
         filter: drop-shadow(0 4px 8px rgba(58, 123, 213, 0.24));
@@ -1135,6 +1143,7 @@
       .hero-note .motto-t {
         font-size: 12px;
         font-weight: 700;
+        line-height: 1;
         letter-spacing: 0.01em;
         color: transparent;
         background: linear-gradient(90deg, #2a5f91, #1f8f7d, #3a7bd5);
@@ -5225,7 +5234,8 @@
         }
 
         function renderLinkCard(link) {
-          const icon = resolveIcon(link.url);
+          const iconUrls = resolveIconCandidates(link.url);
+          const iconFallback = siteIconFallback(link.url, link.title);
           const secondaryText = link.note ? link.note : link.url;
           const draggable = "true";
           return `
@@ -5233,7 +5243,7 @@
               <div class="t">
                 <div>
                   <div class="brandline">
-                    <img class="site-ico" src="${escAttr(iconPlaceholder())}" data-icon-url="${escAttr(icon)}" alt="" decoding="async" loading="lazy" referrerpolicy="no-referrer" />
+                    <img class="site-ico" src="${escAttr(iconFallback)}" data-icon-urls="${escAttr(iconUrls.join("\n"))}" data-icon-fallback="${escAttr(iconFallback)}" alt="" decoding="async" loading="lazy" referrerpolicy="no-referrer" />
                     <h3><a class="stretched" href="${escAttr(link.url)}" target="_blank" rel="noreferrer noopener">${escHtml(link.title)}</a></h3>
                   </div>
                   <div class="u">${escHtml(secondaryText)}</div>
@@ -5421,14 +5431,18 @@
           return state.db && state.db.settings && state.db.settings.ui && state.db.settings.ui.mode === "manage";
         }
 
-        function resolveIcon(url) {
+        function resolveIconCandidates(url) {
           try {
             const parsed = new URL(url);
             const host = safeString(parsed.hostname);
-            if (!host) return "assets/icons/chrome.png";
-            return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+            if (!host) return ["assets/icons/chrome.png"];
+            const origin = `${parsed.protocol}//${host}${parsed.port ? `:${parsed.port}` : ""}`;
+            return [
+              `${origin}/favicon.ico`,
+              `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`,
+            ];
           } catch (_error) {
-            return "assets/icons/chrome.png";
+            return ["assets/icons/chrome.png"];
           }
         }
 
@@ -5685,25 +5699,42 @@
           return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#eef3f6"/><text x="32" y="40" font-size="28" text-anchor="middle" fill="#223236" font-family="Segoe UI, PingFang SC, Microsoft YaHei">${text}</text></svg>`)}`;
         }
 
+        function siteIconFallback(url, title) {
+          const label = siteKeyFromUrl(url) || hostFromUrl(url) || safeString(title);
+          return engineFallbackIcon(label);
+        }
+
         function hydrateLinkIcons() {
           if (!els.grid) return;
-          const nodes = Array.from(els.grid.querySelectorAll(".site-ico[data-icon-url]"));
+          const nodes = Array.from(els.grid.querySelectorAll(".site-ico[data-icon-urls]"));
           nodes.forEach((img) => {
-            const url = safeString(img.getAttribute("data-icon-url"));
-            if (!url) return;
-            img.src = iconPlaceholder();
-            loadIconMaybe(img, url);
+            const urls = safeString(img.getAttribute("data-icon-urls"))
+              .split("\n")
+              .map((item) => safeString(item))
+              .filter(Boolean);
+            if (!urls.length) return;
+            img.src = safeString(img.getAttribute("data-icon-fallback")) || iconPlaceholder();
+            loadIconMaybe(img, urls);
           });
         }
 
-        function loadIconMaybe(img, url) {
-          if (!img || !url) return;
-          if (img.dataset.loadedIcon === url) return;
-          img.dataset.loadedIcon = url;
+        function loadIconMaybe(img, urls, index = 0) {
+          if (!img || !Array.isArray(urls) || !urls.length || index >= urls.length) return;
+          const url = safeString(urls[index]);
+          if (!url) {
+            loadIconMaybe(img, urls, index + 1);
+            return;
+          }
+          const cacheKey = urls.join("|");
+          if (index === 0) {
+            if (img.dataset.loadedIcon === cacheKey) return;
+            img.dataset.loadedIcon = cacheKey;
+          }
           const probe = new Image();
           let done = false;
           const timer = window.setTimeout(() => {
             done = true;
+            loadIconMaybe(img, urls, index + 1);
           }, 1200);
           probe.onload = () => {
             if (done) return;
@@ -5712,8 +5743,10 @@
             img.src = url;
           };
           probe.onerror = () => {
+            if (done) return;
             done = true;
             window.clearTimeout(timer);
+            loadIconMaybe(img, urls, index + 1);
           };
           probe.src = url;
         }
