@@ -128,36 +128,41 @@
 
       .shell {
         display: grid;
-        grid-template-columns: 176px minmax(0, 1.85fr) minmax(420px, 1.18fr);
+        grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
         grid-template-rows: auto 1fr;
         column-gap: 14px;
-        row-gap: var(--s3);
+        row-gap: 14px;
         padding-top: 12px;
         height: calc(100vh - 20px);
         min-height: calc(100vh - 20px);
       }
 
       .below {
-        display: contents;
+        grid-column: 1;
+        grid-row: 2;
+        display: grid;
+        grid-template-columns: 176px minmax(0, 1fr);
+        gap: 14px;
+        min-height: 0;
       }
 
       .shell > .panel.hero {
-        grid-column: 1 / 3;
+        grid-column: 1;
         grid-row: 1;
       }
 
       .catpanel {
         grid-column: 1;
-        grid-row: 2;
+        grid-row: 1;
       }
 
       .linkpanel {
         grid-column: 2;
-        grid-row: 2;
+        grid-row: 1;
       }
 
       .planpanel {
-        grid-column: 3;
+        grid-column: 2;
         grid-row: 1 / 3;
       }
 
@@ -188,9 +193,9 @@
       .planpanel .planbody {
         flex: 1;
         overflow: auto;
-        padding: 10px;
+        padding: 7px 10px 10px;
         display: grid;
-        gap: 10px;
+        gap: 6px;
         align-content: start;
       }
 
@@ -215,7 +220,7 @@
 
       .panel.hero .hd {
         border-bottom: 0;
-        padding: 10px 14px 6px;
+        padding: 8px 14px 4px;
         gap: 0;
       }
 
@@ -229,32 +234,91 @@
       .catpanel .hd,
       .linkpanel .hd,
       .planpanel .hd {
-        min-height: 64px;
+        min-height: 56px;
         align-content: center;
       }
 
+      .planpanel .hd {
+        padding: 10px 12px 8px;
+        gap: 6px;
+      }
+
       .planpanel .hd .row {
-        align-items: flex-end;
+        align-items: flex-start;
       }
 
       .planpanel .title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
         line-height: 1.1;
-      }
-
-      .planpanel .sub {
-        margin-top: 4px;
-        font-size: 11px;
-        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
-        letter-spacing: 0.02em;
       }
 
       .plancard {
         border: 1px solid color-mix(in oklab, var(--rule) 86%, transparent);
         border-radius: 16px;
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 251, 255, 0.8));
-        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.09);
+          linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 255, 0.82));
+        box-shadow: 0 10px 22px rgba(12, 27, 29, 0.08);
         padding: 10px;
+      }
+
+      .calendar-card {
+        padding: 7px 8px 9px;
+        border-color: color-mix(in oklab, var(--accent-3) 12%, var(--rule));
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 249, 255, 0.88)),
+          radial-gradient(220px 120px at 100% 0%, rgba(58, 123, 213, 0.05), transparent 74%);
+      }
+
+      .planstatus {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 0;
+        color: color-mix(in oklab, var(--ink) 82%, var(--muted));
+      }
+
+      .planstatus-main {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        min-width: 0;
+      }
+
+      .planstatus-item {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .planstatus-label {
+        font-size: 10px;
+        color: color-mix(in oklab, var(--muted) 90%, var(--ink));
+        white-space: nowrap;
+      }
+
+      .planstatus-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1f6d73;
+        white-space: nowrap;
+      }
+
+      .planstatus-sep {
+        font-size: 10px;
+        color: color-mix(in oklab, var(--muted) 70%, transparent);
+      }
+
+      .planstatus-action {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        box-shadow: none;
       }
 
       .plan-h {
@@ -339,13 +403,14 @@
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
       }
 
       .calmonth {
         font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
-        font-size: 14px;
-        letter-spacing: 0.02em;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
       }
 
       .calops {
@@ -356,30 +421,37 @@
       .calgrid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 5px;
+        gap: 3px;
       }
 
       .caldow {
-        font-size: 10px;
+        font-size: 9px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: color-mix(in oklab, var(--muted) 90%, var(--ink));
         text-align: center;
-        padding-bottom: 2px;
+        padding-bottom: 1px;
       }
 
       .calday {
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         border-radius: 8px;
-        min-height: 28px;
+        min-height: 24px;
         background: color-mix(in oklab, white 72%, var(--cream));
         cursor: pointer;
-        display: grid;
-        place-items: center;
-        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
         line-height: 1;
         position: relative;
+        overflow: hidden;
         transition: transform 140ms ease, border-color 140ms ease;
+      }
+
+      .calday-num {
+        position: relative;
+        z-index: 1;
       }
 
       .calday:hover {
@@ -410,47 +482,74 @@
 
       .calday .dot {
         position: absolute;
-        width: 7px;
-        height: 7px;
+        width: 6px;
+        height: 6px;
         border-radius: 99px;
-        left: 50%;
-        bottom: 4px;
-        transform: translateX(-50%);
+        top: 4px;
+        left: 4px;
         background: color-mix(in oklab, var(--accent) 88%, white);
-        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 16%, transparent);
       }
 
       .calday .dot.overdue-severe {
         background: #ff5a47;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #ff5a47 22%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, #ff5a47 22%, transparent);
       }
 
       .calday .dot.overdue {
         background: #ff9a63;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #ff9a63 22%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, #ff9a63 22%, transparent);
       }
 
       .calday .dot.today {
         background: #f59f00;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #f59f00 20%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, #f59f00 20%, transparent);
       }
 
       .calday .dot.future-near {
         background: #20c997;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #20c997 20%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, #20c997 20%, transparent);
       }
 
       .calday .dot.future-far {
         background: #6ea8e5;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #6ea8e5 18%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in oklab, #6ea8e5 18%, transparent);
+      }
+
+      .calday .holiday-flag {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        min-width: 12px;
+        height: 12px;
+        padding: 0 2px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        font-weight: 700;
+        line-height: 1;
+        color: #9a3412;
+        background: linear-gradient(180deg, #fff4df, #ffe8c5);
+        border: 1px solid rgba(245, 158, 11, 0.28);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.14);
+      }
+
+      .calday .holiday-flag.weekend {
+        color: #8a5a18;
+        background: linear-gradient(180deg, #fff8ea, #ffefcf);
+        border-color: rgba(245, 158, 11, 0.18);
+        box-shadow: 0 3px 8px rgba(245, 158, 11, 0.1);
       }
 
       .todo-card-shell {
         position: relative;
         overflow: visible;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 252, 250, 0.86)),
-          radial-gradient(320px 180px at 100% 0%, rgba(58, 123, 213, 0.05), transparent 72%);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
       }
 
       .todo-shell-head {
@@ -470,16 +569,16 @@
 
       .todoquick {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 122px 74px 46px;
-        gap: 8px;
-        margin-bottom: 10px;
-        padding: 9px;
+        grid-template-columns: minmax(0, 1fr) 116px 58px 40px;
+        gap: 6px;
+        margin-bottom: 6px;
+        padding: 5px;
         border-radius: 16px;
-        border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
+        border: 1px solid color-mix(in oklab, var(--accent) 6%, var(--rule));
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 251, 248, 0.74)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(244, 251, 248, 0.76)),
           radial-gradient(280px 140px at 0% 0%, rgba(14, 165, 165, 0.06), transparent 72%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 4px 10px rgba(12, 27, 29, 0.025);
       }
 
       .todoquick input,
@@ -490,8 +589,11 @@
         border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
         background: linear-gradient(180deg, color-mix(in oklab, white 82%, var(--cream)), color-mix(in oklab, white 74%, var(--cream)));
         border-radius: 11px;
-        padding: 7px 10px;
+        padding: 6px 8px;
         font-size: 11.5px;
+        line-height: 1;
+        min-height: 36px;
+        box-sizing: border-box;
         transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
       }
 
@@ -514,7 +616,10 @@
       .todoquick input[type="date"] {
         grid-column: 2;
         min-width: 0;
-        width: 122px;
+        width: 116px;
+        text-align: center;
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       input[type="date"],
@@ -536,13 +641,30 @@
 
       .todoquick select {
         grid-column: 3;
-        width: 74px;
+        width: 58px;
+        appearance: none;
+        -webkit-appearance: none;
+        padding-left: 6px;
+        padding-right: 20px;
+        background-color: color-mix(in oklab, white 74%, var(--cream));
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5 5 6.5 8 3.5' fill='none' stroke='%231b5d61' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 7px center;
+        background-size: 10px 10px;
+        text-align: center;
+        text-align-last: center;
+        text-indent: 0;
+      }
+
+      .todoquick select option {
+        text-align: center;
+        text-align-last: center;
       }
 
       .todoquick-submit {
         grid-column: 4;
-        min-width: 46px;
-        width: 46px;
+        min-width: 40px;
+        width: 40px;
         justify-self: end;
         display: inline-flex;
         align-items: center;
@@ -557,17 +679,17 @@
 
       .todo-groups {
         display: grid;
-        gap: 10px;
+        gap: 7px;
       }
 
       .todo-g {
-        padding: 10px;
+        padding: 9px;
         border-radius: 18px;
-        border: 1px solid color-mix(in oklab, var(--accent) 10%, var(--rule));
+        border: 1px solid color-mix(in oklab, var(--accent) 6%, var(--rule));
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(241, 252, 248, 0.74)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(241, 252, 248, 0.78)),
           radial-gradient(260px 160px at 100% 0%, rgba(14, 165, 165, 0.08), transparent 70%);
-        box-shadow: 0 10px 20px rgba(12, 27, 29, 0.04);
+        box-shadow: 0 6px 14px rgba(12, 27, 29, 0.03);
       }
 
       .todo-gh {
@@ -603,18 +725,19 @@
 
       .todo-list {
         display: grid;
-        gap: 8px;
+        gap: 6px;
       }
 
       .todo-item {
+        position: relative;
         border: 1px solid color-mix(in oklab, var(--accent) 14%, var(--rule));
         border-radius: 16px;
         background: linear-gradient(180deg, color-mix(in oklab, white 87%, var(--cream)), color-mix(in oklab, white 77%, var(--cream)));
-        box-shadow: 0 12px 24px rgba(12, 27, 29, 0.07);
-        padding: 10px;
+        box-shadow: 0 6px 14px rgba(12, 27, 29, 0.04);
+        padding: 10px 72px 10px 10px;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        align-items: center;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
         gap: 8px;
         transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
         animation: todoRise 240ms cubic-bezier(0.22, 0.9, 0.24, 1) both;
@@ -623,7 +746,7 @@
       .todo-item:hover {
         transform: translateY(-1px);
         border-color: color-mix(in oklab, var(--accent) 34%, var(--rule));
-        box-shadow: 0 16px 28px rgba(12, 27, 29, 0.1);
+        box-shadow: 0 10px 18px rgba(12, 27, 29, 0.06);
       }
 
       .todo-item.done {
@@ -635,7 +758,7 @@
       .todo-main {
         min-width: 0;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 44px 96px;
+        grid-template-columns: minmax(0, 1fr) 38px 60px;
         align-items: center;
         gap: 5px;
         overflow: hidden;
@@ -673,12 +796,18 @@
         align-items: center;
         justify-content: center;
         gap: 4px;
-        padding: 5px 7px;
-        font-size: 10.5px;
+        padding: 4px 5px;
+        font-size: 9.5px;
         line-height: 1;
         border-radius: 999px;
         justify-self: stretch;
         min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .todo-priority-chip {
+        min-width: 38px;
       }
 
       .todo-date-link {
@@ -687,6 +816,7 @@
         white-space: nowrap;
         border: 1px solid color-mix(in oklab, var(--accent-3) 16%, var(--rule));
         background: color-mix(in oklab, white 82%, var(--accent-3));
+        min-width: 60px;
       }
 
       .todo-date-link[data-tone="overdue-severe"] {
@@ -739,31 +869,50 @@
 
       #todo-quick-priority[data-priority="high"],
       #tp[data-priority="high"] {
-        background: color-mix(in oklab, white 74%, #ffe1d8);
+        background-color: color-mix(in oklab, white 74%, #ffe1d8);
         border-color: color-mix(in oklab, #ff7a59 34%, var(--rule));
         color: #8a3514;
       }
 
       #todo-quick-priority[data-priority="medium"],
       #tp[data-priority="medium"] {
-        background: color-mix(in oklab, white 74%, #dff7f4);
+        background-color: color-mix(in oklab, white 74%, #dff7f4);
         border-color: color-mix(in oklab, #0ea5a5 24%, var(--rule));
         color: #185f63;
       }
 
       #todo-quick-priority[data-priority="low"],
       #tp[data-priority="low"] {
-        background: color-mix(in oklab, white 80%, #edf2f7);
+        background-color: color-mix(in oklab, white 80%, #edf2f7);
         border-color: color-mix(in oklab, #94a3b8 20%, var(--rule));
         color: #536171;
       }
 
       .todo-item-actions {
-        display: flex;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: inline-flex;
         align-items: center;
         gap: 4px;
-        padding-left: 2px;
         flex-shrink: 0;
+      }
+
+      .todo-actbtn {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        box-shadow: none;
+      }
+
+      .todo-actbtn svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      .todo-actbtn.danger {
+        border-color: color-mix(in oklab, var(--accent-2) 24%, var(--rule));
+        color: color-mix(in oklab, var(--accent-2) 55%, var(--ink));
       }
 
       .todo-cb {
@@ -818,9 +967,53 @@
         }
       }
 
+      @media (max-width: 1240px) {
+        .shell {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto auto;
+          height: auto;
+          min-height: 0;
+        }
+
+        .shell > .panel.hero,
+        .planpanel,
+        .below {
+          grid-column: 1;
+        }
+
+        .shell > .panel.hero {
+          grid-row: 1;
+        }
+
+        .planpanel {
+          grid-row: 2;
+        }
+
+        .below {
+          grid-row: 3;
+        }
+      }
+
       @media (max-width: 1100px) {
         .todo-shell-head {
           grid-template-columns: 1fr;
+        }
+
+        .below {
+          grid-template-columns: 1fr;
+        }
+
+        .catpanel,
+        .linkpanel {
+          grid-column: 1;
+        }
+
+        .catpanel {
+          grid-row: 1;
+        }
+
+        .linkpanel {
+          grid-row: 2;
         }
 
         .todo-head {
@@ -869,11 +1062,27 @@
           flex-wrap: wrap;
         }
 
-        .hero-note {
-          margin-left: 0;
+        .title-group {
           width: 100%;
+          gap: 10px;
+        }
+
+        .title-brand {
+          width: 100%;
+        }
+
+        .brand-name {
+          white-space: normal;
+        }
+
+        .hero-note {
+          width: 100%;
+          max-width: none;
           justify-content: flex-start;
-          text-align: left;
+        }
+
+        .planstatus {
+          flex-wrap: wrap;
         }
 
         .hero-countdown {
@@ -902,12 +1111,13 @@
         }
 
         .todo-item {
+          padding-right: 68px;
           grid-template-columns: auto minmax(0, 1fr);
         }
 
         .todo-item-actions {
-          grid-column: 2;
-          justify-content: flex-end;
+          top: 8px;
+          right: 8px;
         }
       }
 
@@ -999,46 +1209,47 @@
         border-color: color-mix(in oklab, var(--accent-2) 45%, var(--rule));
       }
 
-      .motto {
-        max-width: 460px;
+      .title-group {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        flex-wrap: wrap;
+      }
+
+      .title-brand {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        border-radius: 999px;
-        border: 1px solid color-mix(in oklab, var(--rule) 70%, transparent);
-        background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.66),
-            rgba(255, 255, 255, 0.38)
-          );
-        backdrop-filter: blur(8px);
-        box-shadow: 0 16px 40px rgba(12, 27, 29, 0.10);
-        color: color-mix(in oklab, var(--ink) 82%, var(--muted));
+        min-width: 0;
       }
 
       .brand-name {
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
+        margin: 0;
+        font-size: clamp(19px, 2vw, 24px);
+        font-weight: 650;
+        line-height: 1.05;
+        letter-spacing: -0.015em;
+        color: #243336;
+        text-shadow: 0 3px 10px rgba(12, 27, 29, 0.04);
+        white-space: nowrap;
       }
 
       .hero-note {
-        margin-left: 18px;
-        max-width: 420px;
-        text-align: right;
-        color: color-mix(in oklab, var(--ink) 72%, var(--muted));
+        max-width: min(460px, 100%);
+        min-width: 0;
+        color: color-mix(in oklab, var(--ink) 76%, var(--muted));
         display: inline-flex;
         align-items: center;
-        justify-content: flex-end;
         gap: 8px;
-        height: 40px;
-        padding: 0 12px;
+        min-height: 38px;
+        padding: 7px 14px;
         border-radius: 999px;
-        background: linear-gradient(120deg, rgba(255, 255, 255, 0.72), rgba(213, 241, 235, 0.55));
-        border: 1px solid color-mix(in oklab, var(--accent-3) 22%, var(--rule));
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.76), rgba(213, 241, 235, 0.58));
+        border: 1px solid color-mix(in oklab, var(--accent-3) 24%, var(--rule));
+        box-shadow: 0 10px 24px rgba(12, 27, 29, 0.08);
         animation: noteGlow 2.8s ease-in-out infinite, noteFloat 4.8s ease-in-out infinite;
         box-sizing: border-box;
+        backdrop-filter: blur(8px);
       }
 
       .hero-countdown {
@@ -1134,16 +1345,16 @@
       }
 
       .motto-emoji {
-        font-size: 13px;
+        font-size: 15px;
         line-height: 1;
         animation: emojiHop 1.8s ease-in-out infinite;
         filter: drop-shadow(0 4px 8px rgba(58, 123, 213, 0.24));
       }
 
       .hero-note .motto-t {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
-        line-height: 1;
+        line-height: 1.2;
         letter-spacing: 0.01em;
         color: transparent;
         background: linear-gradient(90deg, #2a5f91, #1f8f7d, #3a7bd5);
@@ -1151,6 +1362,9 @@
         background-clip: text;
         -webkit-background-clip: text;
         animation: textShimmer 4.5s linear infinite;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       @keyframes emojiHop {
@@ -1185,22 +1399,19 @@
       }
 
       .motto-t {
-        font-size: 12px;
+        font-size: 13px;
         letter-spacing: 0.01em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       /* Search */
       .search {
-        padding: 10px 14px 12px;
+        padding: 6px 14px 8px;
         display: grid;
-        gap: 12px;
+        gap: 8px;
       }
 
       .shell > .panel .search {
-        padding-bottom: 12px;
+        padding-bottom: 8px;
       }
 
       .tabs {
@@ -1211,18 +1422,18 @@
       }
 
       .shell > .panel .tabs {
-        gap: 10px;
+        gap: 8px;
       }
 
       .tab {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
+        gap: 8px;
+        padding: 8px 11px;
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         border-radius: 999px;
         background: color-mix(in oklab, white 70%, var(--cream));
-        box-shadow: 0 10px 22px rgba(20, 18, 13, 0.07);
+        box-shadow: 0 8px 18px rgba(20, 18, 13, 0.06);
         cursor: pointer;
         user-select: none;
         transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
@@ -1331,7 +1542,7 @@
       .searchbar {
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 10px;
+        gap: 8px;
         align-items: stretch;
       }
 
@@ -1341,13 +1552,13 @@
 
       .searchbar input {
         width: 100%;
-        padding: 12px 14px;
+        padding: 10px 14px;
         border-radius: var(--radius-2);
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         background: color-mix(in oklab, white 74%, var(--cream));
         color: var(--ink);
         outline: none;
-        box-shadow: 0 12px 30px rgba(20, 18, 13, 0.08);
+        box-shadow: 0 10px 24px rgba(20, 18, 13, 0.07);
         font-size: 14px;
       }
 
@@ -1360,13 +1571,13 @@
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         background: linear-gradient(180deg, rgba(20, 18, 13, 0.06), rgba(20, 18, 13, 0.02));
         color: var(--ink);
-        padding: 10px 12px;
+        padding: 9px 12px;
         border-radius: var(--radius-2);
         font-size: 13px;
         font-weight: 600;
         letter-spacing: 0.02em;
         cursor: pointer;
-        box-shadow: 0 12px 28px rgba(20, 18, 13, 0.08);
+        box-shadow: 0 10px 22px rgba(20, 18, 13, 0.07);
         transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
         display: inline-flex;
         align-items: center;
@@ -2174,32 +2385,14 @@
         <section class="panel hero reveal d2" aria-label="快速搜索">
           <div class="hd">
             <div class="row">
-              <div class="motto" role="note" title="MyWorkHub">
-                <span class="spark" aria-hidden="true"></span>
-                <span class="brand-name">MyWorkHub</span>
-              </div>
-              <section class="hero-countdown" aria-label="放假倒计时">
-                <div class="hero-countdown-head">
-                  <div class="hero-countdown-item">
-                    <span class="countdown-k">周末</span>
-                    <span class="countdown-v" id="weekend-countdown">计算中...</span>
-                  </div>
-                  <div class="hero-countdown-values">
-                  <div class="hero-countdown-item compact">
-                    <span class="countdown-v" id="holiday-countdown">尚未配置</span>
-                  </div>
-                  </div>
+              <div class="title-group" title="MyWorkHub 每日提示">
+                <div class="title-brand">
+                  <h1 class="brand-name">MyWorkHub</h1>
                 </div>
-                <a href="#modal-holidays" class="plan-link" id="open-holidays-modal-hero" title="管理假日" aria-label="管理假日">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M12 3.8 14 5l2.3-.2.9 2.1 2 1.1-.5 2.2 1.2 2-1.2 2 .5 2.2-2 1.1-.9 2.1-2.3-.2-2 1.2-2-1.2-2.3.2-.9-2.1-2-1.1.5-2.2-1.2-2 1.2-2-.5-2.2 2-1.1.9-2.1L10 5l2-1.2Z" stroke="#2f6572" stroke-width="1.4" stroke-linejoin="round" />
-                    <path d="M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" stroke="#2f6572" stroke-width="1.4" />
-                  </svg>
-                </a>
-              </section>
-              <div class="hero-note" role="note" title="每日一句（示意）">
-                <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
-                <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
+                <div class="hero-note" role="note" title="每日一句（示意）">
+                  <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
+                  <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
+                </div>
               </div>
             </div>
           </div>
@@ -2541,9 +2734,34 @@
             </div>
           </section>
 
-          <aside class="panel reveal d3 planpanel" aria-label="周计划">
+          </div>
+
+          <aside class="panel reveal d3 planpanel" aria-label="我的待办">
+            <div class="hd">
+              <section class="planstatus" aria-label="倒计时">
+                <div class="planstatus-main">
+                  <span class="title">我的待办</span>
+                  <span class="planstatus-sep" aria-hidden="true">/</span>
+                  <div class="planstatus-item">
+                    <span class="planstatus-label">周末</span>
+                    <span class="planstatus-value" id="weekend-countdown">计算中...</span>
+                  </div>
+                  <span class="planstatus-sep" aria-hidden="true">/</span>
+                  <div class="planstatus-item">
+                    <span class="planstatus-label">假期</span>
+                    <span class="planstatus-value" id="holiday-countdown">尚未配置</span>
+                  </div>
+                </div>
+                <a href="#modal-holidays" class="iconbtn sm ghost planstatus-action" id="open-holidays-modal-hero" title="管理假日" aria-label="管理假日">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3.8 14 5l2.3-.2.9 2.1 2 1.1-.5 2.2 1.2 2-1.2 2 .5 2.2-2 1.1-.9 2.1-2.3-.2-2 1.2-2-1.2-2.3.2-.9-2.1-2-1.1.5-2.2-1.2-2 1.2-2-.5-2.2 2-1.1.9-2.1L10 5l2-1.2Z" stroke="#2f6572" stroke-width="1.4" stroke-linejoin="round" />
+                    <path d="M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" stroke="#2f6572" stroke-width="1.4" />
+                  </svg>
+                </a>
+              </section>
+            </div>
             <div class="planbody">
-              <section class="plancard" aria-label="日历">
+              <section class="plancard calendar-card" aria-label="日历">
                 <div class="calbar">
                   <div class="calmonth" id="calendar-month-title">2026年03月</div>
                   <div class="calops">
@@ -2599,7 +2817,6 @@
               </section>
             </div>
           </aside>
-        </div>
       </main>
     </div>
 
@@ -2987,8 +3204,7 @@
 
         const STORAGE_KEY = "workhub.db";
         const DB_VERSION = 2;
-        const HOLIDAY_COUNTRY = "CN";
-        const HOLIDAY_API_BASE = "https://date.nager.at/Api/v3/PublicHolidays";
+        const HOLIDAY_API_BASE = "https://timor.tech/api/holiday/year";
         const HOLIDAY_CACHE_PREFIX = "workhub.holidays.cache.v1.";
         const HOLIDAY_CACHE_TTL_MS = 86400000 * 90;
         const HOLIDAY_MANUAL_KEY = "workhub.holidays.manual.v1";
@@ -3042,13 +3258,41 @@
           "eng-lechat",
         ]);
         const WEEKDAY_MOTTOS = {
-          1: { emoji: "☕", text: "周一开机中，先把第一颗小齿轮转起来。" },
-          2: { emoji: "🚀", text: "周二冲刺位，今天适合把一个小目标打穿。" },
-          3: { emoji: "🎯", text: "周三稳住节奏，先拿下一件最关键的事。" },
-          4: { emoji: "💡", text: "周四灵感日，想到就记下，做到就加分。" },
-          5: { emoji: "🎉", text: "周五收官局，清掉一件事，周末更轻松。" },
-          6: { emoji: "🌿", text: "周六慢一点，把待办和心情都整理干净。" },
-          7: { emoji: "🌞", text: "周日预热中，给下周的自己留一点从容。" },
+          1: [
+            { id: "mon-1", emoji: "☕", text: "周一先别上强度，拿一件小事热热机。" },
+            { id: "mon-2", emoji: "🛠️", text: "今天先修最小那口锅，士气会自己回来。" },
+            { id: "mon-3", emoji: "🚶", text: "别急着飞，周一先迈出去那一步就赢了。" },
+          ],
+          2: [
+            { id: "tue-1", emoji: "🚀", text: "周二适合推进度，别让待办继续装忙。" },
+            { id: "tue-2", emoji: "🧹", text: "挑个小坑先填上，后面的路会顺眼很多。" },
+            { id: "tue-3", emoji: "🎯", text: "今天很适合狠狠干掉一个烦人的小目标。" },
+          ],
+          3: [
+            { id: "wed-1", emoji: "📈", text: "周三别演静止画面，把进度条往前推一点。" },
+            { id: "wed-2", emoji: "🧩", text: "卡住也没事，先拼上最容易的那一块。" },
+            { id: "wed-3", emoji: "⚙️", text: "系统运行到周中，记得顺手拧紧一颗螺丝。" },
+          ],
+          4: [
+            { id: "thu-1", emoji: "💡", text: "周四灵感别只路过，顺手把它落成一小步。" },
+            { id: "thu-2", emoji: "🔧", text: "再补一刀细节，这周就更像成品了。" },
+            { id: "thu-3", emoji: "📎", text: "今天适合把零散线头，一个个夹回正轨。" },
+          ],
+          5: [
+            { id: "fri-1", emoji: "🎉", text: "周五先收尾，别把锅打包送给下周一。" },
+            { id: "fri-2", emoji: "🧺", text: "能今天关掉的事，就别留着周末惦记。" },
+            { id: "fri-3", emoji: "✅", text: "本周最后冲一小段，周末会更像奖励。" },
+          ],
+          6: [
+            { id: "sat-1", emoji: "🌿", text: "周六慢一点，先把脑袋里的标签页关几页。" },
+            { id: "sat-2", emoji: "🪴", text: "今天适合轻整理，任务和心情一起除除草。" },
+            { id: "sat-3", emoji: "🧘", text: "别全清空也行，先理顺一件事就很体面。" },
+          ],
+          7: [
+            { id: "sun-1", emoji: "🌞", text: "周日轻轻预热，给下周的自己留点台阶。" },
+            { id: "sun-2", emoji: "🗂️", text: "先排个小队形，明天就不会一开场就乱。" },
+            { id: "sun-3", emoji: "🍵", text: "今天不求满分，给下周备好第一口气就行。" },
+          ],
         };
 
         const state = {
@@ -3223,6 +3467,7 @@
               todoView: "week",
               sceneFilter: "",
               todos: [],
+              workdays: [],
               holidays: [
                 { id: uid("holiday"), name: "清明节", startDate: "2026-04-04", endDate: "2026-04-06", createdAt: now, updatedAt: now },
                 { id: uid("holiday"), name: "劳动节", startDate: "2026-05-01", endDate: "2026-05-05", createdAt: now, updatedAt: now },
@@ -3390,6 +3635,9 @@
             .map((holiday, index) => normalizeHoliday(holiday, index, now))
             .filter(Boolean)
             .sort((a, b) => a.startDate.localeCompare(b.startDate));
+          const workdays = [...new Set((Array.isArray(source.workdays) ? source.workdays : [])
+            .map((item) => safeString(item))
+            .filter((item) => Boolean(parseYmd(item))))].sort();
           return {
             weekStart,
             selectedDate,
@@ -3397,6 +3645,7 @@
             todoView,
             sceneFilter,
             todos: mergedTodos,
+            workdays,
             holidays,
           };
         }
@@ -4603,8 +4852,7 @@
         function renderMotto() {
           if (!els.mottoText) return;
           const today = new Date();
-          const day = weekdayMon(today);
-          const motto = WEEKDAY_MOTTOS[day] || WEEKDAY_MOTTOS[1];
+          const motto = pickDailyMotto(today);
           els.mottoText.textContent = motto.text;
           if (els.mottoEmoji) {
             els.mottoEmoji.textContent = motto.emoji;
@@ -4858,10 +5106,6 @@
             state.ui.holidayAutoStatus = "manual";
             return;
           }
-          if (Array.isArray(state.db.plan.holidays) && state.db.plan.holidays.length) {
-            state.ui.holidayAutoStatus = "ok";
-            return;
-          }
 
           state.ui.holidayAutoStatus = "loading";
           renderPlanPanel();
@@ -4869,15 +5113,28 @@
           const year = new Date().getFullYear();
           const years = [year, year + 1];
           try {
-            const all = [];
+            const holidays = [];
+            const workdays = [];
             for (let i = 0; i < years.length; i += 1) {
               const y = years[i];
-              const raw = await loadOrFetchHolidaysForYear(y);
-              all.push(...raw);
+              const schedule = await loadOrFetchHolidaysForYear(y);
+              holidays.push(...schedule.holidays);
+              workdays.push(...schedule.workdays);
             }
-            const normalized = nagerToRanges(all, now)
+            const normalized = holidays
+              .map((holiday, index) => normalizeHoliday({
+                id: holiday.id || uid("holiday"),
+                name: holiday.name,
+                startDate: holiday.startDate,
+                endDate: holiday.endDate,
+                order: Number.isFinite(Number(holiday.order)) ? Number(holiday.order) : (index + 1) * 10,
+                createdAt: holiday.createdAt || now,
+                updatedAt: holiday.updatedAt || now,
+              }, index, now))
+              .filter(Boolean)
               .sort((a, b) => a.startDate.localeCompare(b.startDate));
             state.db.plan.holidays = normalized;
+            state.db.plan.workdays = [...new Set(workdays.map((item) => safeString(item)).filter((item) => Boolean(parseYmd(item))))].sort();
             saveDb();
             state.ui.holidayAutoStatus = normalized.length ? "ok" : "error";
             renderPlanPanel();
@@ -4888,13 +5145,15 @@
         }
 
         async function loadOrFetchHolidaysForYear(year) {
-          const cacheKey = `${HOLIDAY_CACHE_PREFIX}${HOLIDAY_COUNTRY}.${year}`;
+          const cacheKey = `${HOLIDAY_CACHE_PREFIX}cn.${year}`;
           const cached = safeReadStorage(cacheKey);
           if (cached) {
             try {
               const payload = JSON.parse(cached);
               if (payload
-                && Array.isArray(payload.data)
+                && payload.data
+                && Array.isArray(payload.data.holidays)
+                && Array.isArray(payload.data.workdays)
                 && Number.isFinite(Number(payload.fetchedAt))
                 && (Date.now() - Number(payload.fetchedAt)) < HOLIDAY_CACHE_TTL_MS) {
                 return payload.data;
@@ -4906,61 +5165,73 @@
           const controller = new AbortController();
           const timer = window.setTimeout(() => controller.abort(), 8000);
           try {
-            const url = `${HOLIDAY_API_BASE}/${year}/${HOLIDAY_COUNTRY}`;
+            const url = `${HOLIDAY_API_BASE}/${year}`;
             const res = await fetch(url, { signal: controller.signal });
             if (!res.ok) throw new Error(`http_${res.status}`);
             const data = await res.json();
-            const list = Array.isArray(data) ? data : [];
+            const schedule = timorToSchedule(data, nowFromYear(year));
             try {
-              localStorage.setItem(cacheKey, JSON.stringify({ fetchedAt: Date.now(), data: list }));
+              localStorage.setItem(cacheKey, JSON.stringify({ fetchedAt: Date.now(), data: schedule }));
             } catch (_error) {
             }
-            return list;
+            return schedule;
           } finally {
             window.clearTimeout(timer);
           }
         }
 
-        function nagerToRanges(items, now) {
-          const list = Array.isArray(items) ? items : [];
-          const normalized = list
-            .map((item) => {
-              const date = safeString(item && item.date);
-              const localName = safeString(item && item.localName);
-              const name = safeString(item && item.name);
-              const label = localName || name;
-              if (!label || !parseYmd(date)) return null;
-              return { date, label };
-            })
-            .filter(Boolean)
+        function timorToSchedule(payload, now) {
+          const items = payload && payload.holiday && typeof payload.holiday === "object"
+            ? Object.values(payload.holiday)
+            : [];
+          const holidayDates = items
+            .filter((item) => item && item.holiday === true && parseYmd(safeString(item.date)))
+            .map((item) => ({ date: safeString(item.date), label: holidayTargetLabel(item) }))
             .sort((a, b) => a.date.localeCompare(b.date));
-          if (!normalized.length) return [];
+          const workdays = items
+            .filter((item) => item && item.holiday === false && parseYmd(safeString(item.date)))
+            .map((item) => safeString(item.date))
+            .sort();
 
-          const ranges = [];
+          const holidays = [];
           let current = null;
-          normalized.forEach((item) => {
+          holidayDates.forEach((item) => {
             if (!current) {
-              current = { label: item.label, startDate: item.date, endDate: item.date };
+              current = { name: item.label, startDate: item.date, endDate: item.date };
               return;
             }
-            if (item.label === current.label && isNextYmd(current.endDate, item.date)) {
+            if (isNextYmd(current.endDate, item.date)) {
               current.endDate = item.date;
+              if (!current.name && item.label) current.name = item.label;
               return;
             }
-            ranges.push(current);
-            current = { label: item.label, startDate: item.date, endDate: item.date };
+            holidays.push(current);
+            current = { name: item.label, startDate: item.date, endDate: item.date };
           });
-          if (current) ranges.push(current);
+          if (current) holidays.push(current);
 
-          return ranges.map((r, index) => ({
-            id: uid("holiday"),
-            name: r.label,
-            startDate: r.startDate,
-            endDate: r.endDate,
-            order: (index + 1) * 10,
-            createdAt: now,
-            updatedAt: now,
-          }));
+          return {
+            holidays: holidays.map((item, index) => ({
+              id: uid("holiday"),
+              name: item.name,
+              startDate: item.startDate,
+              endDate: item.endDate,
+              order: (index + 1) * 10,
+              createdAt: now,
+              updatedAt: now,
+            })),
+            workdays,
+          };
+        }
+
+        function holidayTargetLabel(item) {
+          const target = safeString(item && item.target);
+          const name = safeString(item && item.name);
+          return target || name || "假期";
+        }
+
+        function nowFromYear(year) {
+          return new Date(year, 0, 1).getTime();
         }
 
         function isNextYmd(prevYmd, nextYmd) {
@@ -4996,9 +5267,12 @@
             if (current.getMonth() !== month) classes.push("muted");
             if (selectedYmd && key === selectedYmd) classes.push("selected");
             if (key === todayYmd) classes.push("today");
-            const marker = markers.get(key) || "";
-            const dot = marker ? `<span class="dot ${marker}" aria-hidden="true"></span>` : "";
-            days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell">${current.getDate()}${dot}</button>`);
+            const marker = markers.get(key) || null;
+            const dot = marker && marker.tone ? `<span class="dot ${marker.tone}" aria-hidden="true"></span>` : "";
+            const holiday = marker && marker.restLabel
+              ? `<span class="holiday-flag ${marker.restKind === "weekend" ? "weekend" : "holiday"}" aria-hidden="true" title="${escAttr(marker.holidayName || "周末休息")}">${escHtml(marker.restLabel)}</span>`
+              : "";
+            days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell" title="${escAttr(buildCalendarDayTitle(key, marker))}"><span class="calday-num">${current.getDate()}</span>${dot}${holiday}</button>`);
           }
           els.calendarGrid.innerHTML = headers.concat(days).join("");
         }
@@ -5074,14 +5348,14 @@
                 </div>
               </div>
               <div class="todo-item-actions">
-                <a class="toolbtn sm" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
+                <a class="iconbtn sm ghost todo-actbtn" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">编辑</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
                     <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
                   </svg>
                 </a>
-                <a class="toolbtn sm ghost danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
+                <a class="iconbtn sm ghost todo-actbtn danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
                   <span class="sr">删除</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -5202,6 +5476,21 @@
         function buildCalendarMarkers() {
           const markers = new Map();
           const buckets = new Map();
+          const holidays = Array.isArray(state.db.plan && state.db.plan.holidays)
+            ? state.db.plan.holidays
+            : [];
+
+          holidays.forEach((holiday) => {
+            const dates = enumerateDateRange(holiday.startDate, holiday.endDate);
+            dates.forEach((key) => {
+              const current = markers.get(key) || { tone: "", holidayName: "", restLabel: "", restKind: "" };
+              current.holidayName = safeString(holiday.name);
+              current.restLabel = "休";
+              current.restKind = "holiday";
+              markers.set(key, current);
+            });
+          });
+
           (state.db.plan.todos || []).forEach((todo) => {
             const key = todoDateKey(todo);
             if (!key || todo.done) return;
@@ -5210,9 +5499,57 @@
           });
           buckets.forEach((items, key) => {
             const tones = items.map((item) => formatTodoDateBadge(key).tone);
-            markers.set(key, pickMostUrgentTone(tones));
+            const current = markers.get(key) || { tone: "", holidayName: "", restLabel: "", restKind: "" };
+            current.tone = pickMostUrgentTone(tones);
+            markers.set(key, current);
           });
+
+          const monthDate = parseYm(state.db.plan && state.db.plan.calendarMonth) || new Date();
+          const first = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+          const firstOffset = (weekdayMon(first) + 6) % 7;
+          const start = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1 - firstOffset);
+          for (let i = 0; i < 42; i += 1) {
+            const currentDate = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+            const key = formatYmd(currentDate);
+            if (!isWeekendRestDay(currentDate, key)) continue;
+            const current = markers.get(key) || { tone: "", holidayName: "", restLabel: "", restKind: "" };
+            if (!current.restLabel) {
+              current.restLabel = "休";
+              current.restKind = "weekend";
+            }
+            markers.set(key, current);
+          }
+
           return markers;
+        }
+
+        function buildCalendarDayTitle(dateKey, marker) {
+          const parts = [dateKey];
+          if (marker && marker.holidayName) parts.push(marker.holidayName);
+          if (marker && marker.restKind === "weekend") parts.push("周末休息");
+          if (marker && marker.tone) {
+            const badge = formatTodoDateBadge(dateKey);
+            if (badge && badge.title) parts.push(badge.title);
+          }
+          return parts.join(" · ");
+        }
+
+        function isWeekendRestDay(date, dateKey) {
+          const day = date.getDay();
+          if (day !== 0 && day !== 6) return false;
+          const workdays = Array.isArray(state.db.plan && state.db.plan.workdays) ? state.db.plan.workdays : [];
+          return !workdays.includes(dateKey);
+        }
+
+        function enumerateDateRange(startDate, endDate) {
+          const start = parseYmd(startDate);
+          const end = parseYmd(endDate);
+          if (!start || !end || start > end) return [];
+          const dates = [];
+          for (let current = new Date(start); current <= end; current = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1)) {
+            dates.push(formatYmd(current));
+          }
+          return dates;
         }
 
         function pickMostUrgentTone(tones) {
@@ -5616,6 +5953,39 @@
           return day === 0 ? 7 : day;
         }
 
+        function hashText(text) {
+          let hash = 0;
+          for (let i = 0; i < text.length; i += 1) {
+            hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+          }
+          return hash;
+        }
+
+        function pickDailyMotto(date) {
+          const day = weekdayMon(date);
+          const pool = Array.isArray(WEEKDAY_MOTTOS[day]) && WEEKDAY_MOTTOS[day].length
+            ? WEEKDAY_MOTTOS[day]
+            : WEEKDAY_MOTTOS[1];
+          const todayKey = formatYmd(date);
+          const stored = state.db && state.db.settings && state.db.settings.motto
+            ? state.db.settings.motto
+            : null;
+          const storedId = stored ? safeString(stored.quoteId) : "";
+          if (stored && stored.lastDate === todayKey && storedId) {
+            const existing = pool.find((item) => item.id === storedId);
+            if (existing) return existing;
+          }
+
+          const index = hashText(`${todayKey}:${day}`) % pool.length;
+          const selected = pool[index] || pool[0];
+          if (stored && (stored.lastDate !== todayKey || stored.quoteId !== selected.id)) {
+            stored.lastDate = todayKey;
+            stored.quoteId = selected.id;
+            saveDb();
+          }
+          return selected;
+        }
+
         function startOfWeekMon(date) {
           const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
           const offset = weekdayMon(d) - 1;
@@ -5667,31 +6037,30 @@
           if (diffDays < 0) {
             const overdueDays = Math.abs(diffDays);
             return {
-              label: `${mmdd} 逾期${overdueDays}天`,
+              label: `${mmdd} 逾${overdueDays}天`,
               tone: overdueDays >= 7 ? "overdue-severe" : "overdue",
               title: `${formatDateTitle(dateText)}，已逾期 ${overdueDays} 天`,
             };
           }
           if (diffDays === 0) {
             return {
-              label: `${mmdd} 今天`,
+              label: `${mmdd} 今`,
               tone: "today",
               title: `${formatDateTitle(dateText)}，今天到期`,
             };
           }
           return {
-            label: `${mmdd} 还差${diffDays}天`,
+            label: `${mmdd} ${diffDays}天`,
             tone: diffDays <= 7 ? "future-near" : "future-far",
             title: `${formatDateTitle(dateText)}，距离今天还有 ${diffDays} 天`,
           };
         }
 
         function engineIconUrl(engine) {
-          if (!engine) return "";
+          if (!engine) return [];
           const target = safeString(engine.homeUrl) || safeString(engine.searchUrl);
-          const host = hostFromUrl(target);
-          if (!host) return "";
-          return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+          if (!target) return [];
+          return resolveIconCandidates(target);
         }
 
         function engineFallbackIcon(name) {
