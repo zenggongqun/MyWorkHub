@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>WorkHub · 快速搜索与常用链接</title>
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <div class="wrap">
+          <main class="shell">
+            <!-- Top: Search -->
+            <section class="panel hero reveal d2" aria-label="快速搜索">
+              <div class="hd">
+                <div class="row">
+                  <div class="title-group" title="MyWorkHub 每日提示">
+                    <div class="title-brand">
+                      <h1 class="brand-name">MyWorkHub</h1>
+                    </div>
+                    <div class="hero-note" role="note" title="每日一句（示意）">
+                      <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
+                      <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <form class="search" action="#" method="get">
+                <div class="tabs" id="engine-tabs" role="tablist" aria-label="搜索引擎">
+                  <a id="open-engine-modal" class="iconbtn sm addbtn" href="#modal-engine" title="管理引擎">
+                    <span class="sr">管理引擎</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </a>
+                </div>
+
+                <div class="searchbar" id="search">
+                  <label class="sr" for="q">关键词</label>
+                  <input id="q" name="q" type="search" placeholder="输入关键词…（回车或点搜索）" autocomplete="off" />
+                  <button class="btn" type="submit">
+                    <img id="search-btn-ico" class="btn-ico" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" decoding="async" referrerpolicy="no-referrer" />
+                    搜索
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Below: Categories + Links -->
+            <div class="below">
+              <aside class="panel reveal d3 catpanel" aria-label="分类">
+                <div class="hd">
+                  <div class="row">
+                    <div class="title">分类</div>
+                    <div class="sidebar-actions">
+                      <a id="open-category-manage" class="iconbtn sm addbtn" href="#modal-category" title="新增/重命名分类">
+                        <span class="sr">管理分类</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a id="open-category-delete" class="iconbtn sm" href="#modal-category-danger" title="删除分类（示意）">
+                        <span class="sr">删除分类</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M6.5 8.2h11" stroke="#b1402a" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M9.2 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M14.8 8.2v11" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                          <path d="M8.4 6.3h7.2" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <nav class="cats" aria-label="分类列表">
+                  <a class="cat" href="#" aria-current="true" data-color="sky">
+                    <div class="name">
+                      <strong>开发</strong>
+                      <span class="count">8</span>
+                    </div>
+                  </a>
+
+                  <a class="cat" href="#" data-color="mint">
+                    <div class="name">
+                      <strong>AI 工具</strong>
+                      <span class="count">6</span>
+                    </div>
+                  </a>
+
+                  <a class="cat" href="#" data-color="lilac">
+                    <div class="name">
+                      <strong>协作</strong>
+                      <span class="count">4</span>
+                    </div>
+                  </a>
+
+                  <a class="cat" href="#" data-color="coral">
+                    <div class="name">
+                      <strong>运营</strong>
+                      <span class="count">3</span>
+                    </div>
+                  </a>
+                </nav>
+              </aside>
+
+              <section class="panel reveal d3 linkpanel" aria-label="链接面板">
+                <div class="hd">
+                  <div class="row">
+                    <div>
+                      <div class="title">常用链接</div>
+                    </div>
+                    <div class="ops" aria-label="链接操作">
+                      <a id="open-link-modal" class="toolbtn addbtn" href="#modal-link" title="新增链接">
+                        <span class="sr">新增链接</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 5v14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a class="toolbtn ghost" href="#modal-data-import" title="导入">
+                        <span class="sr">导入</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20V10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M15.5 13.5 12 10 8.5 13.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M6.5 5h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                        </svg>
+                      </a>
+                      <a id="data-export-direct-btn" class="toolbtn ghost" href="#" title="导出">
+                        <span class="sr">导出</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 4v10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M8.5 10.5 12 14l3.5-3.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M6.5 19h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                        </svg>
+                      </a>
+
+                      <div class="modeToggle" aria-label="模式切换">
+                        <input type="radio" name="mode" id="mode-browse" checked />
+                        <input type="radio" name="mode" id="mode-manage" />
+                        <label for="mode-browse" title="纯展示">浏览</label>
+                        <label for="mode-manage" title="显示编辑/删除">管理</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="links">
+                  <div class="grid" role="list">
+                    <article class="card linkcard" role="listitem" title="GitHub — https://github.com/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/github.ico" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a></h3>
+                          </div>
+                          <div class="u">https://github.com/</div>
+                        </div>
+                        <div class="acts" aria-label="管理操作">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="Google — https://www.google.com/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/chrome.png" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://www.google.com/" target="_blank" rel="noreferrer">Google</a></h3>
+                          </div>
+                          <div class="u">https://www.google.com/</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="百度 — https://www.baidu.com/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/baidu.ico" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://www.baidu.com/" target="_blank" rel="noreferrer">百度</a></h3>
+                          </div>
+                          <div class="u">https://www.baidu.com/</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="DeepSeek — https://www.deepseek.com/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/deepseek.ico" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://www.deepseek.com/" target="_blank" rel="noreferrer">DeepSeek</a></h3>
+                          </div>
+                          <div class="u">https://www.deepseek.com/</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="GLM — https://chatglm.cn/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/glm.ico" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://chatglm.cn/" target="_blank" rel="noreferrer">GLM</a></h3>
+                          </div>
+                          <div class="u">https://chatglm.cn/</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="豆包 — https://www.doubao.com/">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/doubao.png" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://www.doubao.com/" target="_blank" rel="noreferrer">豆包</a></h3>
+                          </div>
+                          <div class="u">https://www.doubao.com/</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="card linkcard" role="listitem" title="Trending — https://github.com/trending">
+                      <div class="t">
+                        <div>
+                          <div class="brandline">
+                            <img class="site-ico" src="assets/icons/github.ico" alt="" decoding="async" />
+                            <h3><a class="stretched" href="https://github.com/trending" target="_blank" rel="noreferrer">Trending</a></h3>
+                          </div>
+                          <div class="u">https://github.com/trending</div>
+                        </div>
+                        <div class="acts">
+                          <a class="toolbtn sm" href="#modal-link" title="编辑">
+                            <span class="sr">编辑</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
+                              <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除">
+                            <span class="sr">删除</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M9.2 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M14.8 8v11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                              <path d="M8.5 6.2h7" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+
+                  </div>
+                </div>
+              </section>
+
+              </div>
+
+              <aside class="panel reveal d3 planpanel" aria-label="我的待办">
+                <div class="hd">
+                  <section class="planstatus" aria-label="倒计时">
+                    <div class="planstatus-main">
+                      <span class="title">我的待办</span>
+                      <span class="planstatus-sep" aria-hidden="true">/</span>
+                      <div class="planstatus-item">
+                        <span class="planstatus-label">周末</span>
+                        <span class="planstatus-value" id="weekend-countdown">计算中...</span>
+                      </div>
+                      <span class="planstatus-sep" aria-hidden="true">/</span>
+                      <div class="planstatus-item">
+                        <span class="planstatus-label">假期</span>
+                        <span class="planstatus-value" id="holiday-countdown">尚未配置</span>
+                      </div>
+                    </div>
+                    <a href="#modal-holidays" class="iconbtn sm ghost planstatus-action" id="open-holidays-modal-hero" title="管理假日" aria-label="管理假日">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 3.8 14 5l2.3-.2.9 2.1 2 1.1-.5 2.2 1.2 2-1.2 2 .5 2.2-2 1.1-.9 2.1-2.3-.2-2 1.2-2-1.2-2.3.2-.9-2.1-2-1.1.5-2.2-1.2-2 1.2-2-.5-2.2 2-1.1.9-2.1L10 5l2-1.2Z" stroke="#2f6572" stroke-width="1.4" stroke-linejoin="round" />
+                        <path d="M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" stroke="#2f6572" stroke-width="1.4" />
+                      </svg>
+                    </a>
+                  </section>
+                </div>
+                <div class="planbody">
+                  <section class="plancard calendar-card" aria-label="日历">
+                    <div class="calbar">
+                      <div class="calmonth" id="calendar-month-title">2026年03月</div>
+                      <div class="calops">
+                        <button class="toolbtn sm" type="button" data-action="cal-prev" title="上个月">
+                          <span class="sr">上个月</span>
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M14.5 6 8.5 12l6 6" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                        <button class="toolbtn sm ghost" type="button" data-action="cal-today" title="今天">今</button>
+                        <button class="toolbtn sm" type="button" data-action="cal-next" title="下个月">
+                          <span class="sr">下个月</span>
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="m9.5 6 6 6-6 6" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="calgrid" id="calendar-grid" role="grid" aria-label="月历"></div>
+                  </section>
+
+                  <section class="plancard todo-card-shell" aria-label="待办">
+                    <div class="plan-h todo-shell-head">
+                      <span class="todo-head">
+                        <span class="seg" role="tablist" aria-label="待办维度">
+                          <button id="todo-view-week-btn" class="segbtn" type="button" data-action="todo-view-week" aria-selected="true">周</button>
+                          <button id="todo-view-month-btn" class="segbtn" type="button" data-action="todo-view-month" aria-selected="false">月</button>
+                        </span>
+                        <span class="plan-link" id="todo-week-label"></span>
+                      </span>
+                    </div>
+
+                    <form class="todoquick" id="todo-quick-form">
+                      <label class="sr" for="todo-quick-title">新增待办</label>
+                      <input id="todo-quick-title" class="todoquick-title" type="text" placeholder="写下下一件要推进的小事..." />
+                      <label class="sr" for="todo-quick-date">指定日期</label>
+                      <input id="todo-quick-date" type="date" />
+                      <label class="sr" for="todo-quick-priority">优先级</label>
+                      <select id="todo-quick-priority">
+                        <option value="high">高</option>
+                        <option value="medium" selected>中</option>
+                        <option value="low">低</option>
+                      </select>
+                      <button class="btn tight todoquick-submit addbtn" type="submit" title="新增待办" aria-label="新增待办">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 5v14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                    </form>
+
+                    <div id="todo-groups" class="todo-groups"></div>
+                  </section>
+                </div>
+              </aside>
+          </main>
+        </div>
+
+        <!-- Modals -->
+        <section id="modal-link" class="modal" aria-label="链接编辑弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong id="link-modal-title">新增 / 编辑链接</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label for="lt">名称</label>
+                <input id="lt" type="text" placeholder="例如：GitHub / CI / 文档" />
+              </div>
+              <div class="field">
+                <label for="lu">URL</label>
+                <input id="lu" type="url" placeholder="https://..." />
+              </div>
+              <div class="field">
+                <label for="lc">所属分类</label>
+                <select id="lc">
+                  <option>开发</option>
+                  <option>AI 工具</option>
+                  <option>协作</option>
+                  <option>运营</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ln">备注（可选）</label>
+                <textarea id="ln" rows="3" placeholder="用于你自己：比如用途、登录方式、常用路径"></textarea>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="link-save-btn" class="btn" href="#" title="保存链接">保存</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-category" class="modal" aria-label="分类管理弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong id="category-modal-title">新增分类</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label for="cn">分类名</label>
+                <input id="cn" type="text" placeholder="例如：开发 / AI 工具 / 协作" />
+              </div>
+              <div class="field">
+                <label for="cc">分类颜色</label>
+                <div id="cc-palette" class="color-palette" role="radiogroup" aria-label="分类颜色调色盘">
+                  <button type="button" class="color-swatch" data-color="sky" aria-checked="true" title="sky"></button>
+                  <button type="button" class="color-swatch" data-color="mint" aria-checked="false" title="mint"></button>
+                  <button type="button" class="color-swatch" data-color="aqua" aria-checked="false" title="aqua"></button>
+                  <button type="button" class="color-swatch" data-color="coral" aria-checked="false" title="coral"></button>
+                  <button type="button" class="color-swatch" data-color="lemon" aria-checked="false" title="lemon"></button>
+                  <button type="button" class="color-swatch" data-color="lilac" aria-checked="false" title="lilac"></button>
+                  <button type="button" class="color-swatch" data-color="slate" aria-checked="false" title="slate"></button>
+                </div>
+                <input id="cc" type="hidden" value="sky" />
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="category-confirm-btn" class="btn" href="#" title="保存分类">确认</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-category-danger" class="modal" aria-label="删除分类确认">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>删除分类？</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+                这将删除分类 <strong id="danger-category-name">开发</strong>，并影响 <strong id="danger-category-count">8</strong> 条链接。
+                首版建议：一并删除这些链接（后续可扩展“迁移到其他分类”）。
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="category-delete-confirm-btn" class="btn danger" href="#" title="确认删除分类">确认删除</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-data-export" class="modal" aria-label="导出弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>导出（JSON）</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label>导出文件</label>
+                <a id="data-export-btn" class="btn ghost" href="#" title="下载数据">下载 workhub.json</a>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">关闭</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-data-import" class="modal" aria-label="导入弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>导入（JSON）</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label for="imp">导入文件</label>
+                <input id="imp" type="file" accept="application/json" />
+              </div>
+              <div class="field">
+                <label for="import-strategy">导入策略</label>
+                <select id="import-strategy">
+                  <option value="overwrite">覆盖本地数据（推荐）</option>
+                  <option value="merge">合并（后续可做）</option>
+                </select>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="data-import-apply-btn" class="btn" href="#" title="导入并应用">导入并应用</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-engine" class="modal" aria-label="搜索引擎管理弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>搜索引擎管理</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <div class="tabs" style="justify-content:space-between;align-items:center;">
+                  <label style="margin:0;">常用搜索引擎（可多选）· 选择后点击“应用选择”</label>
+                  <div class="tabs" style="gap:6px;">
+                    <button id="engine-select-all-btn" type="button" class="btn tight ghost" title="全部勾选">全选</button>
+                    <button id="engine-select-none-btn" type="button" class="btn tight ghost" title="取消勾选">清空</button>
+                    <button id="engine-open-custom-form" type="button" class="iconbtn sm addbtn" title="添加自定义引擎">
+                      <span class="sr">添加自定义引擎</span>
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M5 12h14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div id="engine-preset-list" style="display:grid;gap:8px;"></div>
+              </div>
+
+              <div id="engine-custom-panel" hidden>
+                <div class="field">
+                  <label for="en-name">名称</label>
+                  <input id="en-name" type="text" placeholder="例如：Google / 百度 / 内网搜索" />
+                </div>
+                <div class="field">
+                  <label for="en-search">搜索 URL 模板</label>
+                  <input id="en-search" type="text" placeholder="例如：https://www.google.com/search?q={q}" />
+                </div>
+                <div class="field">
+                  <label for="en-home">主页 URL（可选）</label>
+                  <input id="en-home" type="url" placeholder="例如：https://www.google.com/" />
+                </div>
+                <div class="ft" style="padding:0;border-top:none;justify-content:flex-end;">
+                  <a id="engine-custom-add-btn" class="btn" href="#" title="添加自定义引擎">添加自定义引擎</a>
+                </div>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="engine-add-btn" class="btn" href="#" title="应用默认引擎选择">应用选择</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-delete" class="modal" aria-label="删除链接确认">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>删除链接？</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+                将删除 <strong id="danger-link-name">GitHub</strong>。该操作不可撤销（可通过 JSON 备份恢复）。
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="link-delete-confirm-btn" class="btn danger" href="#" title="确认删除链接">确认删除</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-todo" class="modal" aria-label="待办编辑弹窗">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong id="todo-modal-title">新增待办</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label for="tt">标题</label>
+                <input id="tt" type="text" placeholder="例如：整理需求说明并发给团队" />
+              </div>
+              <div class="field">
+                <label for="tdt">日期（可留空）</label>
+                <input id="tdt" type="date" />
+              </div>
+              <div class="field">
+                <label for="tp">优先级</label>
+                <select id="tp">
+                  <option value="high">高</option>
+                  <option value="medium">中</option>
+                  <option value="low">低</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ts">场景</label>
+                <select id="ts">
+                  <option value="work">工作</option>
+                  <option value="life">生活</option>
+                  <option value="study">学习</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="todo-save-btn" class="btn" href="#" title="保存待办">保存</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-todo-delete" class="modal" aria-label="删除待办确认">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>删除待办？</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+                将删除待办 <strong id="danger-todo-name">示例待办</strong>。
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="todo-delete-confirm-btn" class="btn danger" href="#" title="确认删除待办">确认删除</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="modal-holidays" class="modal" aria-label="法定假日设置">
+          <a class="overlay" href="#" aria-label="关闭"></a>
+          <div class="sheet" role="dialog" aria-modal="true">
+            <div class="hd">
+              <strong>法定假日设置</strong>
+              <a class="iconbtn" href="#" title="关闭">
+                <span class="sr">关闭</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+            <div class="bd">
+              <div class="field">
+                <label for="hn">假日名称</label>
+                <input id="hn" type="text" placeholder="例如：清明节" />
+              </div>
+              <div class="field">
+                <label for="hs">开始日期</label>
+                <input id="hs" type="date" />
+              </div>
+              <div class="field">
+                <label for="he">结束日期</label>
+                <input id="he" type="date" />
+              </div>
+              <div class="field">
+                <label>已配置假日</label>
+                <div id="holiday-list" style="display: grid; gap: 8px;"></div>
+              </div>
+            </div>
+            <div class="ft">
+              <a class="btn ghost" href="#">取消</a>
+              <a id="holiday-add-btn" class="btn" href="#" title="添加假日">添加假日</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Toast placeholder -->
+        <div class="toast" aria-hidden="true">
+          <div class="msg">
+            <span class="badge"></span>
+            <div>
+              <strong>提示（示意）</strong>
+              <span>保存成功 / 导入失败 / URL 不合法 等反馈会出现在这里。</span>
+            </div>
+          </div>
+          <button type="button" class="toast-action" hidden>撤销</button>
+        </div>
+    <script src="assets/js/constants.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/events.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
