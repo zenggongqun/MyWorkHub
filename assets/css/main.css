@@ -44,6 +44,10 @@
         --s4: 30px;
         --s5: 42px;
 
+        --icon-size-md: 16px;
+        --icon-size-sm: 14px;
+        --icon-size-xs: 12px;
+
         --max: 1720px;
       }
 
@@ -309,7 +313,20 @@
         width: 26px;
         height: 26px;
         border-radius: 999px;
-        box-shadow: none;
+        border-style: solid;
+        border-color: color-mix(in oklab, var(--rule) 85%, transparent);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), color-mix(in oklab, white 82%, var(--cream))),
+          linear-gradient(135deg, color-mix(in oklab, var(--accent) 14%, transparent), color-mix(in oklab, var(--accent-3) 10%, transparent));
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
+      }
+
+      .planstatus-action:hover {
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--rule));
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.98), color-mix(in oklab, white 84%, var(--cream))),
+          linear-gradient(135deg, color-mix(in oklab, var(--accent) 20%, transparent), color-mix(in oklab, var(--accent-3) 14%, transparent));
+        box-shadow: 0 14px 28px rgba(12, 27, 29, 0.1);
       }
 
       .plan-h {
@@ -664,8 +681,8 @@
       }
 
       .todoquick-submit svg {
-        width: 18px;
-        height: 18px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
       }
 
       .todo-groups {
@@ -897,8 +914,8 @@
       }
 
       .todo-actbtn svg {
-        width: 13px;
-        height: 13px;
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
       }
 
       .todo-actbtn.danger {
@@ -1120,8 +1137,13 @@
       }
 
       .catpanel .hd .row {
-        justify-content: flex-start;
-        gap: 10px;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .catpanel .title {
+        line-height: 1.1;
+        transform: none;
       }
 
       .kicker {
@@ -1151,8 +1173,8 @@
       }
 
       .ops .toolbtn svg {
-        width: 16px;
-        height: 16px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
       }
 
       .ops .pill {
@@ -1178,13 +1200,13 @@
       }
 
       .toolbtn.sm svg {
-        width: 15px;
-        height: 15px;
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
       }
 
       .toolbtn svg {
-        width: 18px;
-        height: 18px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
       }
 
       .toolbtn:hover {
@@ -1208,12 +1230,12 @@
         height: 34px;
         min-width: 34px;
         padding: 0;
-        border-radius: 12px;
-        border: 1px solid color-mix(in oklab, var(--accent) 28%, var(--accent-3) 18%, var(--rule));
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         background:
           linear-gradient(180deg, rgba(255, 255, 255, 0.94), color-mix(in oklab, white 82%, var(--cream))),
           linear-gradient(135deg, color-mix(in oklab, var(--accent) 18%, transparent), color-mix(in oklab, var(--accent-3) 12%, transparent));
-        box-shadow: 0 10px 24px rgba(40, 111, 125, 0.1);
+        box-shadow: 0 12px 26px rgba(12, 27, 29, 0.08);
         color: color-mix(in oklab, var(--accent) 52%, var(--accent-3) 28%, var(--ink));
         display: inline-flex;
         align-items: center;
@@ -1226,8 +1248,8 @@
       .iconbtn.addbtn svg,
       .toolbtn.addbtn svg,
       .btn.addbtn svg {
-        width: 15px;
-        height: 15px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
       }
 
       .addbtn svg path,
@@ -1242,11 +1264,11 @@
       .toolbtn.addbtn:hover,
       .btn.addbtn:hover {
         transform: translateY(-1px);
-        border-color: color-mix(in oklab, var(--accent) 42%, var(--accent-3) 24%, var(--rule));
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--rule));
         background:
           linear-gradient(180deg, rgba(255, 255, 255, 0.98), color-mix(in oklab, white 84%, var(--cream))),
           linear-gradient(135deg, color-mix(in oklab, var(--accent) 24%, transparent), color-mix(in oklab, var(--accent-3) 18%, transparent));
-        box-shadow: 0 16px 30px rgba(40, 111, 125, 0.14);
+        box-shadow: 0 14px 28px rgba(12, 27, 29, 0.1);
       }
 
       .addbtn:focus-visible,
@@ -1254,7 +1276,7 @@
       .toolbtn.addbtn:focus-visible,
       .btn.addbtn:focus-visible {
         outline: none;
-        box-shadow: 0 16px 30px rgba(40, 111, 125, 0.14), 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
+        box-shadow: 0 14px 28px rgba(12, 27, 29, 0.1), 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
       }
 
       .title-group {
@@ -1643,8 +1665,8 @@
       }
 
       .btn.tight .btn-ico {
-        width: 16px;
-        height: 16px;
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
       }
 
       .btn:hover {
@@ -1663,8 +1685,8 @@
       }
 
       .btn .btn-ico {
-        width: 18px;
-        height: 18px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
         display: inline-block;
         object-fit: cover;
         border-radius: 6px;
@@ -1796,8 +1818,8 @@
       }
 
       .cat-edit svg {
-        width: 14px;
-        height: 14px;
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
       }
 
       .cat:hover .cat-edit,
@@ -1847,35 +1869,63 @@
       }
 
       .catpanel .sidebar-actions {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
         gap: 6px;
+        margin-left: auto;
+        transform: none;
       }
 
-      .catpanel #open-category-delete.iconbtn.sm {
-        width: 28px;
-        height: 28px;
-        border-radius: 10px;
-        border-color: transparent;
-        background: transparent;
-        box-shadow: none;
-        color: color-mix(in oklab, var(--ink) 74%, var(--muted));
+      .catpanel .sidebar-actions .toolbtn.ghost {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        color: color-mix(in oklab, var(--muted) 82%, var(--ink));
       }
 
-      .catpanel #open-category-delete.iconbtn.sm:hover {
-        border-color: color-mix(in oklab, var(--rule) 88%, transparent);
-        background: color-mix(in oklab, white 72%, var(--cream));
+      .catpanel .sidebar-actions .toolbtn.ghost:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 10%, transparent);
       }
 
-      .catpanel #open-category-delete.iconbtn.sm:focus-visible {
-        box-shadow: var(--ring);
+      .catpanel #open-category-manage.toolbtn.ghost {
+        color: color-mix(in oklab, #4f8077 68%, var(--ink));
       }
 
-      .catpanel #open-category-delete {
-        color: color-mix(in oklab, #a83a27 78%, var(--muted));
+      .catpanel #open-category-manage.toolbtn.ghost:hover,
+      .catpanel #open-category-manage.toolbtn.ghost:focus-visible {
+        color: color-mix(in oklab, #456f67 78%, var(--ink));
       }
 
-      .catpanel #open-category-delete:hover {
-        border-color: color-mix(in oklab, #d56b55 24%, var(--rule));
-        background: color-mix(in oklab, #fff3ef 72%, white);
+      .catpanel #open-category-manage.toolbtn.ghost svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .catpanel #open-category-manage.toolbtn.ghost svg path {
+        stroke-width: 1.9;
+        stroke: currentColor;
+      }
+
+      .catpanel #open-category-delete.toolbtn.ghost {
+        color: color-mix(in oklab, #7f655b 64%, var(--ink));
+      }
+
+      .catpanel #open-category-delete.toolbtn.ghost:hover,
+      .catpanel #open-category-delete.toolbtn.ghost:focus-visible {
+        color: color-mix(in oklab, #6f473a 82%, var(--ink));
+      }
+
+      .catpanel #open-category-delete.toolbtn.ghost svg {
+        width: 16px;
+        height: 16px;
+        transform: none;
+      }
+
+      .catpanel #open-category-delete.toolbtn.ghost svg path {
+        stroke-width: 1.85;
+        stroke: currentColor;
       }
 
       .iconbtn {
@@ -1898,6 +1948,10 @@
         border-radius: 11px;
       }
 
+      .iconbtn.sm.addbtn {
+        border-radius: 999px;
+      }
+
       .iconbtn:hover {
         transform: translateY(-1px);
         border-color: color-mix(in oklab, var(--accent-2) 24%, var(--rule));
@@ -1909,8 +1963,8 @@
       }
 
       .iconbtn svg {
-        width: 16px;
-        height: 16px;
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
       }
 
       /* Main */
@@ -2236,8 +2290,8 @@
       }
 
       .linkpanel:has(#mode-manage:checked) .linkcard .acts .toolbtn.sm svg {
-        width: 13px;
-        height: 13px;
+        width: var(--icon-size-xs);
+        height: var(--icon-size-xs);
       }
 
 
