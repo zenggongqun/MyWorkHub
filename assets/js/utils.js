@@ -283,7 +283,7 @@ function formatTodoDateBadge(dateText) {
   }
   if (diffDays === 0) {
     return {
-      label: `${mmdd} 今`,
+      label: `${mmdd} 今天`,
       tone: "today",
       title: `${formatDateTitle(dateText)}，今天到期`,
     };

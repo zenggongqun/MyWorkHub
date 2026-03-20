@@ -336,12 +336,14 @@ function renderLinks() {
     const groupedHtml = categories
       .map((cat) => {
         const catLinks = grouped.get(cat.id) || [];
-        if (!catLinks.length) return "";
         const cardsHtml = catLinks.map((link) => renderLinkCard(link)).join("");
+        const emptyHtml = !cardsHtml && isManageMode()
+          ? '<div class="all-group-empty">拖到这里可移动到该分类</div>'
+          : "";
         return `
-          <section class="all-group" id="${escAttr(anchorIdForCategory(cat.id))}">
+          <section class="all-group" id="${escAttr(anchorIdForCategory(cat.id))}" data-category-id="${escAttr(cat.id)}">
             <h3 class="all-group-title" style="--group-cat: var(--cat-${escAttr(cat.colorToken)});">${escHtml(cat.name)}</h3>
-            <div class="all-group-links">${cardsHtml}</div>
+            <div class="all-group-links" data-category-id="${escAttr(cat.id)}">${cardsHtml}${emptyHtml}</div>
           </section>
         `;
       })
@@ -674,22 +676,27 @@ function renderTodos() {
     els.todoWeekLabel.textContent = `${formatYmd(weekStart)} 周`;
   }
 
-  const groups = buildTodoGroups(allTodos, {
-    view,
-    todayYmd,
-    selectedYmd,
-    calendarMonth,
-  });
+  const activeTodos = sortTodosByTimeline(allTodos.filter((todo) => !todo.done));
+  const completedTodos = sortTodosByTimeline(allTodos.filter((todo) => todo.done)).reverse();
 
-  if (!groups.some((group) => group.active.length || group.completed.length)) {
+  if (!activeTodos.length && !completedTodos.length) {
     els.todoGroups.innerHTML = '<div class="todo-empty">今天还没有行动项，先记下一件最想推进的小事。</div>';
     return;
   }
 
-  els.todoGroups.innerHTML = groups
-    .filter((group) => group.active.length || group.completed.length)
-    .map((group) => renderTodoGroup(group))
-    .join("");
+  const activeHtml = activeTodos.length
+    ? `<div class="todo-list">${activeTodos.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>`
+    : '<div class="todo-empty">当前没有待推进事项。</div>';
+  const completedHtml = completedTodos.length
+    ? `
+      <details class="todo-completed">
+        <summary>已完成 ${completedTodos.length} 项</summary>
+        <div class="todo-list">${completedTodos.map((todo, index) => renderTodoItem(todo, index + activeTodos.length)).join("")}</div>
+      </details>
+    `
+    : "";
+
+  els.todoGroups.innerHTML = activeHtml + completedHtml;
 }
 
 function renderTodoItem(todo, index) {
@@ -730,88 +737,6 @@ function renderTodoItem(todo, index) {
       </div>
     </article>
   `;
-}
-
-function renderTodoGroup(group) {
-  const activeHtml = group.active.length
-    ? `<div class="todo-list">${group.active.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>`
-    : "";
-  const completedHtml = group.completed.length
-    ? `
-      <details class="todo-completed">
-        <summary>已完成 ${group.completed.length} 项</summary>
-        <div class="todo-list">${group.completed.map((todo, index) => renderTodoItem(todo, index)).join("")}</div>
-      </details>
-    `
-    : "";
-  return `
-    <section class="todo-g">
-      <h4 class="todo-gh">
-        <span class="todo-gh-main">${escHtml(group.label)}</span>
-        <span class="todo-group-meta">${group.active.length} 项待推进</span>
-      </h4>
-      ${activeHtml}
-      ${completedHtml}
-    </section>
-  `;
-}
-
-function buildTodoGroups(todos, options) {
-  const view = options.view === "month" ? "month" : "week";
-  const todayYmd = options.todayYmd;
-  const selectedYmd = options.selectedYmd || "";
-  const calendarMonth = options.calendarMonth;
-  const currentMonthKey = todayYmd.slice(0, 7);
-  const todayDate = parseYmd(todayYmd) || new Date();
-  const endOfWeek = formatYmd(endOfWeekMon(todayDate));
-  const monthBase = parseYm(currentMonthKey) || new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
-  const monthEnd = formatYmd(new Date(monthBase.getFullYear(), monthBase.getMonth() + 1, 0));
-  const monthStart = formatYmd(monthBase);
-  const defs = view === "month"
-    ? [
-      { id: "overdue", label: "逾期", emptyText: "没有逾期项，节奏很好。" },
-      { id: "today", label: "今天", emptyText: "今天还没安排，先放一件最关键的事。" },
-      { id: "month", label: "本月", emptyText: "本月区还是空的，适合放一个正在推进的目标。" },
-      { id: "later", label: "稍后", emptyText: "稍后区暂时空着，也是一种轻盈。" },
-    ]
-    : [
-      { id: "overdue", label: "逾期", emptyText: "没有逾期项，继续保持。" },
-      { id: "today", label: "今天", emptyText: "今天还没安排，先写下一件最想推进的小事。" },
-      { id: "month", label: "本月", emptyText: "本月区还是空的，适合放一个正在推进的目标。" },
-      { id: "later", label: "稍后", emptyText: "稍后区现在空着，说明注意力很集中。" },
-    ];
-  const groups = new Map(defs.map((group) => [group.id, { ...group, active: [], completed: [] }]));
-
-  todos.forEach((todo) => {
-    const date = todo.date;
-    let groupId = "later";
-    if (date) {
-      if (date < todayYmd) {
-        groupId = "overdue";
-      } else if (date === todayYmd) {
-        groupId = "today";
-      } else if (view === "month") {
-        groupId = date.slice(0, 7) === currentMonthKey ? "month" : (date > monthEnd ? "later" : (date < monthStart ? "later" : "month"));
-      } else {
-        groupId = date <= monthEnd ? "month" : "later";
-      }
-    }
-    const bucket = groups.get(groupId) || groups.get("later");
-    if (todo.done) {
-      bucket.completed.push(todo);
-    } else {
-      bucket.active.push(todo);
-    }
-  });
-
-  return defs.map((group) => {
-    const bucket = groups.get(group.id);
-    return {
-      ...bucket,
-      active: sortTodosByTimeline(bucket.active),
-      completed: sortTodosByTimeline(bucket.completed),
-    };
-  });
 }
 
 function sortTodosByTimeline(items) {
@@ -937,7 +862,7 @@ function renderLinkCard(link) {
   const iconUrls = resolveIconCandidates(link.url);
   const iconFallback = siteIconFallback(link.url, link.title);
   const secondaryText = link.note ? link.note : link.url;
-  const draggable = "true";
+  const draggable = isManageMode() ? "true" : "false";
   return `
     <article class="card linkcard" role="listitem" data-link-id="${escAttr(link.id)}" data-category-id="${escAttr(link.categoryId)}" draggable="${draggable}" title="${escAttr(`${link.title} — ${link.url}`)}">
       <div class="t">
@@ -976,6 +901,7 @@ function anchorIdForCategory(catId) {
 }
 
 function onGridDragStart(event) {
+  if (!isManageMode()) return;
   const card = event.target.closest(".linkcard[data-link-id]");
   if (!card) return;
   const linkId = card.getAttribute("data-link-id");
@@ -983,6 +909,7 @@ function onGridDragStart(event) {
   state.ui.draggingLinkId = linkId;
   state.ui.draggingContainer = card.parentElement;
   state.ui.dragDirty = false;
+  state.ui.dragAllMode = state.db.activeCategoryId === ALL_CATEGORY_ID;
   card.classList.add("dragging");
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = "move";
@@ -995,11 +922,14 @@ function onGridDragOver(event) {
   const sourceCard = getCardElementById(state.ui.draggingLinkId);
   if (!sourceCard) return;
   const targetCard = event.target.closest(".linkcard[data-link-id]");
+  const activeCategoryId = state.db.activeCategoryId;
 
   if (targetCard) {
     if (targetCard === sourceCard) return;
-    if (targetCard.parentElement !== sourceCard.parentElement) return;
-    if (targetCard.getAttribute("data-category-id") !== sourceCard.getAttribute("data-category-id")) return;
+    if (activeCategoryId !== ALL_CATEGORY_ID) {
+      if (targetCard.parentElement !== sourceCard.parentElement) return;
+      if (targetCard.getAttribute("data-category-id") !== sourceCard.getAttribute("data-category-id")) return;
+    }
     event.preventDefault();
     const rect = targetCard.getBoundingClientRect();
     const insertBefore = event.clientY < rect.top + rect.height / 2;
@@ -1008,36 +938,54 @@ function onGridDragOver(event) {
       targetCard.parentElement.insertBefore(sourceCard, ref);
       state.ui.dragDirty = true;
     }
+    const categoryId = targetCard.parentElement && targetCard.parentElement.getAttribute("data-category-id");
+    setGridDropTarget(categoryId);
     return;
   }
 
   const container = event.target.closest(".all-group-links, .site-group-links, .grid");
-  if (!container || container !== sourceCard.parentElement) return;
+  if (!container) return;
+  if (activeCategoryId !== ALL_CATEGORY_ID && container !== sourceCard.parentElement) return;
   event.preventDefault();
-  container.appendChild(sourceCard);
+  const emptyHint = container.querySelector(".all-group-empty");
+  if (emptyHint) {
+    container.insertBefore(sourceCard, emptyHint);
+  } else {
+    container.appendChild(sourceCard);
+  }
+  setGridDropTarget(container.getAttribute("data-category-id"));
   state.ui.dragDirty = true;
 }
 
 function onGridDrop(event) {
   if (!state.ui.draggingLinkId) return;
   event.preventDefault();
+  clearGridDropTargets();
 }
 
 function onGridDragEnd(_event) {
   const draggingId = state.ui.draggingLinkId;
   const draggingContainer = state.ui.draggingContainer;
   const shouldPersist = state.ui.dragDirty;
+  const dragAllMode = Boolean(state.ui.dragAllMode);
 
   const card = draggingId ? getCardElementById(draggingId) : null;
   if (card) {
     card.classList.remove("dragging");
   }
 
+  clearGridDropTargets();
+
   state.ui.draggingLinkId = null;
   state.ui.draggingContainer = null;
   state.ui.dragDirty = false;
+  state.ui.dragAllMode = false;
 
   if (!shouldPersist || !draggingContainer) return;
+  if (dragAllMode && state.db.activeCategoryId === ALL_CATEGORY_ID) {
+    persistAllModeLinkOrder();
+    return;
+  }
   persistOrderFromContainer(draggingContainer);
 }
 
@@ -1055,6 +1003,41 @@ function persistOrderFromContainer(container) {
   saveDb();
   renderAll();
   toast("已排序", "链接顺序已更新。");
+}
+
+function persistAllModeLinkOrder() {
+  if (!els.grid) return;
+  const groups = Array.from(els.grid.querySelectorAll(".all-group[data-category-id]"));
+  if (!groups.length) return;
+  const now = Date.now();
+  groups.forEach((group) => {
+    const categoryId = safeString(group.getAttribute("data-category-id"));
+    const cards = Array.from(group.querySelectorAll(".all-group-links .linkcard[data-link-id]"));
+    cards.forEach((card, index) => {
+      const linkId = safeString(card.getAttribute("data-link-id"));
+      const link = getLinkById(linkId);
+      if (!link) return;
+      link.categoryId = categoryId;
+      link.order = (index + 1) * 10;
+      link.updatedAt = now;
+      card.setAttribute("data-category-id", categoryId);
+    });
+  });
+  saveDb();
+  renderAll();
+  toast("已排序", "链接分类和顺序已更新。");
+}
+
+function clearGridDropTargets() {
+  if (!els.grid) return;
+  els.grid.querySelectorAll(".drop-target").forEach((node) => node.classList.remove("drop-target"));
+}
+
+function setGridDropTarget(categoryId) {
+  if (!els.grid || !categoryId) return;
+  clearGridDropTargets();
+  const target = els.grid.querySelector(`.all-group-links[data-category-id="${CSS.escape(categoryId)}"]`);
+  if (target) target.classList.add("drop-target");
 }
 
 function getCardElementById(linkId) {
