@@ -18,7 +18,7 @@
                     <div class="title-brand">
                       <h1 class="brand-name">MyWorkHub</h1>
                     </div>
-                    <div class="hero-note" role="note" title="每日一句（示意）">
+                    <div class="hero-note" role="note">
                       <span id="motto-emoji" class="motto-emoji" aria-hidden="true">✨</span>
                       <span id="motto-text" class="motto-t">把今天最重要的一件事先推进一点点。</span>
                     </div>
@@ -786,26 +786,29 @@
               </a>
             </div>
             <div class="bd">
-              <div class="field">
-                <label for="hn">假日名称</label>
-                <input id="hn" type="text" placeholder="例如：清明节" />
-              </div>
-              <div class="field">
-                <label for="hs">开始日期</label>
-                <input id="hs" type="date" />
-              </div>
-              <div class="field">
-                <label for="he">结束日期</label>
-                <input id="he" type="date" />
+              <div class="holiday-editor" aria-label="新增假日">
+                <div class="field holiday-name-field">
+                  <label for="hn">假日名称</label>
+                  <input id="hn" type="text" placeholder="例如：清明节" />
+                </div>
+                <div class="field holiday-range-field">
+                  <label for="hs">日期起止时间</label>
+                  <div class="holiday-range-inputs">
+                    <input id="hs" type="date" />
+                    <span class="holiday-range-sep" aria-hidden="true">-</span>
+                    <label class="sr" for="he">结束日期</label>
+                    <input id="he" type="date" />
+                  </div>
+                </div>
+                <a id="holiday-add-btn" class="btn holiday-add-btn" href="#" title="添加假日">添加</a>
               </div>
               <div class="field">
                 <label>已配置假日</label>
-                <div id="holiday-list" style="display: grid; gap: 8px;"></div>
+                <div id="holiday-list" class="holiday-list"></div>
               </div>
             </div>
             <div class="ft">
               <a class="btn ghost" href="#">取消</a>
-              <a id="holiday-add-btn" class="btn" href="#" title="添加假日">添加假日</a>
             </div>
           </div>
         </section>
@@ -813,10 +816,10 @@
         <!-- Toast placeholder -->
         <div class="toast" aria-hidden="true">
           <div class="msg">
-            <span class="badge"></span>
+            <span class="badge" aria-hidden="true">✓</span>
             <div>
-              <strong>提示（示意）</strong>
-              <span>保存成功 / 导入失败 / URL 不合法 等反馈会出现在这里。</span>
+              <strong>操作完成</strong>
+              <span>新增、删除、更新和导入导出的结果都会在这里即时提示。</span>
             </div>
           </div>
           <button type="button" class="toast-action" hidden>撤销</button>

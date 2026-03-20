@@ -456,6 +456,7 @@ function onLinkSave(event) {
 
   const now = Date.now();
   const existing = state.ui.editingLinkId ? getLinkById(state.ui.editingLinkId) : null;
+  const category = getCategoryById(categoryId);
 
   if (existing) {
     existing.title = title;
@@ -482,7 +483,11 @@ function onLinkSave(event) {
   saveDb();
   renderAll();
   closeHashModal();
-  toast("已保存", "链接已更新。", false);
+  if (existing) {
+    toast("已更新链接", `「${title}」已同步到${category ? `「${category.name}」` : "当前分类"}。`, false);
+  } else {
+    toast("已添加链接", `「${title}」已加入${category ? `「${category.name}」` : "当前分类"}，现在可以直接打开了。`, false);
+  }
 }
 
 function onLinkDeleteConfirm(event) {
@@ -499,12 +504,13 @@ function onLinkDeleteConfirm(event) {
     return;
   }
   const removed = state.db.links[idx];
+  const category = getCategoryById(removed.categoryId);
   state.db.links.splice(idx, 1);
   state.ui.deletingLinkId = null;
   saveDb();
   renderAll();
   closeHashModal();
-  toast("已删除", `已删除：${removed.title}`);
+  toast("已删除链接", `「${removed.title}」已从${category ? `「${category.name}」` : "当前分类"}移除。`);
 }
 
 function onCategoryConfirm(event) {
@@ -580,7 +586,7 @@ function onCategoryDeleteConfirm(event) {
   saveDb();
   renderAll();
   closeHashModal();
-  toast("已删除", `删除分类「${cat.name}」，移除 ${affected} 条链接。`);
+  toast("已删除分类", `「${cat.name}」已移除，同时清理了 ${affected} 条关联链接。`);
 }
 
 async function onDataExport(event) {
@@ -864,7 +870,7 @@ function onTodoDeleteConfirm(event) {
   saveDb();
   renderPlanPanel();
   closeHashModal();
-  toast("已删除", `已移除：${removed.title}`);
+  toast("已删除待办", `「${removed.title}」已从行动清单移除。`);
 }
 
 function onHolidayAdd(event) {
@@ -910,5 +916,5 @@ function onHolidayListClick(event) {
   saveDb();
   renderPlanPanel();
   renderHolidayList();
-  toast("已删除", `已删除假日：${removed.name}`);
+  toast("已删除假日", `「${removed.name}」假期安排已移除。`);
 }

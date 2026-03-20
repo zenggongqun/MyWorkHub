@@ -139,10 +139,13 @@ function renderHolidayList() {
     return;
   }
   els.holidayList.innerHTML = holidays.map((holiday) => `
-    <article class="todo-item">
-      <div class="dot" aria-hidden="true"></div>
-      <div class="todo-t">${escHtml(holiday.name)} · ${escHtml(holiday.startDate)} - ${escHtml(holiday.endDate)}</div>
-      <button type="button" class="toolbtn sm ghost danger" data-action="delete-holiday" data-holiday-id="${escAttr(holiday.id)}" title="删除">
+    <article class="holiday-row">
+      <div class="holiday-row-main">
+        <div class="dot" aria-hidden="true"></div>
+        <div class="holiday-row-name">${escHtml(holiday.name)}</div>
+        <div class="holiday-row-date">${escHtml(holiday.startDate)} - ${escHtml(holiday.endDate)}</div>
+      </div>
+      <button type="button" class="toolbtn sm ghost danger holiday-row-delete" data-action="delete-holiday" data-holiday-id="${escAttr(holiday.id)}" title="删除">
         <span class="sr">删除</span>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -426,9 +429,14 @@ function openExternal(url) {
 
 function toast(title, message, isError, action) {
   if (!els.toast || !els.toastTitle) return;
+  const tone = isError ? "error" : (action ? "action" : "success");
+  els.toast.dataset.tone = tone;
   els.toastTitle.textContent = title || "提示";
   if (els.toastText) {
     els.toastText.textContent = message || title;
+  }
+  if (els.toastBadge) {
+    els.toastBadge.textContent = isError ? "!" : (action ? "↺" : "✓");
   }
   if (els.toastActionBtn) {
     els.toastActionBtn.hidden = !(action && typeof action.onClick === "function");
@@ -443,7 +451,7 @@ function toast(title, message, isError, action) {
       : null;
   }
   els.toast.style.display = "flex";
-  els.toast.style.opacity = isError ? "0.98" : "0.92";
+  els.toast.style.opacity = isError ? "1" : "0.98";
   if (state.ui.toastTimer) {
     window.clearTimeout(state.ui.toastTimer);
   }

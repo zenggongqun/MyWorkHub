@@ -194,6 +194,7 @@ const els = {
   holidayList: document.getElementById("holiday-list"),
   holidayAddBtn: document.getElementById("holiday-add-btn"),
   toast: document.querySelector(".toast"),
+  toastBadge: document.querySelector(".toast .badge"),
   toastTitle: document.querySelector(".toast .msg strong"),
   toastText: document.querySelector(".toast .msg span"),
   toastActionBtn: document.querySelector(".toast-action"),
