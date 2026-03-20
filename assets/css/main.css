@@ -743,7 +743,7 @@
         background: linear-gradient(180deg, color-mix(in oklab, white 87%, var(--cream)), color-mix(in oklab, white 77%, var(--cream)));
         box-shadow: 0 6px 14px rgba(12, 27, 29, 0.04);
         min-height: 42px;
-        padding: 3px 14px 3px 12px;
+        padding: 6px 12px 6px 12px;
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
         align-items: center;
@@ -2134,12 +2134,12 @@
         border: 1px solid color-mix(in oklab, var(--rule) 85%, transparent);
         background: color-mix(in oklab, white 76%, var(--cream));
         border-radius: var(--radius-2);
-        padding: 9px 10px 8px;
+        padding: 6px 10px 6px;
         box-shadow: 0 14px 34px rgba(20, 18, 13, 0.08);
         transition: transform 160ms ease, border-color 160ms ease;
         position: relative;
         overflow: hidden;
-        min-height: 62px;
+        min-height: 54px;
       }
 
       .card::before {
@@ -2272,9 +2272,20 @@
       }
 
       .brandline {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         gap: 8px;
+        min-width: 0;
+      }
+
+      .brandline h3 {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .linkcard .t > :first-child {
+        min-width: 0;
+        flex: 1 1 auto;
       }
 
       .site-ico {
@@ -2288,6 +2299,9 @@
       }
 
       .card .u {
+        display: block;
+        width: 100%;
+        max-width: 100%;
         margin-top: 4px;
         font-size: 10.5px;
         color: color-mix(in oklab, var(--muted) 92%, var(--ink));
@@ -2314,10 +2328,14 @@
 
 
       .linkcard .stretched {
+        display: block;
         color: inherit;
         text-decoration: none;
         position: relative;
         z-index: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .linkcard .stretched::before {
