@@ -130,6 +130,7 @@ function getTodoById(id) {
 
 function renderHolidayList() {
   if (!els.holidayList) return;
+  const locked = !state.ui.fileSync.handle;
   const holidays = [...state.db.plan.holidays].sort((a, b) => a.startDate.localeCompare(b.startDate));
   if (!holidays.length) {
     const msg = state.ui.holidayAutoStatus === "loading"
@@ -145,7 +146,7 @@ function renderHolidayList() {
         <div class="holiday-row-name">${escHtml(holiday.name)}</div>
         <div class="holiday-row-date">${escHtml(holiday.startDate)} - ${escHtml(holiday.endDate)}</div>
       </div>
-      <button type="button" class="toolbtn sm ghost danger holiday-row-delete" data-action="delete-holiday" data-holiday-id="${escAttr(holiday.id)}" title="删除">
+      <button type="button" class="toolbtn sm ghost danger holiday-row-delete ${locked ? "is-disabled" : ""}" data-action="delete-holiday" data-holiday-id="${escAttr(holiday.id)}" title="${escAttr(locked ? "请先绑定同步文件后再删除假日" : `删除假日 ${holiday.name}`)}" aria-label="删除假日 ${escAttr(holiday.name)}" ${locked ? 'disabled aria-disabled="true"' : ""}>
         <span class="sr">删除</span>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -220,7 +221,7 @@ function pickDailyMotto(date) {
   if (stored && (stored.lastDate !== todayKey || stored.quoteId !== selected.id)) {
     stored.lastDate = todayKey;
     stored.quoteId = selected.id;
-    saveDb();
+    saveDb({ showPrompt: false });
   }
   return selected;
 }
@@ -266,7 +267,7 @@ function formatDateTitle(dateText) {
 function formatTodoDateBadge(dateText) {
   const d = parseYmd(dateText);
   if (!d) {
-    return { label: "稍后安排", tone: "later", title: "未指定日期" };
+    return { label: "稍后安排", tone: "later", title: "未指定日期", detail: "未指定截止日期" };
   }
   const today = new Date();
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -279,6 +280,7 @@ function formatTodoDateBadge(dateText) {
       label: `${mmdd} 逾${overdueDays}天`,
       tone: overdueDays >= 7 ? "overdue-severe" : "overdue",
       title: `${formatDateTitle(dateText)}，已逾期 ${overdueDays} 天`,
+      detail: `待办截止：已逾期 ${overdueDays} 天`,
     };
   }
   if (diffDays === 0) {
@@ -286,12 +288,14 @@ function formatTodoDateBadge(dateText) {
       label: `${mmdd} 今天`,
       tone: "today",
       title: `${formatDateTitle(dateText)}，今天到期`,
+      detail: "待办截止：今天到期",
     };
   }
   return {
     label: `${mmdd} ${diffDays}天`,
     tone: diffDays <= 7 ? "future-near" : "future-far",
     title: `${formatDateTitle(dateText)}，距离今天还有 ${diffDays} 天`,
+    detail: `待办截止：还有 ${diffDays} 天`,
   };
 }
 
@@ -398,16 +402,544 @@ function getNearestHoliday(now) {
   return { inHoliday: false, name: next.name, days };
 }
 
-function saveDb() {
-  if (state.ui.readOnly) return false;
+function supportsLocalFileSync() {
+  return typeof window.showOpenFilePicker === "function" || typeof window.showSaveFilePicker === "function";
+}
+
+function fileSyncIdleMessage() {
+  return "未绑定同步文件。请先绑定本地 JSON 文件，后续改动才会直接写入文件。";
+}
+
+function snapshotDb(db) {
+  const source = db || state.db || defaultDb();
+  return JSON.stringify(source);
+}
+
+function updateFileSyncSnapshot(db) {
+  state.ui.fileSync.snapshot = snapshotDb(db);
+}
+
+function restoreDbFromSnapshot() {
+  const raw = safeString(state.ui.fileSync.snapshot).trim();
+  if (!raw) {
+    state.db = validateAndNormalize(defaultDb());
+    updateFileSyncSnapshot(state.db);
+    return;
+  }
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
-    return true;
+    state.db = validateAndNormalize(JSON.parse(raw));
   } catch (_error) {
-    state.ui.readOnly = true;
-    toast("存储不可用", "本地存储写入失败，已进入只读模式。", true);
+    state.db = validateAndNormalize(defaultDb());
+    updateFileSyncSnapshot(state.db);
+  }
+}
+
+function openDataSyncModal() {
+  window.location.hash = "#modal-data-sync";
+}
+
+function requireBoundFile(actionLabel) {
+  const label = safeString(actionLabel) || "保存改动";
+  if (state.ui.fileSync.handle) return true;
+  toast("请先绑定同步文件", `${label}前请先绑定本地 JSON 文件。`, true, {
+    label: "去绑定",
+    onClick: openDataSyncModal,
+  });
+  return false;
+}
+
+function hydrateFileSyncMeta() {
+  const sync = state.ui.fileSync;
+  const supported = supportsLocalFileSync();
+  let parsed = null;
+  const raw = safeReadStorage(FILE_SYNC_META_KEY);
+  if (raw) {
+    try {
+      parsed = JSON.parse(raw);
+    } catch (_error) {
+      parsed = null;
+    }
+  }
+  sync.supported = supported;
+  sync.enabled = !!(parsed && parsed.enabled);
+  sync.fileName = safeString(parsed && parsed.fileName);
+  const lastSyncedAt = Number(parsed && parsed.lastSyncedAt);
+  sync.lastSyncedAt = Number.isFinite(lastSyncedAt) ? lastSyncedAt : 0;
+  sync.status = supported ? (sync.enabled ? "idle" : "idle") : "unsupported";
+  sync.message = supported
+    ? (sync.enabled && sync.fileName ? `正在恢复本地同步文件：${sync.fileName}` : fileSyncIdleMessage())
+    : "当前环境不支持自动同步，请继续使用导入/导出备份。";
+}
+
+function persistFileSyncMeta() {
+  try {
+    localStorage.setItem(FILE_SYNC_META_KEY, JSON.stringify({
+      enabled: !!state.ui.fileSync.enabled,
+      fileName: safeString(state.ui.fileSync.fileName),
+      lastSyncedAt: Number(state.ui.fileSync.lastSyncedAt) || 0,
+    }));
+  } catch (_error) {
+    // ignore metadata persistence failures; main app storage already handles read-only mode separately
+  }
+}
+
+function setFileSyncState(patch, options) {
+  const next = patch && typeof patch === "object" ? patch : {};
+  const settings = options && typeof options === "object" ? options : {};
+  Object.assign(state.ui.fileSync, next);
+  if (settings.persist !== false) {
+    persistFileSyncMeta();
+  }
+  if (settings.render !== false && typeof renderDataSyncStatus === "function") {
+    renderDataSyncStatus();
+  }
+}
+
+function formatFileSyncTime(timestamp) {
+  if (!Number.isFinite(Number(timestamp)) || Number(timestamp) <= 0) return "尚未同步";
+  const diff = Date.now() - Number(timestamp);
+  if (diff < 60000) return "刚刚";
+  if (diff < 3600000) return `${Math.max(1, Math.round(diff / 60000))} 分钟前`;
+  if (diff < 86400000) return `${Math.max(1, Math.round(diff / 3600000))} 小时前`;
+  return new Date(Number(timestamp)).toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function openFileSyncDb() {
+  if (!window.indexedDB) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    try {
+      const request = window.indexedDB.open(FILE_SYNC_DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(FILE_SYNC_STORE_NAME)) {
+          db.createObjectStore(FILE_SYNC_STORE_NAME);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    } catch (_error) {
+      resolve(null);
+    }
+  });
+}
+
+async function saveStoredFileHandle(handle) {
+  const db = await openFileSyncDb();
+  if (!db) return false;
+  return new Promise((resolve) => {
+    const tx = db.transaction(FILE_SYNC_STORE_NAME, "readwrite");
+    tx.objectStore(FILE_SYNC_STORE_NAME).put(handle, FILE_SYNC_HANDLE_KEY);
+    tx.oncomplete = () => {
+      db.close();
+      resolve(true);
+    };
+    tx.onerror = () => {
+      db.close();
+      resolve(false);
+    };
+  });
+}
+
+async function loadStoredFileHandle() {
+  const db = await openFileSyncDb();
+  if (!db) return null;
+  return new Promise((resolve) => {
+    const tx = db.transaction(FILE_SYNC_STORE_NAME, "readonly");
+    const request = tx.objectStore(FILE_SYNC_STORE_NAME).get(FILE_SYNC_HANDLE_KEY);
+    request.onsuccess = () => {
+      db.close();
+      resolve(request.result || null);
+    };
+    request.onerror = () => {
+      db.close();
+      resolve(null);
+    };
+  });
+}
+
+async function clearStoredFileHandle() {
+  const db = await openFileSyncDb();
+  if (!db) return false;
+  return new Promise((resolve) => {
+    const tx = db.transaction(FILE_SYNC_STORE_NAME, "readwrite");
+    tx.objectStore(FILE_SYNC_STORE_NAME).delete(FILE_SYNC_HANDLE_KEY);
+    tx.oncomplete = () => {
+      db.close();
+      resolve(true);
+    };
+    tx.onerror = () => {
+      db.close();
+      resolve(false);
+    };
+  });
+}
+
+async function ensureFileSyncPermission(handle, interactive) {
+  return ensureFileHandlePermission(handle, interactive, "readwrite");
+}
+
+async function ensureFileHandlePermission(handle, interactive, mode) {
+  if (!handle) return false;
+  try {
+    if (typeof handle.queryPermission === "function") {
+      const current = await handle.queryPermission({ mode });
+      if (current === "granted") return true;
+      if (!interactive) return false;
+    }
+    if (interactive && typeof handle.requestPermission === "function") {
+      const next = await handle.requestPermission({ mode });
+      return next === "granted";
+    }
+    return interactive;
+  } catch (_error) {
     return false;
   }
+}
+
+async function readTextFromFileHandle(handle, interactive) {
+  if (!handle) return null;
+  const allowed = await ensureFileHandlePermission(handle, interactive, "read");
+  if (!allowed) return null;
+  try {
+    const file = await handle.getFile();
+    return await file.text();
+  } catch (_error) {
+    return null;
+  }
+}
+
+async function loadDbFromBoundFile(options) {
+  const settings = options && typeof options === "object" ? options : {};
+  const interactive = !!settings.interactive;
+  const showSuccess = !!settings.showSuccess;
+  const closeAfterSuccess = !!settings.closeAfterSuccess;
+  const sync = state.ui.fileSync;
+  if (!sync.handle) {
+    if (interactive) {
+      toast("未绑定文件", "请先绑定本地 JSON 文件。", true);
+    }
+    return false;
+  }
+
+  const fileName = sync.fileName || sync.handle.name || FILE_SYNC_SUGGESTED_NAME;
+  setFileSyncState({
+    enabled: true,
+    fileName,
+    status: "syncing",
+    message: `正在读取 ${fileName}...`,
+  });
+
+  const text = await readTextFromFileHandle(sync.handle, interactive);
+  if (text === null) {
+    setFileSyncState({
+      enabled: true,
+      fileName,
+      status: interactive ? "error" : "permission",
+      message: interactive
+        ? `读取 ${fileName} 失败，请检查权限后重试。`
+        : `已绑定 ${fileName}，需要重新授权后才能读取文件。`,
+    });
+    if (interactive) {
+      toast("读取失败", "无法读取本地同步文件，请检查权限。", true);
+    }
+    return false;
+  }
+
+  const normalizedText = typeof text === "string" ? text.replace(/^\uFEFF/, "").trim() : "";
+  if (!normalizedText) {
+    setFileSyncState({
+      enabled: true,
+      fileName,
+      status: "idle",
+      message: `已绑定 ${fileName}，文件为空，可先从浏览器写入。`,
+    });
+    if (interactive) {
+      toast("文件为空", `已绑定 ${fileName}，可点击“浏览器 -> 本地文件”初始化数据。`, true);
+    }
+    return false;
+  }
+
+  let parsed = null;
+  try {
+    parsed = JSON.parse(normalizedText);
+  } catch (_error) {
+    setFileSyncState({
+      enabled: true,
+      fileName,
+      status: "error",
+      message: `${fileName} 不是合法的 JSON 文件。`,
+    });
+    if (interactive) {
+      toast("同步失败", "本地文件不是合法的 JSON。", true);
+    }
+    return false;
+  }
+
+  const normalized = validateAndNormalize(parsed);
+  state.db = normalized;
+  updateFileSyncSnapshot(normalized);
+  setFileSyncState({
+    enabled: true,
+    fileName,
+    status: "success",
+    message: `已绑定 ${fileName}，当前浏览器数据已与文件一致。`,
+  });
+  renderAll();
+  if (closeAfterSuccess) {
+    closeHashModal();
+  }
+  if (showSuccess) {
+    toast("已从本地同步", `已读取 ${fileName}`);
+  }
+  return true;
+}
+
+async function chooseLocalFileHandle() {
+  const pickerOptions = {
+    excludeAcceptAllOption: false,
+    multiple: false,
+    types: [
+      {
+        description: "JSON Files",
+        accept: { "application/json": [".json"] },
+      },
+    ],
+  };
+
+  if (typeof window.showOpenFilePicker === "function") {
+    const handles = await window.showOpenFilePicker(pickerOptions);
+    return Array.isArray(handles) ? handles[0] || null : null;
+  }
+
+  if (typeof window.showSaveFilePicker === "function") {
+    return window.showSaveFilePicker({
+      suggestedName: state.ui.fileSync.fileName || FILE_SYNC_SUGGESTED_NAME,
+      types: pickerOptions.types,
+    });
+  }
+
+  return null;
+}
+
+async function writeDbToBoundFile(options) {
+  const settings = options && typeof options === "object" ? options : {};
+  const interactive = !!settings.interactive;
+  const showSuccess = !!settings.showSuccess;
+  const sync = state.ui.fileSync;
+  if (!sync.supported || !sync.handle) {
+    if (interactive) toast("未绑定文件", "请先绑定本地 JSON 文件。", true);
+    return false;
+  }
+
+  const fileName = sync.fileName || sync.handle.name || FILE_SYNC_SUGGESTED_NAME;
+  const allowed = await ensureFileSyncPermission(sync.handle, interactive);
+  if (!allowed) {
+    setFileSyncState({
+      status: "permission",
+      message: `已绑定 ${fileName}，需要重新授权后才能继续同步。`,
+    });
+    if (interactive) {
+      toast("需要授权", "请允许写入本地文件后再同步。", true);
+    }
+    return false;
+  }
+
+  setFileSyncState({
+    enabled: true,
+    fileName,
+    status: "syncing",
+    message: `正在同步到 ${fileName}...`,
+  });
+
+  try {
+    const writable = await sync.handle.createWritable();
+    await writable.write(JSON.stringify(state.db, null, 2));
+    await writable.close();
+    const now = Date.now();
+    setFileSyncState({
+      enabled: true,
+      fileName,
+      lastSyncedAt: now,
+      status: "success",
+      message: `已绑定 ${fileName}，上次同步：${formatFileSyncTime(now)}`,
+    });
+    updateFileSyncSnapshot(state.db);
+    if (showSuccess) {
+      toast("已同步", `已写入 ${fileName}`);
+    }
+    return true;
+  } catch (_error) {
+    setFileSyncState({
+      enabled: true,
+      fileName,
+      status: "error",
+      message: `同步失败，请检查 ${fileName} 的写入权限后重试。`,
+    });
+    if (interactive) {
+      toast("同步失败", "写入本地文件失败，请重新绑定或检查权限。", true);
+    }
+    return false;
+  }
+}
+
+function queueFileSync(options) {
+  const run = () => writeDbToBoundFile(options);
+  state.ui.fileSync.writeChain = Promise.resolve(state.ui.fileSync.writeChain).then(run, run);
+  return state.ui.fileSync.writeChain;
+}
+
+function scheduleAutoFileSync() {
+  const sync = state.ui.fileSync;
+  if (!sync.supported || !sync.enabled || !sync.handle) return;
+  void queueFileSync({ interactive: false, showSuccess: false });
+}
+
+async function bindLocalFileSync() {
+  if (!supportsLocalFileSync()) {
+    setFileSyncState({
+      supported: false,
+      status: "unsupported",
+      message: "当前环境不支持文件同步，请改用支持文件选择器的浏览器。",
+    });
+    toast("当前环境不支持", "当前浏览器不支持绑定本地文件。", true);
+    return false;
+  }
+
+  try {
+    const handle = await chooseLocalFileHandle();
+    if (!handle) return false;
+    await saveStoredFileHandle(handle);
+    const fileName = safeString(handle.name) || FILE_SYNC_SUGGESTED_NAME;
+    setFileSyncState({
+      supported: true,
+      enabled: true,
+      handle,
+      fileName,
+    });
+    const text = await readTextFromFileHandle(handle, true);
+    if (text === null) {
+      setFileSyncState({
+        enabled: true,
+        handle,
+        fileName,
+        status: "error",
+        message: `已绑定 ${fileName}，但暂时无法读取文件。`,
+      });
+      toast("绑定失败", `无法读取 ${fileName}。`, true);
+      return false;
+    }
+
+    const normalizedText = typeof text === "string" ? text.replace(/^\uFEFF/, "").trim() : "";
+    if (!normalizedText) {
+      return queueFileSync({ interactive: true, showSuccess: true });
+    }
+
+    try {
+      state.db = validateAndNormalize(JSON.parse(normalizedText));
+      updateFileSyncSnapshot(state.db);
+      setFileSyncState({
+        enabled: true,
+        handle,
+        fileName,
+        status: "success",
+        message: `已绑定 ${fileName}，当前浏览器数据已与文件一致。`,
+      });
+      renderAll();
+      toast("绑定成功", `已读取 ${fileName}`);
+      return true;
+    } catch (_error) {
+      setFileSyncState({
+        enabled: true,
+        handle,
+        fileName,
+        status: "error",
+        message: `${fileName} 不是合法的 JSON 文件，请先修复后再同步。`,
+      });
+      toast("文件内容无效", `已绑定 ${fileName}，但文件内容不是合法 JSON。`, true);
+      return false;
+    }
+  } catch (error) {
+    if (error && error.name === "AbortError") return false;
+    toast("绑定失败", "无法绑定本地文件，请稍后重试。", true);
+    return false;
+  }
+}
+
+async function restoreFileSyncHandle() {
+  const sync = state.ui.fileSync;
+  if (!sync.supported) {
+    renderDataSyncStatus();
+    return;
+  }
+  if (!sync.enabled) {
+    renderDataSyncStatus();
+    return;
+  }
+  const handle = await loadStoredFileHandle();
+  if (!handle) {
+    setFileSyncState({
+      enabled: false,
+      handle: null,
+      status: "idle",
+      message: fileSyncIdleMessage(),
+      fileName: "",
+      lastSyncedAt: 0,
+    });
+    return;
+  }
+  const fileName = sync.fileName || safeString(handle.name) || FILE_SYNC_SUGGESTED_NAME;
+  const allowed = await ensureFileHandlePermission(handle, false, "readwrite");
+  setFileSyncState({
+    enabled: true,
+    handle,
+    fileName,
+    status: allowed ? "success" : "permission",
+    message: allowed
+      ? `已绑定 ${fileName}，正在从文件恢复数据。`
+      : `已绑定 ${fileName}，点击同步面板中的操作按钮后可重新授权。`,
+  });
+  if (allowed) {
+    await loadDbFromBoundFile({ interactive: false, showSuccess: false });
+  }
+}
+
+async function disableLocalFileSync() {
+  await clearStoredFileHandle();
+  state.db = validateAndNormalize(defaultDb());
+  updateFileSyncSnapshot(state.db);
+  setFileSyncState({
+    enabled: false,
+    handle: null,
+    fileName: "",
+    lastSyncedAt: 0,
+    status: "idle",
+      message: fileSyncIdleMessage(),
+    });
+  renderAll();
+}
+
+function saveDb(options) {
+  const settings = options && typeof options === "object" ? options : {};
+  if (state.ui.readOnly) return false;
+  if (!state.ui.fileSync.handle) {
+    restoreDbFromSnapshot();
+    if (settings.showPrompt !== false) {
+      toast("请先绑定同步文件", "当前已停用浏览器缓存，绑定文件后才能保存改动。", true, {
+        label: "去绑定",
+        onClick: openDataSyncModal,
+      });
+    }
+    return false;
+  }
+  if (!settings.skipFileSync) {
+    scheduleAutoFileSync();
+  }
+  return true;
 }
 
 function safeReadStorage(key) {
@@ -415,6 +947,13 @@ function safeReadStorage(key) {
     return localStorage.getItem(key);
   } catch (_error) {
     return null;
+  }
+}
+
+function clearLegacyDbCache() {
+  try {
+    localStorage.removeItem("workhub.db");
+  } catch (_error) {
   }
 }
 
@@ -452,6 +991,7 @@ function toast(title, message, isError, action) {
   }
   els.toast.style.display = "flex";
   els.toast.style.opacity = isError ? "1" : "0.98";
+  els.toast.setAttribute("aria-hidden", "false");
   if (state.ui.toastTimer) {
     window.clearTimeout(state.ui.toastTimer);
   }
@@ -461,6 +1001,7 @@ function toast(title, message, isError, action) {
       els.toastActionBtn.onclick = null;
     }
     els.toast.style.display = "none";
+    els.toast.setAttribute("aria-hidden", "true");
   }, action ? 4200 : 2200);
 }
 

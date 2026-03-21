@@ -31,10 +31,15 @@ function syncModalWithHash() {
   }
   if (window.location.hash === "#modal-engine") {
     fillEngineModal();
+    return;
+  }
+  if (window.location.hash === "#modal-data-sync") {
+    renderDataSyncStatus();
   }
 }
 
 function fillLinkModal() {
+  const locked = isPersistenceLocked();
   renderCategoryOptions();
   const defaultCategoryId = state.db.activeCategoryId === ALL_CATEGORY_ID
     ? ((sortedCategories()[0] && sortedCategories()[0].id) || "")
@@ -53,9 +58,15 @@ function fillLinkModal() {
     if (els.linkNoteInput) els.linkNoteInput.value = "";
     if (els.linkCategorySelect) els.linkCategorySelect.value = defaultCategoryId;
   }
+  if (els.linkTitleInput) els.linkTitleInput.disabled = locked;
+  if (els.linkUrlInput) els.linkUrlInput.disabled = locked;
+  if (els.linkNoteInput) els.linkNoteInput.disabled = locked;
+  if (els.linkCategorySelect) els.linkCategorySelect.disabled = locked;
+  setControlDisabled(els.linkSaveBtn, locked, "请先绑定同步文件后再保存链接");
 }
 
 function fillCategoryModal() {
+  const locked = isPersistenceLocked();
   const editing = state.ui.editingCategoryId ? getCategoryById(state.ui.editingCategoryId) : null;
   const active = getCategoryById(state.db.activeCategoryId);
   const source = editing || active;
@@ -72,7 +83,17 @@ function fillCategoryModal() {
   }
   if (els.categoryConfirmBtn) {
     els.categoryConfirmBtn.textContent = editing ? "保存修改" : "确认";
+    els.categoryConfirmBtn.title = editing ? "保存分类修改" : "确认新增分类";
   }
+  if (els.categoryNameInput) els.categoryNameInput.disabled = locked;
+  if (els.categoryColorSelect) els.categoryColorSelect.disabled = locked;
+  if (els.categoryColorPalette) {
+    els.categoryColorPalette.querySelectorAll(".color-swatch[data-color]").forEach((chip) => {
+      chip.disabled = locked;
+      chip.classList.toggle("is-disabled", locked);
+    });
+  }
+  setControlDisabled(els.categoryConfirmBtn, locked, "请先绑定同步文件后再保存分类");
 }
 
 function syncColorPalette(selectedColor) {
@@ -92,6 +113,7 @@ function fillCategoryDeleteDialog() {
   const affected = state.db.links.filter((item) => item.categoryId === targetId).length;
   if (els.dangerCategoryName) els.dangerCategoryName.textContent = cat.name;
   if (els.dangerCategoryCount) els.dangerCategoryCount.textContent = String(affected);
+  setControlDisabled(els.categoryDeleteConfirmBtn, isPersistenceLocked(), "请先绑定同步文件后再删除分类");
 }
 
 function fillLinkDeleteDialog() {
@@ -100,9 +122,11 @@ function fillLinkDeleteDialog() {
   if (els.dangerLinkName) {
     els.dangerLinkName.textContent = link.title;
   }
+  setControlDisabled(els.linkDeleteConfirmBtn, isPersistenceLocked(), "请先绑定同步文件后再删除链接");
 }
 
 function fillTodoModal() {
+  const locked = isPersistenceLocked();
   const editing = state.ui.editingTodoId ? getTodoById(state.ui.editingTodoId) : null;
 
   if (editing) {
@@ -111,7 +135,13 @@ function fillTodoModal() {
     if (els.todoDateInput) els.todoDateInput.value = editing.date || "";
     if (els.todoPrioritySelect) els.todoPrioritySelect.value = editing.priority || "medium";
     if (els.todoSceneSelect) els.todoSceneSelect.value = editing.scene || "other";
+    if (els.todoSaveBtn) els.todoSaveBtn.title = "保存待办修改";
     syncPrioritySelectStyles();
+    if (els.todoTitleInput) els.todoTitleInput.disabled = locked;
+    if (els.todoDateInput) els.todoDateInput.disabled = locked;
+    if (els.todoPrioritySelect) els.todoPrioritySelect.disabled = locked;
+    if (els.todoSceneSelect) els.todoSceneSelect.disabled = locked;
+    setControlDisabled(els.todoSaveBtn, locked, "请先绑定同步文件后再保存待办");
     return;
   }
 
@@ -120,34 +150,56 @@ function fillTodoModal() {
   if (els.todoDateInput) els.todoDateInput.value = safeString(els.todoQuickDate && els.todoQuickDate.value) || safeString(state.db.plan.selectedDate);
   if (els.todoPrioritySelect) els.todoPrioritySelect.value = safeString(els.todoQuickPriority && els.todoQuickPriority.value) || "medium";
   if (els.todoSceneSelect) els.todoSceneSelect.value = "work";
+  if (els.todoSaveBtn) els.todoSaveBtn.title = "保存待办内容";
   syncPrioritySelectStyles();
+  if (els.todoTitleInput) els.todoTitleInput.disabled = locked;
+  if (els.todoDateInput) els.todoDateInput.disabled = locked;
+  if (els.todoPrioritySelect) els.todoPrioritySelect.disabled = locked;
+  if (els.todoSceneSelect) els.todoSceneSelect.disabled = locked;
+  setControlDisabled(els.todoSaveBtn, locked, "请先绑定同步文件后再保存待办");
 }
 
 function fillTodoDeleteDialog() {
   const todo = state.ui.deletingTodoId ? getTodoById(state.ui.deletingTodoId) : null;
   if (!todo) return;
   if (els.dangerTodoName) els.dangerTodoName.textContent = todo.title;
+  setControlDisabled(els.todoDeleteConfirmBtn, isPersistenceLocked(), "请先绑定同步文件后再删除待办");
 }
 
 function fillHolidayModal() {
+  const locked = isPersistenceLocked();
   if (els.holidayNameInput) els.holidayNameInput.value = "";
   if (els.holidayStartInput) els.holidayStartInput.value = "";
   if (els.holidayEndInput) els.holidayEndInput.value = "";
+  if (els.holidayNameInput) els.holidayNameInput.disabled = locked;
+  if (els.holidayStartInput) els.holidayStartInput.disabled = locked;
+  if (els.holidayEndInput) els.holidayEndInput.disabled = locked;
+  setControlDisabled(els.holidayAddBtn, locked, "请先绑定同步文件后再管理假日");
   renderHolidayList();
 }
 
 function fillEngineModal() {
+  const locked = isPersistenceLocked();
   if (els.engineNameInput) els.engineNameInput.value = "";
   if (els.engineSearchInput) els.engineSearchInput.value = "";
   if (els.engineHomeInput) els.engineHomeInput.value = "";
+  if (els.engineNameInput) els.engineNameInput.disabled = locked;
+  if (els.engineSearchInput) els.engineSearchInput.disabled = locked;
+  if (els.engineHomeInput) els.engineHomeInput.disabled = locked;
   if (els.engineCustomPanel) {
     els.engineCustomPanel.hidden = true;
   }
+  setControlDisabled(els.engineOpenCustomFormBtn, locked, "请先绑定同步文件后再管理搜索引擎");
+  setControlDisabled(els.engineSelectAllBtn, locked, "请先绑定同步文件后再管理搜索引擎");
+  setControlDisabled(els.engineSelectNoneBtn, locked, "请先绑定同步文件后再管理搜索引擎");
+  setControlDisabled(els.engineAddBtn, locked, "请先绑定同步文件后再保存搜索引擎");
+  setControlDisabled(els.engineCustomAddBtn, locked, "请先绑定同步文件后再新增搜索引擎");
   renderEnginePresetList();
 }
 
 function renderEnginePresetList(overrideSelectedIds) {
   if (!els.enginePresetList) return;
+  const locked = isPersistenceLocked();
   const activeIds = overrideSelectedIds instanceof Set
     ? overrideSelectedIds
     : new Set((state.db.settings.engines || []).map((item) => item.id));
@@ -158,9 +210,9 @@ function renderEnginePresetList(overrideSelectedIds) {
   const unselected = ordered.filter((item) => !activeIds.has(item.id));
   const list = [...selected, ...unselected];
   els.enginePresetList.innerHTML = `<div class="engine-preset-grid">${list.map((engine) => `
-    <label class="engine-preset-item" draggable="true" data-engine-preset-id="${escAttr(engine.id)}">
+    <label class="engine-preset-item ${locked ? "is-disabled" : ""}" draggable="${locked ? "false" : "true"}" data-engine-preset-id="${escAttr(engine.id)}">
       <div class="engine-option">
-        <input type="checkbox" class="todo-cb" data-engine-preset-id="${escAttr(engine.id)}" ${activeIds.has(engine.id) ? "checked" : ""} />
+        <input type="checkbox" class="todo-cb" data-engine-preset-id="${escAttr(engine.id)}" ${activeIds.has(engine.id) ? "checked" : ""} ${locked ? 'disabled aria-disabled="true"' : ""} />
         <img class="fav" src="${escAttr(iconPlaceholder())}" data-engine-option-id="${escAttr(engine.id)}" alt="" decoding="async" referrerpolicy="no-referrer" />
         <div class="engine-option-name">${escHtml(engine.name)}</div>
       </div>
@@ -192,6 +244,73 @@ function renderAll() {
   renderCategories();
   renderLinks();
   renderPlanPanel();
+  renderDataSyncStatus();
+}
+
+function renderDataSyncStatus() {
+  if (!els.localFileSyncStatus) return;
+  const sync = state.ui.fileSync;
+  let text = fileSyncIdleMessage();
+  let tone = "default";
+
+  if (!sync.supported) {
+    text = "当前环境不支持绑定本地文件，无法启用文件直写模式。";
+    tone = "error";
+  } else if (sync.status === "syncing") {
+    text = sync.message || "正在与本地文件同步...";
+    tone = "info";
+  } else if (sync.status === "permission") {
+    text = sync.message || "已绑定本地文件，需要重新授权后才能继续同步。";
+    tone = "info";
+  } else if (sync.status === "error") {
+    text = sync.message || "同步失败，请重新绑定本地文件。";
+    tone = "error";
+  } else if (sync.enabled && sync.fileName) {
+    text = sync.message || `已绑定 ${sync.fileName}，上次同步：${formatFileSyncTime(sync.lastSyncedAt)}`;
+    tone = "success";
+  }
+
+  els.localFileSyncStatus.dataset.tone = tone;
+  els.localFileSyncStatus.textContent = text;
+
+  if (els.localFileBindBtn) {
+    els.localFileBindBtn.disabled = !sync.supported || sync.status === "syncing";
+    els.localFileBindBtn.textContent = sync.enabled ? "重新绑定文件" : "绑定本地文件";
+  }
+  if (els.localFilePullBtn) {
+    els.localFilePullBtn.disabled = !sync.supported || !sync.handle || sync.status === "syncing";
+  }
+  if (els.localFileSyncBtn) {
+    els.localFileSyncBtn.disabled = !sync.supported || !sync.handle || sync.status === "syncing";
+    els.localFileSyncBtn.textContent = sync.status === "syncing" ? "同步中..." : "浏览器 -> 本地文件";
+  }
+  if (els.localFileUnbindBtn) {
+    els.localFileUnbindBtn.disabled = !sync.handle || sync.status === "syncing";
+  }
+}
+
+function isPersistenceLocked() {
+  return !state.ui.fileSync.handle;
+}
+
+function setControlDisabled(node, disabled, disabledTitle) {
+  if (!node) return;
+  const nextDisabled = !!disabled;
+  if (node.dataset.defaultTitle === undefined) {
+    node.dataset.defaultTitle = node.getAttribute("title") || "";
+  }
+  if ("disabled" in node) {
+    node.disabled = nextDisabled;
+  }
+  node.classList.toggle("is-disabled", nextDisabled);
+  node.setAttribute("aria-disabled", nextDisabled ? "true" : "false");
+  node.tabIndex = nextDisabled ? -1 : 0;
+  const title = nextDisabled ? (disabledTitle || node.dataset.defaultTitle || "") : (node.dataset.defaultTitle || "");
+  if (title) {
+    node.setAttribute("title", title);
+  } else {
+    node.removeAttribute("title");
+  }
 }
 
 function renderMotto() {
@@ -205,10 +324,13 @@ function renderMotto() {
 }
 
 function renderHeader() {
+  const locked = isPersistenceLocked();
   if (els.modeManage && els.modeBrowse) {
     const mode = state.db.settings.ui.mode === "manage" ? "manage" : "browse";
     els.modeManage.checked = mode === "manage";
     els.modeBrowse.checked = mode !== "manage";
+    els.modeManage.disabled = locked;
+    els.modeBrowse.disabled = locked;
   }
 
   renderEngineTabs();
@@ -227,6 +349,12 @@ function renderHeader() {
       ? `${currentCategory.name} · 常用链接`
       : "全部 · 常用链接";
   }
+
+  setControlDisabled(document.getElementById("open-engine-modal"), locked, "请先绑定同步文件后再管理搜索引擎");
+  setControlDisabled(els.openLinkModal, locked, "请先绑定同步文件后再新增链接");
+  setControlDisabled(els.openCategoryManage, locked, "请先绑定同步文件后再管理分类");
+  setControlDisabled(els.openCategoryDelete, locked, "请先绑定同步文件后再删除分类");
+  setControlDisabled(document.getElementById("open-holidays-modal-hero"), locked, "请先绑定同步文件后再管理假日");
 }
 
 function renderEngineTabs() {
@@ -258,6 +386,7 @@ function renderEngineTabs() {
 
 function renderCategories() {
   if (!els.cats) return;
+  const locked = isPersistenceLocked();
   const counts = new Map();
   state.db.links.forEach((link) => {
     counts.set(link.categoryId, (counts.get(link.categoryId) || 0) + 1);
@@ -268,7 +397,7 @@ function renderCategories() {
   const allActive = allMode;
   const allItemHtml = `
     <div class="cat" data-cat-id="${ALL_CATEGORY_ID}" data-color="aqua" aria-current="${allActive ? "true" : "false"}">
-      <button type="button" class="cat-main" data-cat-id="${ALL_CATEGORY_ID}" aria-label="切换到全部分类">
+      <button type="button" class="cat-main ${locked ? "is-disabled" : ""}" data-cat-id="${ALL_CATEGORY_ID}" aria-label="切换到全部分类" ${locked ? 'disabled aria-disabled="true" title="请先绑定同步文件后再切换分类"' : ""}>
         <div class="cat-label">
           <div class="name">
             <strong>全部</strong>
@@ -286,8 +415,8 @@ function renderCategories() {
       const active = cat.id === state.db.activeCategoryId;
       const count = counts.get(cat.id) || 0;
       return `
-        <div class="cat" data-cat-id="${escAttr(cat.id)}" data-color="${escAttr(cat.colorToken)}" draggable="true" aria-current="${active ? "true" : "false"}">
-          <button type="button" class="cat-main" data-cat-id="${escAttr(cat.id)}" aria-label="切换到分类 ${escAttr(cat.name)}">
+        <div class="cat" data-cat-id="${escAttr(cat.id)}" data-color="${escAttr(cat.colorToken)}" draggable="${locked ? "false" : "true"}" aria-current="${active ? "true" : "false"}">
+          <button type="button" class="cat-main ${locked ? "is-disabled" : ""}" data-cat-id="${escAttr(cat.id)}" aria-label="切换到分类 ${escAttr(cat.name)}" ${locked ? 'disabled aria-disabled="true" title="请先绑定同步文件后再切换分类"' : ""}>
             <div class="cat-label">
               <div class="name">
                 <strong>${escHtml(cat.name)}</strong>
@@ -297,7 +426,7 @@ function renderCategories() {
               <span class="count has-edit">${count}</span>
             </div>
           </button>
-          <a class="cat-edit" href="#modal-category" title="编辑分类" aria-label="编辑分类 ${escAttr(cat.name)}" data-action="edit-category" data-cat-id="${escAttr(cat.id)}">
+          <a class="cat-edit ${locked ? "is-disabled" : ""}" href="#modal-category" title="${locked ? "请先绑定同步文件后再编辑分类" : "编辑分类"}" aria-label="编辑分类" data-action="edit-category" data-cat-id="${escAttr(cat.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M5 19.2h3.2L18 9.4l-3.2-3.2L5 16v3.2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
               <path d="M13.8 6.2 17 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
@@ -399,6 +528,13 @@ function renderPlanPanel() {
   renderCountdown();
   renderCalendar();
   renderTodos();
+  const locked = isPersistenceLocked();
+  Array.from(document.querySelectorAll("[data-action='cal-prev'], [data-action='cal-next'], [data-action='cal-today'], [data-action='todo-view-week'], [data-action='todo-view-month'], [data-action='todo-scene-filter']"))
+    .forEach((node) => setControlDisabled(node, locked, "请先绑定同步文件后再修改待办视图"));
+  if (els.todoQuickTitle) els.todoQuickTitle.disabled = locked;
+  if (els.todoQuickDate) els.todoQuickDate.disabled = locked;
+  if (els.todoQuickPriority) els.todoQuickPriority.disabled = locked;
+  setControlDisabled(document.querySelector("#todo-quick-form .todoquick-submit"), locked, "请先绑定同步文件后再新增待办");
 }
 
 function renderEngineIcons() {
@@ -500,7 +636,7 @@ async function ensureAutoHolidays() {
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
     state.db.plan.holidays = normalized;
     state.db.plan.workdays = [...new Set(workdays.map((item) => safeString(item)).filter((item) => Boolean(parseYmd(item))))].sort();
-    saveDb();
+    saveDb({ showPrompt: false });
     state.ui.holidayAutoStatus = normalized.length ? "ok" : "error";
     renderPlanPanel();
   } catch (_error) {
@@ -608,6 +744,7 @@ function isNextYmd(prevYmd, nextYmd) {
 
 function renderCalendar() {
   if (!els.calendarGrid || !els.calendarMonthTitle) return;
+  const locked = isPersistenceLocked();
   const selected = parseYmd(state.db.plan.selectedDate);
   const monthDate = parseYm(state.db.plan.calendarMonth) || new Date();
   const year = monthDate.getFullYear();
@@ -637,17 +774,20 @@ function renderCalendar() {
     const holiday = marker && marker.restLabel
       ? `<span class="holiday-flag ${marker.restKind === "weekend" ? "weekend" : "holiday"}" aria-hidden="true" title="${escAttr(marker.holidayName || "周末休息")}">${escHtml(marker.restLabel)}</span>`
       : "";
-    days.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" role="gridcell" title="${escAttr(buildCalendarDayTitle(key, marker))}"><span class="calday-num">${current.getDate()}</span>${dot}${holiday}</button>`);
+    days.push(`<button type="button" class="${classes.join(" ")} ${locked ? "is-disabled" : ""}" data-date="${key}" role="gridcell" title="${escAttr(locked ? "请先绑定同步文件后再切换日期" : buildCalendarDayTitle(key, marker))}" ${locked ? 'disabled aria-disabled="true"' : ""}><span class="calday-num">${current.getDate()}</span>${dot}${holiday}</button>`);
   }
   els.calendarGrid.innerHTML = headers.concat(days).join("");
 }
 
 function renderTodos() {
   if (!els.todoGroups) return;
+  const locked = isPersistenceLocked();
   const view = state.db.plan && state.db.plan.todoView === "month" ? "month" : "week";
 
   if (els.todoViewWeekBtn) els.todoViewWeekBtn.setAttribute("aria-selected", view === "week" ? "true" : "false");
   if (els.todoViewMonthBtn) els.todoViewMonthBtn.setAttribute("aria-selected", view === "month" ? "true" : "false");
+  setControlDisabled(els.todoViewWeekBtn, locked, "请先绑定同步文件后再切换待办视图");
+  setControlDisabled(els.todoViewMonthBtn, locked, "请先绑定同步文件后再切换待办视图");
   syncPrioritySelectStyles();
 
   const selected = parseYmd(state.db.plan.selectedDate);
@@ -700,14 +840,15 @@ function renderTodos() {
 }
 
 function renderTodoItem(todo, index) {
+  const locked = isPersistenceLocked();
   const delay = Math.min(index * 28, 180);
   const dateBadge = todo.date ? formatTodoDateBadge(todo.date) : { label: "稍后安排", tone: "later", title: "未指定日期" };
   const dateMeta = todo.date
-    ? `<button type="button" class="todo-date-link" data-tone="${escAttr(dateBadge.tone)}" data-action="select-todo-date" data-date="${escAttr(todo.date)}" title="${escAttr(dateBadge.title)}">${escHtml(dateBadge.label)}</button>`
+    ? `<button type="button" class="todo-date-link ${locked ? "is-disabled" : ""}" data-tone="${escAttr(dateBadge.tone)}" data-action="select-todo-date" data-date="${escAttr(todo.date)}" title="${escAttr(locked ? "请先绑定同步文件后再切换待办日期" : dateBadge.title)}" ${locked ? 'disabled aria-disabled="true"' : ""}>${escHtml(dateBadge.label)}</button>`
     : `<span class="todo-date-link" data-tone="${escAttr(dateBadge.tone)}">${escHtml(dateBadge.label)}</span>`;
   return `
     <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
-      <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} />
+      <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} ${locked ? 'disabled aria-disabled="true"' : ""} />
       <div class="todo-main">
         <div class="todo-title-row">
           <div class="todo-t" title="${escAttr(todo.title)}">${escHtml(todo.title)}</div>
@@ -718,14 +859,14 @@ function renderTodoItem(todo, index) {
         </div>
       </div>
       <div class="todo-item-actions">
-        <a class="iconbtn sm ghost todo-actbtn" href="#modal-todo" title="编辑" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}">
+        <a class="iconbtn sm ghost todo-actbtn ${locked ? "is-disabled" : ""}" href="#modal-todo" title="${locked ? "请先绑定同步文件后再编辑待办" : "编辑待办"}" aria-label="编辑待办" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
           <span class="sr">编辑</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
             <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </a>
-        <a class="iconbtn sm ghost todo-actbtn danger" href="#modal-todo-delete" title="删除" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}">
+        <a class="iconbtn sm ghost todo-actbtn danger ${locked ? "is-disabled" : ""}" href="#modal-todo-delete" title="${locked ? "请先绑定同步文件后再删除待办" : "删除待办"}" aria-label="删除待办" data-action="delete-todo" data-todo-id="${escAttr(todo.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
           <span class="sr">删除</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -812,14 +953,14 @@ function buildCalendarMarkers() {
 }
 
 function buildCalendarDayTitle(dateKey, marker) {
-  const parts = [dateKey];
-  if (marker && marker.holidayName) parts.push(marker.holidayName);
-  if (marker && marker.restKind === "weekend") parts.push("周末休息");
+  const parts = [formatDateTitle(dateKey)];
+  if (marker && marker.holidayName) parts.push(`假期：${marker.holidayName}`);
+  if (marker && marker.restKind === "weekend") parts.push("休息日：周末");
   if (marker && marker.tone) {
     const badge = formatTodoDateBadge(dateKey);
-    if (badge && badge.title) parts.push(badge.title);
+    if (badge && badge.detail) parts.push(badge.detail);
   }
-  return parts.join(" · ");
+  return parts.join(" | ");
 }
 
 function isWeekendRestDay(date, dateKey) {
@@ -859,10 +1000,11 @@ function priorityLabel(priority) {
 }
 
 function renderLinkCard(link) {
+  const locked = isPersistenceLocked();
   const iconUrls = resolveIconCandidates(link.url);
   const iconFallback = siteIconFallback(link.url, link.title);
   const secondaryText = link.note ? link.note : link.url;
-  const draggable = isManageMode() ? "true" : "false";
+  const draggable = !locked && isManageMode() ? "true" : "false";
   return `
     <article class="card linkcard" role="listitem" data-link-id="${escAttr(link.id)}" data-category-id="${escAttr(link.categoryId)}" draggable="${draggable}" title="${escAttr(`${link.title} — ${link.url}`)}">
       <div class="t">
@@ -874,14 +1016,14 @@ function renderLinkCard(link) {
           <div class="u">${escHtml(secondaryText)}</div>
         </div>
         <div class="acts" aria-label="管理操作">
-          <a class="toolbtn sm" href="#modal-link" title="编辑" data-action="edit-link" data-link-id="${escAttr(link.id)}">
+          <a class="toolbtn sm ${locked ? "is-disabled" : ""}" href="#modal-link" title="${locked ? "请先绑定同步文件后再编辑链接" : "编辑链接"}" aria-label="编辑链接" data-action="edit-link" data-link-id="${escAttr(link.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
             <span class="sr">编辑</span>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="#0c1b1d" stroke-width="1.8" stroke-linejoin="round" />
               <path d="M13 6l4 4" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </a>
-          <a class="toolbtn sm ghost danger" href="#modal-delete" title="删除" data-action="delete-link" data-link-id="${escAttr(link.id)}">
+          <a class="toolbtn sm ghost danger ${locked ? "is-disabled" : ""}" href="#modal-delete" title="${locked ? "请先绑定同步文件后再删除链接" : "删除链接"}" aria-label="删除链接" data-action="delete-link" data-link-id="${escAttr(link.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
             <span class="sr">删除</span>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6.5 8h11" stroke="#0c1b1d" stroke-width="1.8" stroke-linecap="round" />
@@ -990,6 +1132,10 @@ function onGridDragEnd(_event) {
 }
 
 function persistOrderFromContainer(container) {
+  if (!requireBoundFile("调整链接顺序")) {
+    renderAll();
+    return;
+  }
   const cards = Array.from(container.querySelectorAll(".linkcard[data-link-id]"));
   if (!cards.length) return;
   const now = Date.now();
@@ -1007,6 +1153,10 @@ function persistOrderFromContainer(container) {
 
 function persistAllModeLinkOrder() {
   if (!els.grid) return;
+  if (!requireBoundFile("调整链接顺序")) {
+    renderAll();
+    return;
+  }
   const groups = Array.from(els.grid.querySelectorAll(".all-group[data-category-id]"));
   if (!groups.length) return;
   const now = Date.now();
@@ -1094,6 +1244,10 @@ function onCategoryDragEnd(_event) {
   state.ui.draggingCategoryId = null;
   state.ui.categoryDragDirty = false;
   if (!dirty) return;
+  if (!requireBoundFile("调整分类顺序")) {
+    renderAll();
+    return;
+  }
 
   const ids = Array.from(els.cats.querySelectorAll(".cat[data-cat-id][draggable='true']"))
     .map((item) => safeString(item.getAttribute("data-cat-id")))

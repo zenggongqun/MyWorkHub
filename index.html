@@ -28,7 +28,7 @@
 
               <form class="search" action="#" method="get">
                 <div class="tabs" id="engine-tabs" role="tablist" aria-label="搜索引擎">
-                  <a id="open-engine-modal" class="iconbtn sm addbtn" href="#modal-engine" title="管理引擎">
+                  <a id="open-engine-modal" class="iconbtn sm addbtn" href="#modal-engine" title="管理搜索引擎">
                     <span class="sr">管理引擎</span>
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
@@ -55,7 +55,7 @@
                   <div class="row">
                     <div class="title">分类</div>
                     <div class="sidebar-actions">
-                      <a id="open-category-manage" class="toolbtn ghost" href="#modal-category" title="新增/重命名分类">
+                      <a id="open-category-manage" class="toolbtn ghost" href="#modal-category" title="管理分类">
                         <span class="sr">管理分类</span>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 6.75v10.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
@@ -122,28 +122,21 @@
                           <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
                         </svg>
                       </a>
-                      <a class="toolbtn ghost" href="#modal-data-import" title="导入">
-                        <span class="sr">导入</span>
+                      <a id="open-data-sync-modal" class="toolbtn ghost" href="#modal-data-sync" title="同步文件">
+                        <span class="sr">同步文件</span>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20V10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
-                          <path d="M15.5 13.5 12 10 8.5 13.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                          <path d="M6.5 5h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
-                        </svg>
-                      </a>
-                      <a id="data-export-direct-btn" class="toolbtn ghost" href="#" title="导出">
-                        <span class="sr">导出</span>
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 4v10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
-                          <path d="M8.5 10.5 12 14l3.5-3.5" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                          <path d="M6.5 19h11" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M7 8.5h10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M14.5 5 18 8.5 14.5 12" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M17 15.5H7" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
+                          <path d="M9.5 12 6 15.5 9.5 19" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </a>
 
                       <div class="modeToggle" aria-label="模式切换">
                         <input type="radio" name="mode" id="mode-browse" checked />
                         <input type="radio" name="mode" id="mode-manage" />
-                        <label for="mode-browse" title="纯展示">浏览</label>
-                        <label for="mode-manage" title="显示编辑/删除">管理</label>
+                        <label for="mode-browse" title="浏览模式（隐藏编辑操作）">浏览</label>
+                        <label for="mode-manage" title="管理模式（显示编辑和删除）">管理</label>
                       </div>
                     </div>
                   </div>
@@ -516,20 +509,20 @@
               <div class="field">
                 <label for="cc">分类颜色</label>
                 <div id="cc-palette" class="color-palette" role="radiogroup" aria-label="分类颜色调色盘">
-                  <button type="button" class="color-swatch" data-color="sky" aria-checked="true" title="sky"></button>
-                  <button type="button" class="color-swatch" data-color="mint" aria-checked="false" title="mint"></button>
-                  <button type="button" class="color-swatch" data-color="aqua" aria-checked="false" title="aqua"></button>
-                  <button type="button" class="color-swatch" data-color="coral" aria-checked="false" title="coral"></button>
-                  <button type="button" class="color-swatch" data-color="lemon" aria-checked="false" title="lemon"></button>
-                  <button type="button" class="color-swatch" data-color="lilac" aria-checked="false" title="lilac"></button>
-                  <button type="button" class="color-swatch" data-color="slate" aria-checked="false" title="slate"></button>
+                  <button type="button" class="color-swatch" data-color="sky" aria-checked="true" aria-label="天空蓝" title="天空蓝"></button>
+                  <button type="button" class="color-swatch" data-color="mint" aria-checked="false" aria-label="薄荷绿" title="薄荷绿"></button>
+                  <button type="button" class="color-swatch" data-color="aqua" aria-checked="false" aria-label="水青色" title="水青色"></button>
+                  <button type="button" class="color-swatch" data-color="coral" aria-checked="false" aria-label="珊瑚橙" title="珊瑚橙"></button>
+                  <button type="button" class="color-swatch" data-color="lemon" aria-checked="false" aria-label="柠檬黄" title="柠檬黄"></button>
+                  <button type="button" class="color-swatch" data-color="lilac" aria-checked="false" aria-label="淡紫色" title="淡紫色"></button>
+                  <button type="button" class="color-swatch" data-color="slate" aria-checked="false" aria-label="岩灰色" title="岩灰色"></button>
                 </div>
                 <input id="cc" type="hidden" value="sky" />
               </div>
             </div>
             <div class="ft">
               <a class="btn ghost" href="#">取消</a>
-              <a id="category-confirm-btn" class="btn" href="#" title="保存分类">确认</a>
+              <a id="category-confirm-btn" class="btn" href="#" title="确认分类设置">确认</a>
             </div>
           </div>
         </section>
@@ -560,11 +553,11 @@
           </div>
         </section>
 
-        <section id="modal-data-export" class="modal" aria-label="导出弹窗">
+        <section id="modal-data-sync" class="modal" aria-label="同步弹窗">
           <a class="overlay" href="#" aria-label="关闭"></a>
           <div class="sheet" role="dialog" aria-modal="true">
             <div class="hd">
-              <strong>导出（JSON）</strong>
+              <strong>同步文件</strong>
               <a class="iconbtn" href="#" title="关闭">
                 <span class="sr">关闭</span>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -574,46 +567,25 @@
               </a>
             </div>
             <div class="bd">
-              <div class="field">
-                <label>导出文件</label>
-                <a id="data-export-btn" class="btn ghost" href="#" title="下载数据">下载 workhub.json</a>
+              <div class="file-sync-panel">
+                <div class="field">
+                  <label>当前状态</label>
+                  <div id="local-file-sync-status" class="file-sync-status" data-tone="info">未绑定同步文件。</div>
+                </div>
+                <div class="field">
+                  <label>操作说明</label>
+                  <div class="file-sync-status" data-tone="info">绑定时会优先选择现有 JSON 文件，并以该外部文件为准；绑定后，所有待办、链接、分类等改动都会直接写回这个文件。</div>
+                </div>
+                <div class="file-sync-actions">
+                  <a id="local-file-bind-btn" class="btn ghost" href="#" title="选择同步文件">绑定本地文件</a>
+                  <a id="local-file-pull-btn" class="btn ghost" href="#" title="用本地文件覆盖浏览器数据">本地文件 -> 浏览器</a>
+                  <a id="local-file-sync-btn" class="btn" href="#" title="把当前浏览器数据写回本地文件">浏览器 -> 本地文件</a>
+                  <a id="local-file-unbind-btn" class="btn ghost" href="#" title="解绑当前同步文件">解绑文件</a>
+                </div>
               </div>
             </div>
             <div class="ft">
               <a class="btn ghost" href="#">关闭</a>
-            </div>
-          </div>
-        </section>
-
-        <section id="modal-data-import" class="modal" aria-label="导入弹窗">
-          <a class="overlay" href="#" aria-label="关闭"></a>
-          <div class="sheet" role="dialog" aria-modal="true">
-            <div class="hd">
-              <strong>导入（JSON）</strong>
-              <a class="iconbtn" href="#" title="关闭">
-                <span class="sr">关闭</span>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 7l10 10" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
-                  <path d="M17 7 7 17" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-            <div class="bd">
-              <div class="field">
-                <label for="imp">导入文件</label>
-                <input id="imp" type="file" accept="application/json" />
-              </div>
-              <div class="field">
-                <label for="import-strategy">导入策略</label>
-                <select id="import-strategy">
-                  <option value="overwrite">覆盖本地数据（推荐）</option>
-                  <option value="merge">合并（后续可做）</option>
-                </select>
-              </div>
-            </div>
-            <div class="ft">
-              <a class="btn ghost" href="#">取消</a>
-              <a id="data-import-apply-btn" class="btn" href="#" title="导入并应用">导入并应用</a>
             </div>
           </div>
         </section>
@@ -636,9 +608,9 @@
                 <div class="tabs" style="justify-content:space-between;align-items:center;">
                   <label style="margin:0;">常用搜索引擎（可多选）· 选择后点击“应用选择”</label>
                   <div class="tabs" style="gap:6px;">
-                    <button id="engine-select-all-btn" type="button" class="btn tight ghost" title="全部勾选">全选</button>
-                    <button id="engine-select-none-btn" type="button" class="btn tight ghost" title="取消勾选">清空</button>
-                    <button id="engine-open-custom-form" type="button" class="iconbtn sm addbtn" title="添加自定义引擎">
+                    <button id="engine-select-all-btn" type="button" class="btn tight ghost" title="全选搜索引擎">全选</button>
+                    <button id="engine-select-none-btn" type="button" class="btn tight ghost" title="清空已选搜索引擎">清空</button>
+                    <button id="engine-open-custom-form" type="button" class="iconbtn sm addbtn" title="展开自定义引擎表单">
                       <span class="sr">添加自定义引擎</span>
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M12 5v14" stroke="#14120d" stroke-width="1.8" stroke-linecap="round" />
@@ -670,7 +642,7 @@
             </div>
             <div class="ft">
               <a class="btn ghost" href="#">取消</a>
-              <a id="engine-add-btn" class="btn" href="#" title="应用默认引擎选择">应用选择</a>
+              <a id="engine-add-btn" class="btn" href="#" title="应用引擎选择">应用选择</a>
             </div>
           </div>
         </section>
@@ -742,7 +714,7 @@
             </div>
             <div class="ft">
               <a class="btn ghost" href="#">取消</a>
-              <a id="todo-save-btn" class="btn" href="#" title="保存待办">保存</a>
+              <a id="todo-save-btn" class="btn" href="#" title="保存待办内容">保存</a>
             </div>
           </div>
         </section>
@@ -800,7 +772,7 @@
                     <input id="he" type="date" />
                   </div>
                 </div>
-                <a id="holiday-add-btn" class="btn holiday-add-btn" href="#" title="添加假日">添加</a>
+                <a id="holiday-add-btn" class="btn holiday-add-btn" href="#" title="添加假日安排">添加</a>
               </div>
               <div class="field">
                 <label>已配置假日</label>

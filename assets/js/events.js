@@ -72,6 +72,7 @@ function bindEvents() {
       if (!catId) return;
 
       if (catId === state.db.activeCategoryId) return;
+      if (!requireBoundFile("切换分类")) return;
       state.db.activeCategoryId = catId;
       saveDb();
       renderAll();
@@ -176,16 +177,20 @@ function bindEvents() {
     els.categoryDeleteConfirmBtn.addEventListener("click", onCategoryDeleteConfirm);
   }
 
-  if (els.dataExportBtn) {
-    els.dataExportBtn.addEventListener("click", onDataExport);
+  if (els.localFileBindBtn) {
+    els.localFileBindBtn.addEventListener("click", onLocalFileBind);
   }
 
-  if (els.dataExportDirectBtn) {
-    els.dataExportDirectBtn.addEventListener("click", onDataExport);
+  if (els.localFilePullBtn) {
+    els.localFilePullBtn.addEventListener("click", onLocalFilePull);
   }
 
-  if (els.dataImportApplyBtn) {
-    els.dataImportApplyBtn.addEventListener("click", onDataImportApply);
+  if (els.localFileSyncBtn) {
+    els.localFileSyncBtn.addEventListener("click", onLocalFileSync);
+  }
+
+  if (els.localFileUnbindBtn) {
+    els.localFileUnbindBtn.addEventListener("click", onLocalFileUnbind);
   }
 
   if (els.planPanel) {
@@ -227,6 +232,7 @@ function bindEvents() {
 }
 
 function onModeChange() {
+  if (!requireBoundFile("切换模式")) return;
   const mode = els.modeManage && els.modeManage.checked ? "manage" : "browse";
   state.db.settings.ui.mode = mode;
   saveDb();
@@ -281,6 +287,7 @@ function onEngineTabsClick(event) {
   if (!tab || !els.engineTabs) return;
   const id = tab.getAttribute("data-engine-id");
   if (!id) return;
+  if (!requireBoundFile("切换搜索引擎")) return;
   state.db.settings.activeEngineId = id;
   saveDb();
   renderHeader();
@@ -293,6 +300,7 @@ function onEngineAdd(event) {
 
 function onEngineCustomAdd(event) {
   event.preventDefault();
+  if (!requireBoundFile("新增搜索引擎")) return;
   const name = safeString(els.engineNameInput && els.engineNameInput.value);
   const searchUrl = safeString(els.engineSearchInput && els.engineSearchInput.value);
   const homeUrl = safeString(els.engineHomeInput && els.engineHomeInput.value);
@@ -349,6 +357,7 @@ function onEnginePresetCheckChange() {
 
 function applyPresetEngineSelection() {
   if (!els.enginePresetList) return;
+  if (!requireBoundFile("保存搜索引擎配置")) return;
   const orderedNodes = Array.from(els.enginePresetList.querySelectorAll(".engine-preset-item[data-engine-preset-id]"));
   const orderedIds = orderedNodes.map((node) => safeString(node.getAttribute("data-engine-preset-id"))).filter(Boolean);
   const checkedIds = new Set(
@@ -428,6 +437,10 @@ function onEnginePresetDrop(event) {
 
 function onEnginePresetDragEnd(_event) {
   if (!els.enginePresetList) return;
+  if (!requireBoundFile("调整搜索引擎顺序")) {
+    fillEngineModal();
+    return;
+  }
   const dragging = els.enginePresetList.querySelector(".engine-preset-item.dragging");
   if (dragging) dragging.classList.remove("dragging");
   const orderedIds = Array.from(els.enginePresetList.querySelectorAll(".engine-preset-item[data-engine-preset-id]"))
@@ -440,6 +453,7 @@ function onEnginePresetDragEnd(_event) {
 
 function onLinkSave(event) {
   event.preventDefault();
+  if (!requireBoundFile("保存链接")) return;
   const title = safeString(els.linkTitleInput && els.linkTitleInput.value);
   const url = safeString(els.linkUrlInput && els.linkUrlInput.value);
   const note = safeString(els.linkNoteInput && els.linkNoteInput.value);
@@ -492,6 +506,7 @@ function onLinkSave(event) {
 
 function onLinkDeleteConfirm(event) {
   event.preventDefault();
+  if (!requireBoundFile("删除链接")) return;
   const id = state.ui.deletingLinkId;
   if (!id) {
     toast("提示", "未找到要删除的链接。", true);
@@ -515,6 +530,7 @@ function onLinkDeleteConfirm(event) {
 
 function onCategoryConfirm(event) {
   event.preventDefault();
+  if (!requireBoundFile("保存分类")) return;
   const name = safeString(els.categoryNameInput && els.categoryNameInput.value);
   const colorToken = safeString(els.categoryColorSelect && els.categoryColorSelect.value);
   const editingId = state.ui.editingCategoryId;
@@ -564,6 +580,7 @@ function onCategoryConfirm(event) {
 
 function onCategoryDeleteConfirm(event) {
   event.preventDefault();
+  if (!requireBoundFile("删除分类")) return;
   if (state.db.categories.length <= 1) {
     toast("提示", "至少保留一个分类。", true);
     return;
@@ -589,93 +606,46 @@ function onCategoryDeleteConfirm(event) {
   toast("已删除分类", `「${cat.name}」已移除，同时清理了 ${affected} 条关联链接。`);
 }
 
-async function onDataExport(event) {
-  if (event) event.preventDefault();
-  const json = JSON.stringify(state.db, null, 2);
-  const date = new Date();
-  const fileName = `workhub-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}.json`;
-
-  if (window.isSecureContext && typeof window.showSaveFilePicker === "function") {
-    try {
-      const fileHandle = await window.showSaveFilePicker({
-        suggestedName: fileName,
-        types: [
-          {
-            description: "JSON Files",
-            accept: { "application/json": [".json"] },
-          },
-        ],
-      });
-      const writable = await fileHandle.createWritable();
-      await writable.write(json);
-      await writable.close();
-      toast("已导出", `已保存 ${fileName}`);
-      return;
-    } catch (error) {
-      if (error && error.name === "AbortError") {
-        return;
-      }
-    }
-  }
-
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast("已导出", `下载 ${fileName}`);
+async function onLocalFileBind(event) {
+  event.preventDefault();
+  await bindLocalFileSync();
 }
 
-async function onDataImportApply(event) {
+async function onLocalFilePull(event) {
   event.preventDefault();
-  const strategy = safeString(els.importStrategy && els.importStrategy.value) || "overwrite";
-  if (strategy !== "overwrite") {
-    toast("提示", "首版仅支持覆盖导入。", true);
+  if (!state.ui.fileSync.handle) {
+    toast("未绑定文件", "请先绑定本地 JSON 文件。", true, {
+      label: "去绑定",
+      onClick: openDataSyncModal,
+    });
     return;
   }
+  await loadDbFromBoundFile({ interactive: true, showSuccess: true, closeAfterSuccess: true });
+}
 
-  const file = els.importInput && els.importInput.files && els.importInput.files[0];
-  if (!file) {
-    toast("导入失败", "请先选择 JSON 文件。", true);
+async function onLocalFileSync(event) {
+  event.preventDefault();
+  if (!state.ui.fileSync.handle) {
+    toast("未绑定文件", "请先绑定本地 JSON 文件。", true, {
+      label: "去绑定",
+      onClick: openDataSyncModal,
+    });
     return;
   }
+  await queueFileSync({ interactive: true, showSuccess: true });
+}
 
-  let text = "";
-  try {
-    text = await file.text();
-  } catch (_error) {
-    toast("导入失败", "读取文件失败。", true);
-    return;
-  }
-
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (_error) {
-    toast("导入失败", "JSON 解析失败。", true);
-    return;
-  }
-
-  const normalized = validateAndNormalize(parsed);
-  if (!normalized.categories.length) {
-    toast("导入失败", "数据结构不合法。", true);
-    return;
-  }
-
-  state.db = normalized;
-  saveDb();
-  renderAll();
+async function onLocalFileUnbind(event) {
+  event.preventDefault();
+  await disableLocalFileSync();
+  toast("已解绑", "同步文件已移除，后续改动需重新绑定文件后才能保存。", false);
   closeHashModal();
-  toast("导入成功", "已覆盖本地数据。", false);
 }
 
 function onPlanPanelClick(event) {
   const actionBtn = event.target.closest("[data-action^='cal-']");
   if (actionBtn) {
+    if (!requireBoundFile("切换日历日期")) return;
     const action = actionBtn.getAttribute("data-action");
     const current = parseYm(state.db.plan.calendarMonth) || new Date();
     if (action === "cal-prev") {
@@ -696,6 +666,7 @@ function onPlanPanelClick(event) {
 
   const viewBtn = event.target.closest("button[data-action='todo-view-week'], button[data-action='todo-view-month']");
   if (viewBtn) {
+    if (!requireBoundFile("切换待办视图")) return;
     const action = viewBtn.getAttribute("data-action");
     state.db.plan.todoView = action === "todo-view-month" ? "month" : "week";
     saveDb();
@@ -705,6 +676,7 @@ function onPlanPanelClick(event) {
 
   const sceneBtn = event.target.closest("button[data-action='todo-scene-filter']");
   if (sceneBtn) {
+    if (!requireBoundFile("筛选待办")) return;
     const scene = safeString(sceneBtn.getAttribute("data-scene"));
     state.db.plan.sceneFilter = state.db.plan.sceneFilter === scene ? "" : scene;
     saveDb();
@@ -716,6 +688,7 @@ function onPlanPanelClick(event) {
   if (!dayBtn) return;
   const date = safeString(dayBtn.getAttribute("data-date"));
   if (!parseYmd(date)) return;
+  if (!requireBoundFile("选择日期")) return;
   state.db.plan.selectedDate = date;
   state.db.plan.calendarMonth = date.slice(0, 7);
   saveDb();
@@ -724,6 +697,7 @@ function onPlanPanelClick(event) {
 
 function onTodoQuickSubmit(event) {
   event.preventDefault();
+  if (!requireBoundFile("新增待办")) return;
   const title = safeString(els.todoQuickTitle && els.todoQuickTitle.value);
   if (!title) {
     toast("提示", "请输入待办标题。", true);
@@ -763,6 +737,7 @@ function onTodoGroupsClick(event) {
   if (dateNode) {
     const date = safeString(dateNode.getAttribute("data-date"));
     if (!parseYmd(date)) return;
+    if (!requireBoundFile("选择待办日期")) return;
     state.db.plan.selectedDate = date;
     state.db.plan.calendarMonth = date.slice(0, 7);
     saveDb();
@@ -785,6 +760,10 @@ function onTodoGroupsClick(event) {
 function onTodoGroupsChange(event) {
   const cb = event.target.closest("input[data-action='toggle-todo'][data-todo-id]");
   if (!cb) return;
+  if (!requireBoundFile("更新待办状态")) {
+    cb.checked = !cb.checked;
+    return;
+  }
   const todoId = cb.getAttribute("data-todo-id");
   const todo = getTodoById(todoId);
   if (!todo) return;
@@ -814,6 +793,7 @@ function onTodoGroupsChange(event) {
 
 function onTodoSave(event) {
   event.preventDefault();
+  if (!requireBoundFile("保存待办")) return;
   const title = safeString(els.todoTitleInput && els.todoTitleInput.value);
   const date = parseYmd(safeString(els.todoDateInput && els.todoDateInput.value)) ? safeString(els.todoDateInput && els.todoDateInput.value) : "";
   const priority = ["high", "medium", "low"].includes(safeString(els.todoPrioritySelect && els.todoPrioritySelect.value))
@@ -856,6 +836,7 @@ function onTodoSave(event) {
 
 function onTodoDeleteConfirm(event) {
   event.preventDefault();
+  if (!requireBoundFile("删除待办")) return;
   const id = state.ui.deletingTodoId;
   if (!id) return;
   const idx = state.db.plan.todos.findIndex((item) => item.id === id);
@@ -875,6 +856,7 @@ function onTodoDeleteConfirm(event) {
 
 function onHolidayAdd(event) {
   event.preventDefault();
+  if (!requireBoundFile("新增假期")) return;
   const name = safeString(els.holidayNameInput && els.holidayNameInput.value);
   const startDate = safeString(els.holidayStartInput && els.holidayStartInput.value);
   const endDate = safeString(els.holidayEndInput && els.holidayEndInput.value);
@@ -906,6 +888,7 @@ function onHolidayAdd(event) {
 function onHolidayListClick(event) {
   const node = event.target.closest("[data-action='delete-holiday'][data-holiday-id]");
   if (!node) return;
+  if (!requireBoundFile("删除假期")) return;
   const holidayId = node.getAttribute("data-holiday-id");
   if (!holidayId) return;
   const idx = state.db.plan.holidays.findIndex((item) => item.id === holidayId);

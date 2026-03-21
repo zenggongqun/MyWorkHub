@@ -1,6 +1,10 @@
 "use strict";
 
-const STORAGE_KEY = "workhub.db";
+const FILE_SYNC_META_KEY = "workhub.fileSync.meta.v1";
+const FILE_SYNC_DB_NAME = "workhub.fileSync.db.v1";
+const FILE_SYNC_STORE_NAME = "handles";
+const FILE_SYNC_HANDLE_KEY = "primary";
+const FILE_SYNC_SUGGESTED_NAME = "workhub-data.json";
 const DB_VERSION = 2;
 const HOLIDAY_API_BASE = "https://timor.tech/api/holiday/year";
 const HOLIDAY_CACHE_PREFIX = "workhub.holidays.cache.v1.";
@@ -117,6 +121,17 @@ const state = {
     holidayAutoStatus: "idle", // idle | loading | ok | error | manual
     lastCompletedTodo: null,
     toastActionHandler: null,
+    fileSync: {
+      supported: false,
+      enabled: false,
+      fileName: "",
+      status: "idle",
+      message: "",
+      lastSyncedAt: 0,
+      handle: null,
+      snapshot: "",
+      writeChain: Promise.resolve(),
+    },
   },
 };
 
@@ -163,11 +178,12 @@ const els = {
   categoryDeleteConfirmBtn: document.getElementById("category-delete-confirm-btn"),
   dangerLinkName: document.getElementById("danger-link-name"),
   linkDeleteConfirmBtn: document.getElementById("link-delete-confirm-btn"),
-  dataExportBtn: document.getElementById("data-export-btn"),
-  dataExportDirectBtn: document.getElementById("data-export-direct-btn"),
-  importInput: document.getElementById("imp"),
-  importStrategy: document.getElementById("import-strategy"),
-  dataImportApplyBtn: document.getElementById("data-import-apply-btn"),
+  openDataSyncModal: document.getElementById("open-data-sync-modal"),
+  localFileSyncStatus: document.getElementById("local-file-sync-status"),
+  localFileBindBtn: document.getElementById("local-file-bind-btn"),
+  localFilePullBtn: document.getElementById("local-file-pull-btn"),
+  localFileSyncBtn: document.getElementById("local-file-sync-btn"),
+  localFileUnbindBtn: document.getElementById("local-file-unbind-btn"),
   weekendCountdown: document.getElementById("weekend-countdown"),
   holidayCountdown: document.getElementById("holiday-countdown"),
   calendarMonthTitle: document.getElementById("calendar-month-title"),
@@ -196,17 +212,20 @@ const els = {
   toast: document.querySelector(".toast"),
   toastBadge: document.querySelector(".toast .badge"),
   toastTitle: document.querySelector(".toast .msg strong"),
-  toastText: document.querySelector(".toast .msg span"),
+  toastText: document.querySelector(".toast .msg div span"),
   toastActionBtn: document.querySelector(".toast-action"),
 };
 
 
 function init() {
   state.db = loadDb();
-  saveDb();
+  hydrateFileSyncMeta();
+  clearLegacyDbCache();
+  state.ui.fileSync.snapshot = JSON.stringify(state.db);
   bindEvents();
   renderAll();
   ensureAutoHolidays();
+  restoreFileSyncHandle();
   syncColorPalette((els.categoryColorSelect && els.categoryColorSelect.value) || "sky");
   syncModalWithHash();
   window.addEventListener("hashchange", syncModalWithHash);
@@ -214,5 +233,6 @@ function init() {
     state.ui.pageLoaded = true;
     renderEngineIcons();
     hydrateLinkIcons();
+    renderDataSyncStatus();
   });
 }
