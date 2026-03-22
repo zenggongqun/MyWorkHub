@@ -221,7 +221,7 @@ function pickDailyMotto(date) {
   if (stored && (stored.lastDate !== todayKey || stored.quoteId !== selected.id)) {
     stored.lastDate = todayKey;
     stored.quoteId = selected.id;
-    saveDb({ showPrompt: false });
+    saveDb({ showPrompt: false, interactiveFileSync: false });
   }
   return selected;
 }
@@ -793,10 +793,14 @@ function queueFileSync(options) {
   return state.ui.fileSync.writeChain;
 }
 
-function scheduleAutoFileSync() {
+function scheduleAutoFileSync(options) {
+  const settings = options && typeof options === "object" ? options : {};
   const sync = state.ui.fileSync;
   if (!sync.supported || !sync.enabled || !sync.handle) return;
-  void queueFileSync({ interactive: false, showSuccess: false });
+  void queueFileSync({
+    interactive: settings.interactive !== false,
+    showSuccess: false,
+  });
 }
 
 async function bindLocalFileSync() {
@@ -937,7 +941,7 @@ function saveDb(options) {
     return false;
   }
   if (!settings.skipFileSync) {
-    scheduleAutoFileSync();
+    scheduleAutoFileSync({ interactive: settings.interactiveFileSync !== false });
   }
   return true;
 }

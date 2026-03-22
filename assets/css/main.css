@@ -944,6 +944,10 @@
         transform: translateY(-50%);
       }
 
+      .todo-item-actions.is-static {
+        display: none;
+      }
+
       .iconbtn.sm.todo-actbtn {
         width: 22px;
         height: 22px;
@@ -1012,6 +1016,13 @@
         transform: scale(1.08);
       }
 
+      .todo-cb-static {
+        width: 18px;
+        height: 18px;
+        align-self: center;
+        flex: 0 0 18px;
+      }
+
       .todo-completed {
         margin-top: 12px;
         border-top: 1px dashed color-mix(in oklab, var(--rule) 84%, transparent);
@@ -1028,6 +1039,56 @@
 
       .todo-completed summary::-webkit-details-marker {
         display: none;
+      }
+
+      .todo-completed-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+      }
+
+      .todo-archived {
+        margin-top: 10px;
+      }
+
+      .todo-archived .todo-item.archived-view {
+        padding-right: 14px;
+      }
+
+      .todo-archived-at {
+        color: color-mix(in oklab, var(--muted) 88%, var(--ink));
+        font-size: 10px;
+      }
+
+      .todo-archive-btn {
+        border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--rule));
+        border-radius: 999px;
+        background: color-mix(in oklab, white 84%, var(--panel));
+        color: color-mix(in oklab, var(--ink) 72%, var(--accent));
+        font: inherit;
+        font-size: 11px;
+        line-height: 1;
+        padding: 7px 12px;
+        cursor: pointer;
+        transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+      }
+
+      .todo-archive-btn:hover,
+      .todo-archive-btn:focus-visible {
+        background: color-mix(in oklab, var(--accent) 10%, white);
+        border-color: color-mix(in oklab, var(--accent) 34%, var(--rule));
+        color: color-mix(in oklab, var(--ink) 58%, var(--accent));
+      }
+
+      .todo-archive-btn:active {
+        transform: translateY(1px);
+      }
+
+      .todo-archive-btn.is-disabled,
+      .todo-archive-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none;
       }
 
       .todo-empty {

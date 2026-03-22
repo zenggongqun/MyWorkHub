@@ -636,7 +636,7 @@ async function ensureAutoHolidays() {
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
     state.db.plan.holidays = normalized;
     state.db.plan.workdays = [...new Set(workdays.map((item) => safeString(item)).filter((item) => Boolean(parseYmd(item))))].sort();
-    saveDb({ showPrompt: false });
+    saveDb({ showPrompt: false, interactiveFileSync: false });
     state.ui.holidayAutoStatus = normalized.length ? "ok" : "error";
     renderPlanPanel();
   } catch (_error) {
@@ -806,6 +806,7 @@ function renderTodos() {
 
   const allTodos = (state.db.plan.todos || [])
     .map((todo) => ({ ...todo, date: todoDateKey(todo) || "" }))
+    .filter((todo) => !todo.archived)
     .sort((a, b) => a.order - b.order);
 
   if (view === "month") {
@@ -818,8 +819,11 @@ function renderTodos() {
 
   const activeTodos = sortTodosByTimeline(allTodos.filter((todo) => !todo.done));
   const completedTodos = sortTodosByTimeline(allTodos.filter((todo) => todo.done)).reverse();
+  const archivedTodos = sortTodosByTimeline((state.db.plan.todos || [])
+    .filter((todo) => todo && todo.archived)
+    .map((todo) => ({ ...todo, date: todoDateKey(todo) || "" }))).reverse();
 
-  if (!activeTodos.length && !completedTodos.length) {
+  if (!activeTodos.length && !completedTodos.length && !archivedTodos.length) {
     els.todoGroups.innerHTML = '<div class="todo-empty">今天还没有行动项，先记下一件最想推进的小事。</div>';
     return;
   }
@@ -831,33 +835,41 @@ function renderTodos() {
     ? `
       <details class="todo-completed">
         <summary>已完成 ${completedTodos.length} 项</summary>
+        <div class="todo-completed-actions">
+          <button type="button" class="todo-archive-btn ${locked ? "is-disabled" : ""}" data-action="archive-completed-todos" title="${escAttr(locked ? "请先绑定同步文件后再归档已完成待办" : "归档全部已完成待办")}" ${locked ? 'disabled aria-disabled="true"' : ""}>归档全部</button>
+        </div>
         <div class="todo-list">${completedTodos.map((todo, index) => renderTodoItem(todo, index + activeTodos.length)).join("")}</div>
       </details>
     `
     : "";
+  const archivedHtml = archivedTodos.length
+    ? `
+      <details class="todo-completed todo-archived">
+        <summary>已归档 ${archivedTodos.length} 项</summary>
+        <div class="todo-list">${archivedTodos.map((todo, index) => renderTodoItem(todo, index + activeTodos.length + completedTodos.length, { readOnly: true, archivedView: true })).join("")}</div>
+      </details>
+    `
+    : "";
 
-  els.todoGroups.innerHTML = activeHtml + completedHtml;
+  els.todoGroups.innerHTML = activeHtml + completedHtml + archivedHtml;
 }
 
-function renderTodoItem(todo, index) {
+function renderTodoItem(todo, index, options) {
+  const settings = options && typeof options === "object" ? options : {};
   const locked = isPersistenceLocked();
+  const readOnly = !!settings.readOnly;
+  const archivedView = !!settings.archivedView;
   const delay = Math.min(index * 28, 180);
   const dateBadge = todo.date ? formatTodoDateBadge(todo.date) : { label: "稍后安排", tone: "later", title: "未指定日期" };
   const dateMeta = todo.date
-    ? `<button type="button" class="todo-date-link ${locked ? "is-disabled" : ""}" data-tone="${escAttr(dateBadge.tone)}" data-action="select-todo-date" data-date="${escAttr(todo.date)}" title="${escAttr(locked ? "请先绑定同步文件后再切换待办日期" : dateBadge.title)}" ${locked ? 'disabled aria-disabled="true"' : ""}>${escHtml(dateBadge.label)}</button>`
+    ? `<button type="button" class="todo-date-link ${locked || readOnly ? "is-disabled" : ""}" data-tone="${escAttr(dateBadge.tone)}" ${readOnly ? "" : `data-action="select-todo-date" data-date="${escAttr(todo.date)}"`} title="${escAttr(readOnly ? dateBadge.title : (locked ? "请先绑定同步文件后再切换待办日期" : dateBadge.title))}" ${locked || readOnly ? 'disabled aria-disabled="true"' : ""}>${escHtml(dateBadge.label)}</button>`
     : `<span class="todo-date-link" data-tone="${escAttr(dateBadge.tone)}">${escHtml(dateBadge.label)}</span>`;
-  return `
-    <article class="todo-item ${todo.done ? "done" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
-      <input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} ${locked ? 'disabled aria-disabled="true"' : ""} />
-      <div class="todo-main">
-        <div class="todo-title-row">
-          <div class="todo-t" title="${escAttr(todo.title)}">${escHtml(todo.title)}</div>
-        </div>
-        <div class="todo-meta">
-          <span class="todo-priority-chip" data-priority="${escAttr(todo.priority || "medium")}">${escHtml(priorityLabel(todo.priority))}</span>
-          ${dateMeta}
-        </div>
-      </div>
+  const archivedMeta = archivedView && todo.archivedAt
+    ? `<span class="todo-archived-at">归档于 ${escHtml(formatFileSyncTime(todo.archivedAt))}</span>`
+    : "";
+  const actionsHtml = readOnly
+    ? ""
+    : `
       <div class="todo-item-actions">
         <a class="iconbtn sm ghost todo-actbtn ${locked ? "is-disabled" : ""}" href="#modal-todo" title="${locked ? "请先绑定同步文件后再编辑待办" : "编辑待办"}" aria-label="编辑待办" data-action="edit-todo" data-todo-id="${escAttr(todo.id)}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>
           <span class="sr">编辑</span>
@@ -876,6 +888,21 @@ function renderTodoItem(todo, index) {
           </svg>
         </a>
       </div>
+    `;
+  return `
+    <article class="todo-item ${todo.done ? "done" : ""} ${archivedView ? "archived-view" : ""}" data-todo-id="${escAttr(todo.id)}" style="animation-delay:${delay}ms;">
+      ${readOnly ? '<span class="todo-cb todo-cb-static" aria-hidden="true"></span>' : `<input class="todo-cb" type="checkbox" data-action="toggle-todo" data-todo-id="${escAttr(todo.id)}" ${todo.done ? "checked" : ""} ${locked ? 'disabled aria-disabled="true"' : ""} />`}
+      <div class="todo-main">
+        <div class="todo-title-row">
+          <div class="todo-t" title="${escAttr(todo.title)}">${escHtml(todo.title)}</div>
+        </div>
+        <div class="todo-meta">
+          <span class="todo-priority-chip" data-priority="${escAttr(todo.priority || "medium")}">${escHtml(priorityLabel(todo.priority))}</span>
+          ${dateMeta}
+          ${archivedMeta}
+        </div>
+      </div>
+      ${actionsHtml}
     </article>
   `;
 }
