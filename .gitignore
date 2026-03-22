@@ -8,3 +8,6 @@ workhub-*.json
 # Optional local env files
 .env
 .env.*
+
+# Local runtime logs
+server.log
