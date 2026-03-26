@@ -255,8 +255,6 @@ function normalizeTodo(todo, index, now) {
   const priority = ["high", "medium", "low"].includes(safeString(todo.priority)) ? safeString(todo.priority) : "medium";
   const scene = ["work", "life", "study", "other"].includes(safeString(todo.scene)) ? safeString(todo.scene) : "other";
   const done = Boolean(todo.done);
-  const archived = done && Boolean(todo.archived);
-  const archivedAt = archived && Number.isFinite(Number(todo.archivedAt)) ? Number(todo.archivedAt) : 0;
   return {
     id: safeString(todo.id) || uid("todo"),
     title,
@@ -264,8 +262,6 @@ function normalizeTodo(todo, index, now) {
     priority,
     scene,
     done,
-    archived,
-    archivedAt,
     order,
     createdAt: Number.isFinite(Number(todo.createdAt)) ? Number(todo.createdAt) : now,
     updatedAt: Number.isFinite(Number(todo.updatedAt)) ? Number(todo.updatedAt) : now,

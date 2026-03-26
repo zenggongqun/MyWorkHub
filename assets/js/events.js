@@ -677,8 +677,6 @@ function onTodoQuickSubmit(event) {
     priority,
     scene: "work",
     done: false,
-    archived: false,
-    archivedAt: 0,
     order: nextOrder(state.db.plan.todos),
     createdAt: now,
     updatedAt: now,
@@ -693,26 +691,6 @@ function onTodoQuickSubmit(event) {
 }
 
 function onTodoGroupsClick(event) {
-  const archiveBtn = event.target.closest("[data-action='archive-completed-todos']");
-  if (archiveBtn) {
-    event.preventDefault();
-    const archivedCandidates = (state.db.plan.todos || []).filter((todo) => todo && todo.done && !todo.archived);
-    if (!archivedCandidates.length) {
-      toast("无需归档", "当前没有可归档的已完成待办。", true);
-      return;
-    }
-    const now = Date.now();
-    archivedCandidates.forEach((todo) => {
-      todo.archived = true;
-      todo.archivedAt = now;
-      todo.updatedAt = now;
-    });
-    saveDb();
-    renderPlanPanel();
-    toast("已归档", `已归档 ${archivedCandidates.length} 项已完成待办。`, false);
-    return;
-  }
-
   const dateNode = event.target.closest("[data-action='select-todo-date'][data-date]");
   if (dateNode) {
     const date = safeString(dateNode.getAttribute("data-date"));
@@ -744,10 +722,6 @@ function onTodoGroupsChange(event) {
   if (!todo) return;
   const previous = { ...todo };
   todo.done = Boolean(cb.checked);
-  if (!todo.done) {
-    todo.archived = false;
-    todo.archivedAt = 0;
-  }
   todo.updatedAt = Date.now();
   state.ui.lastCompletedTodo = todo.done ? previous : null;
   saveDb();
@@ -759,8 +733,6 @@ function onTodoGroupsChange(event) {
         const target = getTodoById(previous.id);
         if (!target) return;
         target.done = false;
-        target.archived = false;
-        target.archivedAt = 0;
         target.updatedAt = Date.now();
         saveDb();
         renderPlanPanel();
@@ -793,8 +765,6 @@ function onTodoSave(event) {
     editing.date = date;
     editing.priority = priority;
     editing.scene = scene;
-    editing.archived = editing.done ? Boolean(editing.archived) : false;
-    editing.archivedAt = editing.archived ? Number(editing.archivedAt) || now : 0;
     editing.updatedAt = now;
   } else {
     state.db.plan.todos.push({
@@ -804,8 +774,6 @@ function onTodoSave(event) {
       priority,
       scene,
       done: false,
-      archived: false,
-      archivedAt: 0,
       order: nextOrder(state.db.plan.todos),
       createdAt: now,
       updatedAt: now,
