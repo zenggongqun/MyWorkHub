@@ -60,7 +60,14 @@ function defaultDb() {
 }
 
 function loadDb() {
-  return validateAndNormalize(defaultDb());
+  const fallback = validateAndNormalize(defaultDb());
+  const raw = safeReadStorage(STORAGE_KEY);
+  if (!raw) return fallback;
+  try {
+    return validateAndNormalize(JSON.parse(raw));
+  } catch (_error) {
+    return fallback;
+  }
 }
 
 function validateAndNormalize(input) {

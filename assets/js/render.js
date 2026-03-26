@@ -34,7 +34,7 @@ function syncModalWithHash() {
     return;
   }
   if (window.location.hash === "#modal-data-sync") {
-    renderDataSyncStatus();
+    renderDataStatus();
   }
 }
 
@@ -244,53 +244,11 @@ function renderAll() {
   renderCategories();
   renderLinks();
   renderPlanPanel();
-  renderDataSyncStatus();
-}
-
-function renderDataSyncStatus() {
-  if (!els.localFileSyncStatus) return;
-  const sync = state.ui.fileSync;
-  let text = fileSyncIdleMessage();
-  let tone = "default";
-
-  if (!sync.supported) {
-    text = "当前环境不支持绑定本地文件，无法启用文件直写模式。";
-    tone = "error";
-  } else if (sync.status === "syncing") {
-    text = sync.message || "正在与本地文件同步...";
-    tone = "info";
-  } else if (sync.status === "permission") {
-    text = sync.message || "已绑定本地文件，需要重新授权后才能继续同步。";
-    tone = "info";
-  } else if (sync.status === "error") {
-    text = sync.message || "同步失败，请重新绑定本地文件。";
-    tone = "error";
-  } else if (sync.enabled && sync.fileName) {
-    text = sync.message || `已绑定 ${sync.fileName}，上次同步：${formatFileSyncTime(sync.lastSyncedAt)}`;
-    tone = "success";
-  }
-
-  els.localFileSyncStatus.dataset.tone = tone;
-  els.localFileSyncStatus.textContent = text;
-
-  if (els.localFileBindBtn) {
-    els.localFileBindBtn.disabled = !sync.supported || sync.status === "syncing";
-    els.localFileBindBtn.textContent = sync.enabled ? "重新绑定文件" : "绑定本地文件";
-  }
-  if (els.localFilePullBtn) {
-    els.localFilePullBtn.disabled = !sync.supported || !sync.handle || sync.status === "syncing";
-  }
-  if (els.localFileSyncBtn) {
-    els.localFileSyncBtn.disabled = !sync.supported || !sync.handle || sync.status === "syncing";
-    els.localFileSyncBtn.textContent = sync.status === "syncing" ? "同步中..." : "浏览器 -> 本地文件";
-  }
-  if (els.localFileUnbindBtn) {
-    els.localFileUnbindBtn.disabled = !sync.handle || sync.status === "syncing";
-  }
+  renderDataStatus();
 }
 
 function isPersistenceLocked() {
-  return !state.ui.fileSync.handle;
+  return false;
 }
 
 function setControlDisabled(node, disabled, disabledTitle) {
@@ -1159,10 +1117,6 @@ function onGridDragEnd(_event) {
 }
 
 function persistOrderFromContainer(container) {
-  if (!requireBoundFile("调整链接顺序")) {
-    renderAll();
-    return;
-  }
   const cards = Array.from(container.querySelectorAll(".linkcard[data-link-id]"));
   if (!cards.length) return;
   const now = Date.now();
@@ -1180,10 +1134,6 @@ function persistOrderFromContainer(container) {
 
 function persistAllModeLinkOrder() {
   if (!els.grid) return;
-  if (!requireBoundFile("调整链接顺序")) {
-    renderAll();
-    return;
-  }
   const groups = Array.from(els.grid.querySelectorAll(".all-group[data-category-id]"));
   if (!groups.length) return;
   const now = Date.now();
@@ -1271,10 +1221,6 @@ function onCategoryDragEnd(_event) {
   state.ui.draggingCategoryId = null;
   state.ui.categoryDragDirty = false;
   if (!dirty) return;
-  if (!requireBoundFile("调整分类顺序")) {
-    renderAll();
-    return;
-  }
 
   const ids = Array.from(els.cats.querySelectorAll(".cat[data-cat-id][draggable='true']"))
     .map((item) => safeString(item.getAttribute("data-cat-id")))

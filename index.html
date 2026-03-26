@@ -122,8 +122,8 @@
                           <path d="M5 12h14" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
                         </svg>
                       </a>
-                      <a id="open-data-sync-modal" class="toolbtn ghost" href="#modal-data-sync" title="同步文件">
-                        <span class="sr">同步文件</span>
+                      <a id="open-data-sync-modal" class="toolbtn ghost" href="#modal-data-sync" title="数据管理">
+                        <span class="sr">数据管理</span>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M7 8.5h10" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" />
                           <path d="M14.5 5 18 8.5 14.5 12" stroke="#0c1b1d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
@@ -553,11 +553,11 @@
           </div>
         </section>
 
-        <section id="modal-data-sync" class="modal" aria-label="同步弹窗">
+        <section id="modal-data-sync" class="modal" aria-label="数据管理弹窗">
           <a class="overlay" href="#" aria-label="关闭"></a>
           <div class="sheet" role="dialog" aria-modal="true">
             <div class="hd">
-              <strong>同步文件</strong>
+              <strong>数据管理</strong>
               <a class="iconbtn" href="#" title="关闭">
                 <span class="sr">关闭</span>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -570,17 +570,16 @@
               <div class="file-sync-panel">
                 <div class="field">
                   <label>当前状态</label>
-                  <div id="local-file-sync-status" class="file-sync-status" data-tone="info">未绑定同步文件。</div>
+                  <div id="data-status" class="file-sync-status" data-tone="info">当前数据默认保存在浏览器缓存中。</div>
                 </div>
                 <div class="field">
                   <label>操作说明</label>
-                  <div class="file-sync-status" data-tone="info">绑定时会优先选择现有 JSON 文件，并以该外部文件为准；绑定后，所有待办、链接、分类等改动都会直接写回这个文件。</div>
+                  <div class="file-sync-status" data-tone="info">导入会用所选 JSON 覆盖当前浏览器数据；导出会把当前全部数据下载为 JSON 文件，适合备份、迁移和手动恢复。</div>
                 </div>
                 <div class="file-sync-actions">
-                  <a id="local-file-bind-btn" class="btn ghost" href="#" title="选择同步文件">绑定本地文件</a>
-                  <a id="local-file-pull-btn" class="btn ghost" href="#" title="用本地文件覆盖浏览器数据">本地文件 -> 浏览器</a>
-                  <a id="local-file-sync-btn" class="btn" href="#" title="把当前浏览器数据写回本地文件">浏览器 -> 本地文件</a>
-                  <a id="local-file-unbind-btn" class="btn ghost" href="#" title="解绑当前同步文件">解绑文件</a>
+                  <a id="data-import-btn" class="btn ghost" href="#" title="从 JSON 导入数据">导入数据</a>
+                  <a id="data-export-btn" class="btn" href="#" title="导出当前数据为 JSON">导出数据</a>
+                  <input id="data-import-input" type="file" accept=".json,application/json" hidden />
                 </div>
               </div>
             </div>
